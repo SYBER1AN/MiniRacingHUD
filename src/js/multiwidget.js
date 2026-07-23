@@ -9,6 +9,7 @@
 var _multiWidgetSlots = [];
 var _multiWidgetActiveSlot = 0;
 var _savedFullBindings = null;   // deep clone конфига при включении MW
+var _savedCheckboxBindings = {}; // per-key save для OFF-режима
 var _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
 
 // --- Маппинг: shortcode → ключи биндов / hide-ключ / UDP-флаг ---
@@ -139,24 +140,30 @@ function getMwCheckbox(key) {
 // --- Null/restore binding helpers ---
 
 function saveAndNullBinding(key) {
-    if (currentConfig.multiWidgetMode && _savedFullBindings) {
-        // В MW режиме — _savedFullBindings уже содержит всё
-        nullBindingInConfig(key);
-    } else {
-        // В OFF-режиме — сохраняем в _savedCheckboxBindings при первом null
-        // (сделано прямо здесь)
-        nullBindingInConfig(key);
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys) return;
+    // Всегда сохраняем в _savedCheckboxBindings (на случай если _savedFullBindings нет/isNaN)
+    if (!_savedCheckboxBindings[key]) {
+        _savedCheckboxBindings[key] = {};
+        entry.bindKeys.forEach(function(k) {
+            _savedCheckboxBindings[key][k] = JSON.parse(JSON.stringify(currentConfig[k]));
+        });
     }
+    nullBindingInConfig(key);
 }
 
 function restoreBinding(key) {
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys) return;
+    var source = null;
     if (currentConfig.multiWidgetMode && _savedFullBindings) {
-        restoreBindingFromSource(key, _savedFullBindings);
-    } else {
-        // В OFF-режиме — берём из _savedCheckboxBindings
-        // Но пока не реализовано хранение per-checkbox
-        // Для OFF-режима пока оставляем старый hideXxx механизм
-        // TODO: implement _savedCheckboxBindings
+        source = _savedFullBindings;
+    } else if (_savedCheckboxBindings[key]) {
+        source = _savedCheckboxBindings[key];
+    }
+    if (source) {
+        restoreBindingFromSource(key, source);
+        delete _savedCheckboxBindings[key];
     }
 }
 
@@ -667,7 +674,30 @@ window.MultiWidget = {
     enableMultiWidget: enableMultiWidget,
     disableMultiWidget: disableMultiWidget,
     isVisible: isVisible,
-    syncPanelCheckboxes: syncPanelCheckboxes
+    syncPanelCheckboxes: syncPanelCheckboxes,
+    applyVisibilityOverlay: applyVisibilityOverlay,
+    applyVisibilityPreset: applyVisibilityPreset
 };
+
+function applyVisibilityOverlay(hideArray) {
+    // Совместимость: напрямую null'им бинды
+    if (hideArray === null) {
+        MW_ENTRIES.forEach(function(entry) { if (entry.bindKeys) restoreBindingFromSource(entry.key, _savedFullBindings || currentConfig); });
+        return;
+    }
+    hideArray.forEach(function(key) {
+        nullBindingInConfig(key);
+    });
+    applyConfig();
+}
+
+function applyVisibilityPreset(hideMap) {
+    if (!hideMap) return;
+    for (var key in hideMap) {
+        if (hideMap[key]) nullBindingInConfig(key);
+        else restoreBindingFromSource(key, _savedFullBindings || currentConfig);
+    }
+    applyConfig();
+}
 
 function applyConfig() { if (typeof window.applyConfig === 'function') window.applyConfig(); }
