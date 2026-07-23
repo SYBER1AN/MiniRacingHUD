@@ -1,0 +1,57 @@
+<ResourceDictionary x:Class="MiniRacingHUD.ColorEditorShared"
+                    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:res="clr-namespace:MiniRacingHUD.Properties"
+                    xmlns:local="clr-namespace:MiniRacingHUD"
+                    xmlns:loc="clr-namespace:MiniRacingHUD">
+
+    <local:HexToBrushConverter x:Key="HexToBrush"/>
+    <DataTemplate x:Key="ColorItemTemplate">
+        <Border x:Name="rowBorder" CornerRadius="4" Margin="0,0,0,4" Cursor="Hand"
+                Background="Transparent"
+                TextElement.Foreground="{StaticResource TextSecondaryBrush}">
+            <Grid Margin="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="70"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Rectangle Width="18" Height="18" RadiusX="3" RadiusY="3"
+                           Stroke="{StaticResource BorderBrush}" StrokeThickness="1"
+                           Fill="{Binding Hex, Converter={StaticResource HexToBrush}}"
+                           Margin="0,0,6,0"/>
+                 <TextBlock Grid.Column="1" Text="{Binding HexDisplay}"
+                            FontSize="11" FontFamily="Consolas"
+                            VerticalAlignment="Center" ToolTip="{loc:Loc Tooltip_HexCode}"/>
+                <TextBlock Grid.Column="2" Text="{Binding Label}" FontSize="11"
+                           VerticalAlignment="Center" Margin="6,0,0,0"/>
+            </Grid>
+        </Border>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                <Setter TargetName="rowBorder" Property="Background" Value="{StaticResource AccentBrush}"/>
+                <Setter TargetName="rowBorder" Property="TextElement.Foreground" Value="#0C1A1F"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsMouseOver, ElementName=rowBorder}" Value="True">
+                <Setter TargetName="rowBorder" Property="Background" Value="{StaticResource SurfaceHoverBrush}"/>
+                <Setter TargetName="rowBorder" Property="TextElement.Foreground" Value="{StaticResource TextPrimaryBrush}"/>
+            </DataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsSelected}" Value="True"/>
+                    <Condition Binding="{Binding IsMouseOver, ElementName=rowBorder}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <Setter TargetName="rowBorder" Property="Background" Value="{StaticResource AccentHoverBrush}"/>
+                <Setter TargetName="rowBorder" Property="TextElement.Foreground" Value="#0C1A1F"/>
+            </MultiDataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+
+    <DataTemplate x:Key="ColorGroupTemplate">
+        <local:BlockPanel Header="{Binding Header}" VerticalAlignment="Stretch">
+            <ItemsControl ItemsSource="{Binding Items}"
+                          ItemTemplate="{StaticResource ColorItemTemplate}"/>
+        </local:BlockPanel>
+    </DataTemplate>
+
+</ResourceDictionary>

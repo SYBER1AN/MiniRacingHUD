@@ -1,0 +1,77 @@
+# Mini Racing HUD v1.0.0.210
+
+Минималистичный HUD для стримов гоночных симуляторов.
+Minimalistic HUD for racing simulator streams.
+
+# Скачать последнюю версию: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
+# Download latest version: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
+
+## Системные требования / System Requirements
+
+- Windows 10/11
+- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- Edge WebView2 (обычно уже установлен / usually pre-installed)
+
+## Возможности / Features
+
+- Отображение руля, педалей, КПП, перегрузок (G-meter), графиков
+- Настройка через обычный браузер (минимальная версия с Gamepad API) или приложение
+- Оптимизация в приоритете: переиспользование объектов, минимум аллокаций
+- UDP-телеметрия: Dirt Rally 2.0, Automobilista 2, BeamNG.drive, Assetto Corsa Rally (постараюсь расширять список)
+- Автоматическое переключение игры по запущенному процессу
+- Возможность добавлять свои игры и создавать пресеты для них, но без телеметрии
+- Поддержка рулей, педалей, джойстиков и геймпадов (Gamepad API или DirectInput)
+- Поддержка тем, в том числе кастомных + встроенный редактор тем
+- Система пресетов и мультипресетов (несколько отдельных виджетов в одном пресете)
+- Русский и английский язык интерфейса
+- Русский, английский и китайский язык виджета ☝️☺️
+
+- Displays steering wheel, pedals, gearbox, G-meter, graphs
+- Customizable via browser (lite version with Gamepad API) or the app
+- Object pooling, minimal allocations — optimization was a priority
+- UDP telemetry: Dirt Rally 2.0, Automobilista 2, BeamNG.drive, Assetto Corsa Rally (more to come)
+- Auto-detect game by running process
+- Add your own games with custom presets (telemetry not available)
+- Supports wheels, pedals, joysticks and gamepads (Gamepad API or DirectInput)
+- Theme system with custom themes + built-in theme editor
+- Presets and multi-presets (multiple widget layouts in one preset)
+- Interface language: Russian, English
+- Widget language: Russian, English, Chinese ☝️☺️
+
+## Поддерживаемые игры / Supported Games
+
+- Dirt Rally 2.0            Port: 20777
+- Automobilista 2           Port: 5606
+- BeamNG.drive              Port: 4444
+- Assetto Corsa Rally       Shared Memory (нет порта / no port)
+
+## Быстрый старт / Quick Start
+
+1. Распакуйте архив, запустите `MiniRacingHUD.exe` и выберите игру
+2. Настройте оси/кнопки через интерфейс виджета и сохраните пресет
+3. Откройте `file:///путь_к_файлу/MiniRacingHUD.html` в источнике "Браузер" в OBS (в C#-режиме нажмите «Копировать URL» в приложении)
+4. Если нужно, измените порт для телеметрии
+
+p.s.: Если вы не видите панель настройки, увеличьте высоту окна и она появится ☝️😉
+
+1. Extract the archive, run `MiniRacingHUD.exe` and select your game
+2. Bind axes/buttons via the widget UI and save the preset
+3. Open `file:///path_to_file/MiniRacingHUD.html` as a Browser source in OBS (in C# mode click "Copy URL" in the app)
+4. Change telemetry port if needed
+
+p.s.: If you don't see the settings panel, increase the window height and it will appear ☝️😉
+
+### Настройка телеметрии DR2 / DR2 Telemetry Setup
+
+В `Документы\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`
+в блоке `motion_platform` добавить строку, если порт 20777 уже используется:
+<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+
+Open `Documents\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`,
+add this line inside the `motion_platform` block if port 20777 is already in use:
+<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+
+# Автор: SYBER1AN
+
+# https://t.me/SYBER1AN
+# https://live.vkvideo.ru/SYBER1AN

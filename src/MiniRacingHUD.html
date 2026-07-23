@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Roboto+Mono:wght@600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/all.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="icon" type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20512%20512%22%3E%3Cg%3E%3Cpath%20fill%3D%22%23AADB82%22%20d%3D%22M227.6%2C336.8L227.6%2C336.8c19.7%2C18.6%2C51.6%2C13.9%2C65.1-9.7l86.2-150.7l-145.5%2C94.8%20C210.7%2C286.1%2C207.8%2C318.2%2C227.6%2C336.8z%22%2F%3E%3Cpath%20fill%3D%22%23AADB82%22%20d%3D%22M506%2C303C504.3%2C165.8%2C393.2%2C56.1%2C256%2C56.1c0%2C0%2C0%2C0%2C0%2C0c0%2C0%2C0%2C0%2C0%2C0c0%2C0%2C0%2C0%2C0%2C0C117.9%2C56.1%2C6%2C168%2C6%2C306.1%20c0%2C22.1%2C2.9%2C43.6%2C8.3%2C64c13.4%2C50.7%2C59.6%2C85.8%2C112%2C85.8h259.4c52.8%2C0%2C99-35.6%2C112.3-86.7C503.5%2C348.1%2C506.3%2C325.9%2C506%2C303z%20M449.6%2C356.6c-7.5%2C29-33.8%2C49.3-63.9%2C49.3H126.3c-30%2C0-56.1-20-63.7-48.5c-4.4-16.6-6.6-33.9-6.6-51.2%20c0-53.4%2C20.8-103.6%2C58.6-141.4c37.8-37.8%2C88-58.6%2C141.4-58.6h0c53.1%2C0%2C103.1%2C20.4%2C140.7%2C57.6c37.6%2C37.1%2C58.6%2C86.8%2C59.3%2C139.9%20C456.2%2C321.6%2C454%2C339.4%2C449.6%2C356.6z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E">
+    <title>Mini Racing HUD</title>
+</head>
+
+<body tabindex="0">
+    <!-- Настройки -->
+    <div class="settings-container">
+        <div class="settings-panel" id="settingsPanel">
+            <div class="settings-header">
+                <h2 class="settings-title"><a href="#" class="settings-version-link">Mini Racing HUD v__VERSION__</a></h2>
+                <div class="select-group">
+                    <div class="language-group" id="interfaceLanguageGroup">
+                        <span class="axis-label" data-i18n="interface.language">Язык интерфейса:</span>
+                        <div class="custom-select" id="interfaceLanguageSelect" title="Язык интерфейса" data-i18n-attr="title" data-i18n-title="interface.language.tooltip">
+                            <div class="custom-select-trigger"></div>
+                            <div class="custom-options" id="interfaceLanguageOptions"></div>
+                        </div>
+                    </div>
+                    <div class="language-group">
+                        <span class="axis-label" data-i18n="widget.language">Язык виджета:</span>
+                        <div class="custom-select" id="languageSelect" data-i18n-attr="title" data-i18n-title="widget.language.tooltip">
+                            <div class="custom-select-trigger"></div>
+                            <div class="custom-options" id="languageOptions"></div>
+                        </div>
+                    </div>
+                    <div class="theme-group">
+                        <span class="axis-label" data-i18n="widget.theme">Тема виджета:</span>
+                        <div class="custom-select" id="themeSelect" title="Цветовая схема виджета" data-i18n-attr="title" data-i18n-title="widget.theme.tooltip">
+                            <div class="custom-select-trigger"></div>
+                            <div class="custom-options" id="themeOptions"></div>
+                        </div>
+                    </div>
+                    <div class="preset-group" id="presetGroup">
+                        <span class="axis-label" data-i18n="preset.label">Пресет:</span>
+                        <div class="custom-select" id="presetSelect" title="Наборы настроек" data-i18n-attr="title" data-i18n-title="preset.tooltip">
+                            <div class="custom-select-trigger"></div>
+                            <div class="custom-options" id="presetOptions"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="settings-body">
+                <!-- ЛЕВАЯ КОЛОНКА: Бинды осей и кнопок -->
+                <div class="settings-column">
+                    <div class="axis-assignment">
+                        <div class="axis-title" data-i18n="axis.section">Оси и кнопки</div>
+                        <!-- Руль -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.wheel">Руль:</span>
+                            <div class="axis-controls">
+                                <div class="axis-value" id="wheelAxisValue" data-mode="wheel" title="Ось руля" data-i18n-attr="title" data-i18n-title="tooltip.wheelAxis">-</div>
+                                <div class="custom-select" id="wheelRangeSelect" title="Диапазон оси" data-i18n-attr="title" data-i18n-title="tooltip.axisRange">
+                                    <div class="custom-select-trigger" data-i18n="range.full">Полный диапазон</div>
+                                    <div class="custom-options">
+                                        <div class="custom-option selected" data-value="full" data-i18n="range.full">Полный диапазон</div>
+                                        <div class="custom-option" data-value="negative" data-i18n="range.negative">Отрицательный диапазон</div>
+                                        <div class="custom-option" data-value="positive" data-i18n="range.positive">Положительный диапазон</div>
+                                    </div>
+                                </div>
+                                <button class="btn invert-btn" id="invertWheel" title="Инвертировать диапазон" data-i18n-attr="title" data-i18n-title="tooltip.invert">⇅</button>
+                                <button class="btn graph-toggle-btn" id="toggleWheelGraph" title="Показать график оси" data-i18n-attr="title" data-i18n-title="tooltip.showGraph">〰</button>
+                            </div>
+                        </div>
+                        <!-- Газ -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.throttle">Газ:</span>
+                            <div class="axis-controls">
+                                <div class="axis-value" id="throttleAxisValue" data-mode="throttle" title="Ось газа" data-i18n-attr="title" data-i18n-title="tooltip.throttleAxis">-
+                                </div>
+                                <div class="custom-select" id="throttleRangeSelect" title="Диапазон оси" data-i18n-attr="title" data-i18n-title="tooltip.axisRange">
+                                    <div class="custom-select-trigger" data-i18n="range.full">Полный диапазон</div>
+                                    <div class="custom-options">
+                                        <div class="custom-option selected" data-value="full" data-i18n="range.full">Полный диапазон</div>
+                                        <div class="custom-option" data-value="negative" data-i18n="range.negative">Отрицательный диапазон</div>
+                                        <div class="custom-option" data-value="positive" data-i18n="range.positive">Положительный диапазон</div>
+                                    </div>
+                                </div>
+                                <button class="btn invert-btn" id="invertThrottle" title="Инвертировать диапазон" data-i18n-attr="title" data-i18n-title="tooltip.invert">⇅</button>
+                                <button class="btn graph-toggle-btn" id="toggleThrottleGraph" title="Показать график оси" data-i18n-attr="title" data-i18n-title="tooltip.showGraph">〰</button>
+                            </div>
+                        </div>
+                        <!-- Тормоз -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.brake">Тормоз:</span>
+                            <div class="axis-controls">
+                                <div class="axis-value" id="brakeAxisValue" data-mode="brake" title="Ось тормоза" data-i18n-attr="title" data-i18n-title="tooltip.brakeAxis">-
+                                </div>
+                                <div class="custom-select" id="brakeRangeSelect" title="Диапазон оси" data-i18n-attr="title" data-i18n-title="tooltip.axisRange">
+                                    <div class="custom-select-trigger" data-i18n="range.full">Полный диапазон</div>
+                                    <div class="custom-options">
+                                        <div class="custom-option selected" data-value="full" data-i18n="range.full">Полный диапазон</div>
+                                        <div class="custom-option" data-value="negative" data-i18n="range.negative">Отрицательный диапазон</div>
+                                        <div class="custom-option" data-value="positive" data-i18n="range.positive">Положительный диапазон</div>
+                                    </div>
+                                </div>
+                                <button class="btn invert-btn" id="invertBrake" title="Инвертировать диапазон" data-i18n-attr="title" data-i18n-title="tooltip.invert">⇅</button>
+                                <button class="btn graph-toggle-btn" id="toggleBrakeGraph" title="Показать график оси" data-i18n-attr="title" data-i18n-title="tooltip.showGraph">〰</button>
+                            </div>
+                        </div>
+                        <!-- Сцепление -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.clutch">Сцепление:</span>
+                            <div class="axis-controls">
+                                <div class="axis-value" id="clutchAxisValue" data-mode="clutch" title="Ось сцепления" data-i18n-attr="title" data-i18n-title="tooltip.clutchAxis">-
+                                </div>
+                                <div class="custom-select" id="clutchRangeSelect" title="Диапазон оси" data-i18n-attr="title" data-i18n-title="tooltip.axisRange">
+                                    <div class="custom-select-trigger" data-i18n="range.full">Полный диапазон</div>
+                                    <div class="custom-options">
+                                        <div class="custom-option selected" data-value="full" data-i18n="range.full">Полный диапазон</div>
+                                        <div class="custom-option" data-value="negative" data-i18n="range.negative">Отрицательный диапазон</div>
+                                        <div class="custom-option" data-value="positive" data-i18n="range.positive">Положительный диапазон</div>
+                                    </div>
+                                </div>
+                                <button class="btn invert-btn" id="invertClutch" title="Инвертировать диапазон" data-i18n-attr="title" data-i18n-title="tooltip.invert">⇅</button>
+                                <button class="btn graph-toggle-btn" id="toggleClutchGraph" title="Показать график оси" data-i18n-attr="title" data-i18n-title="tooltip.showGraph">〰</button>
+                            </div>
+                        </div>
+                        <!-- Ручник (ось) -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.handbrake">Ручник:</span>
+                            <div class="axis-controls">
+                                <div class="axis-value" id="handbrakeAxisValue" data-mode="handbrake"
+                                    title="Ось ручника" data-i18n-attr="title" data-i18n-title="tooltip.handbrakeAxis">-</div>
+                                <div class="custom-select" id="handbrakeRangeSelect" title="Диапазон оси" data-i18n-attr="title" data-i18n-title="tooltip.axisRange">
+                                    <div class="custom-select-trigger" data-i18n="range.full">Полный диапазон</div>
+                                    <div class="custom-options">
+                                        <div class="custom-option selected" data-value="full" data-i18n="range.full">Полный диапазон</div>
+                                        <div class="custom-option" data-value="negative" data-i18n="range.negative">Отрицательный диапазон</div>
+                                        <div class="custom-option" data-value="positive" data-i18n="range.positive">Положительный диапазон</div>
+                                    </div>
+                                </div>
+                                <button class="btn invert-btn" id="invertHandbrake" title="Инвертировать диапазон" data-i18n-attr="title" data-i18n-title="tooltip.invert">⇅</button>
+                                <button class="btn graph-toggle-btn" id="toggleHandbrakeGraph" title="Показать график оси" data-i18n-attr="title" data-i18n-title="tooltip.showGraph">〰</button>
+                            </div>
+                        </div>
+                        <!-- Ручник (кнопки) -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.handbrakeBtn">Ручник (кн.):</span>
+                            <div class="axis-controls">
+                                <div class="handbrake-buttons-container" title="Кнопки ручника" data-i18n-attr="title" data-i18n-title="tooltip.handbrakeButtons">
+                                    <div class="btn handbrake-btn-slot" data-mode="handbrake-button-0">-</div>
+                                    <div class="btn handbrake-btn-slot" data-mode="handbrake-button-1">-</div>
+                                    <div class="btn handbrake-btn-slot" data-mode="handbrake-button-2">-</div>
+                                    <div class="btn handbrake-btn-slot" data-mode="handbrake-button-3">-</div>
+                                    <div class="btn handbrake-btn-slot" data-mode="handbrake-button-4">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- КПП -->
+                        <div class="axis-row">
+                            <span class="axis-label" data-i18n="axis.gearbox">КПП:</span>
+                            <div class="axis-controls">
+                                <div class="gear-buttons-container" title="Кнопки передач" data-i18n-attr="title" data-i18n-title="tooltip.gearButtons">
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-0" data-gear="1">1</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-1" data-gear="2">2</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-2" data-gear="3">3</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-3" data-gear="4">4</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-4" data-gear="5">5</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-5" data-gear="6">6</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-6" data-gear="7">7</div>
+                                    <div class="btn gear-btn-slot" data-mode="gear-button-7" data-gear="R">R</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- СРЕДНЯЯ КОЛОНКА: Масштаб, угол, авто -->
+                <div class="settings-column settings-column-mid">
+                    <!-- МАСШТАБ ВИДЖЕТА -->
+                    <div class="settings-section scale-set">
+                        <div class="setting-title" data-i18n="widget.scale">Масштаб виджета</div>
+                        <div class="steering-angle-row" title="Масштаб виджета" data-i18n-attr="title" data-i18n-title="widget.scale">
+                            <input type="range" class="steering-slider" id="scaleSlider" min="1.0" max="3.0" value="1.0"
+                                step="0.5" title="Масштаб виджета" data-i18n-attr="title" data-i18n-title="widget.scale">
+                            <input type="text" class="steering-input" id="scaleValue" value="100%" step="0.5"
+                                title="Масштаб виджета" data-i18n-attr="title" data-i18n-title="widget.scale">
+                        </div>
+                    </div>
+                    <!-- МАСШТАБ ИНДИКАТОРА КПП -->
+                    <div class="settings-section gear-scale-set">
+                        <div class="setting-title" data-i18n="gear.scale">Масштаб индикатора КПП</div>
+                        <div class="steering-angle-row" title="Масштаб индикатора КПП" data-i18n-attr="title" data-i18n-title="gear.scale">
+                            <input type="range" class="steering-slider" id="gearScaleSlider" min="1.0" max="2.0"
+                                value="1.0" step="0.25" title="Масштаб индикатора КПП" data-i18n-attr="title" data-i18n-title="gear.scale">
+                            <input type="text" class="steering-input" id="gearScaleValue" value="100%" step="0.5"
+                                title="Масштаб индикатора КПП" data-i18n-attr="title" data-i18n-title="gear.scale">
+                        </div>
+                    </div>
+                    <!-- ПРОЗРАЧНОСТЬ ФОНА -->
+                    <div class="settings-section gear-scale-set">
+                        <div class="setting-title" data-i18n="widget.opacity">Прозрачность фона виджета</div>
+                        <div class="steering-angle-row" title="Прозрачность фона виджета и графика" data-i18n-attr="title" data-i18n-title="widget.opacity">
+                            <input type="range" class="steering-slider" id="widgetBgOpacitySlider" min="0.0" max="1.0"
+                                value="0.75" step="0.05" title="Прозрачность фона виджета" data-i18n-attr="title" data-i18n-title="widget.opacity">
+                            <input type="text" class="steering-input" id="widgetBgOpacityValue" value="75%" step="0.5"
+                                title="Прозрачность фона виджета" data-i18n-attr="title" data-i18n-title="widget.opacity">
+                        </div>
+                    </div>
+                    <!-- УГОЛ ПОВОРОТА -->
+                    <div class="settings-section steering-set">
+                        <div class="setting-title" data-i18n="steering.angle">Угол поворота руля</div>
+                        <div class="steering-angle-row" title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">
+                            <input type="range" class="steering-slider" id="steeringSlider" min="180" max="2700"
+                                value="540" step="10" title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">
+                            <input type="text" class="steering-input" id="steeringAngle" value="540°" min="0" step="10"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">
+                        </div>
+                        <div class="steering-presets">
+                            <button class="btn preset-btn angle-preset" data-angle="360°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">360°</button>
+                            <button class="btn preset-btn angle-preset" data-angle="540°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">540°</button>
+                            <button class="btn preset-btn angle-preset" data-angle="720°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">720°</button>
+                            <button class="btn preset-btn angle-preset" data-angle="900°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">900°</button>
+                            <button class="btn preset-btn angle-preset" data-angle="1080°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">1080°</button>
+                            <button class="btn preset-btn angle-preset" data-angle="1800°"
+                                title="Угол поворота руля" data-i18n-attr="title" data-i18n-title="steering.angle">1800°</button>
+                        </div>
+                        <div class="car-selector-group">
+                            <span class="axis-label" data-i18n="car.select">Автомобиль:</span>
+                            <div class="custom-select car-select" id="carSelect" title="Выбор автомобиля" data-i18n-attr="title" data-i18n-title="car.tooltip">
+                                <div class="custom-select-trigger" data-i18n="car.placeholder">Выбрать...</div>
+                                <div class="custom-options" id="carOptions"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ПРАВАЯ КОЛОНКА: Прочие настройки -->
+                <div class="settings-column settings-column-right">
+                    <!-- ПЕРЕКЛЮЧАТЕЛИ ВИДЖЕТА -->
+                    <div class="settings-section">
+                        <div class="setting-title" data-i18n="settings.other">Прочие настройки</div>
+                        <div class="toggles-section">
+                            <!-- Базовые настройки -->
+                            <div class="other-settings">
+                                <div class="other-settings-col">
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleBg"
+                                            title="Показать/скрыть фон страницы" data-i18n-attr="title" data-i18n-title="tooltip.pageBg"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.pageBg">Фон страницы</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="togglePedalLabels"
+                                            title="Включить/выключить подписи" data-i18n-attr="title" data-i18n-title="tooltip.pedalLabels"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.pedalLabels">Подписи педалей</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleLayoutOrder"
+                                            title="Расположить руль/КПП справа от педалей" data-i18n-attr="title" data-i18n-title="tooltip.reverseOrder"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.reverseOrder">Обратный порядок</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGraphIndependent"
+                                            title="Графики отдельно" data-i18n-attr="title" data-i18n-title="tooltip.graphIndependent"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.graphIndependent">Графики отдельно</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGraphsOnly"
+                                            title="Показывать только графики, скрыть виджет" data-i18n-attr="title" data-i18n-title="tooltip.graphsOnly"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.graphsOnly">Только графики</span>
+                                    </div>
+                                </div>
+                                <div class="other-settings-col">
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleNoCornerRounding"
+                                            title="Отключить динамическое скругление по форме элементов" data-i18n-attr="title" data-i18n-title="tooltip.noRounding"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.noRounding">Не скруглять</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleHandbrakeRight"
+                                            title="Расположить ручник справа от педалей" data-i18n-attr="title" data-i18n-title="tooltip.handbrakeRight"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.handbrakeRight">Ручник справа</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGearIndependent"
+                                            title="Расположить КПП отдельно от руля" data-i18n-attr="title" data-i18n-title="tooltip.gearIndependent"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.gearIndependent">КПП отдельно</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGearSync"
+                                            title="Синхронизировать поворот КПП с рулём" data-i18n-attr="title" data-i18n-title="tooltip.rotateGear"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.rotateGear">Вращать КПП</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- UDP-телеметрия -->
+                            <div class="other-settings udp-section">
+                                <div class="other-settings-col">
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleUdpTelemetry"
+                                            title="Использовать UDP телеметрию" data-i18n-attr="title" data-i18n-title="tooltip.udpTelemetry"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpTelemetry">UDP-телеметрия</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="togglePedalsUdp"
+                                            title="Показывать педали через UDP" data-i18n-attr="title" data-i18n-title="tooltip.udpPedals"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpPedals">Педали</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGmeter"
+                                            title="Индикатор перегрузок" data-i18n-attr="title" data-i18n-title="tooltip.gmeter"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.gmeter">G-meter</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGmeterTrail"
+                                            title="Рисовать след движения шарика G-meter" data-i18n-attr="title" data-i18n-title="tooltip.gmeterTrail"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.gmeterTrail">Шлейф G-meter</span>
+                                    </div>
+                                </div>
+                                <div class="other-settings-col">
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleGearUdp"
+                                            title="Показывать КПП через UDP" data-i18n-attr="title" data-i18n-title="tooltip.udpGear"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpGear">КПП</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleWheelUdp"
+                                            title="Показывать руль через UDP" data-i18n-attr="title" data-i18n-title="tooltip.udpWheel"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpWheel">Руль</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleHandbrakeUdp"
+                                            title="Показывать ручник через UDP" data-i18n-attr="title" data-i18n-title="tooltip.udpHandbrake"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpHandbrake">Ручник</span>
+                                    </div>
+                                    <div class="widget-toggle-row">
+                                        <button class="widget-toggle" id="toggleUdpSmoothing"
+                                            title="Сглаживать анимацию (полезно для управления кнопками)" data-i18n-attr="title" data-i18n-title="tooltip.udpSmoothing"></button>
+                                        <span class="widget-toggle-label" data-i18n="toggle.udpSmoothing">Сглаживание UDP</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- МУЛЬТИВИДЖЕТ -->
+            <div class="settings-section mw-panel" id="mwPanel">
+                <div class="mw-panel-inner"></div>
+            </div>
+            <!-- КНОПКИ СОХРАНЕНИЯ (Внизу левой колонки) -->
+            <div class="btn-group">
+                <div class="settings-section device-info" id="deviceInfo"></div>
+                <div class="settings-section mw-panel mw-panel-toggle">
+                    <div class="mw-panel-inner">
+                        <div class="widget-toggle-row">
+                            <button id="mwToggle" class="widget-toggle" title="Мультивиджет" data-i18n-attr="title" data-i18n-title="multiwidget.tooltip"></button>
+                            <span class="widget-toggle-label" data-i18n="multiwidget.title">Мультивиджет</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group-inner">
+                    <button class="btn" id="resetConfig" data-i18n="button.reset">Сбросить</button>
+                    <button class="btn btn-primary" id="saveConfig" data-i18n="button.save">Сохранить</button>
+                </div>
+            </div>
+        </div>
+        <!-- MultiWidget вкладки -->
+        <div class="multi-widget-tabs" id="multiWidgetTabs" style="display:none">
+            <div class="settings-section mw-tabs-block">
+                <button class="mw-btn mw-minus" id="mwRemoveSlot">−</button>
+                <div class="mw-tabs" id="mwTabContainer"></div>
+                <button class="mw-btn mw-plus" id="mwAddSlot">+</button>
+            </div>
+        </div>
+    </div>
+    <!-- Справочное окно -->
+    <div class="hud-info collapsed" id="hudInfoBlock">
+        <div class="settings-header">
+            <h2 class="hud-info-title" data-i18n="help.title">Справка</h2>
+            <button class="help-btn" id="toggleHelpBtn" title="Справка" data-i18n-attr="title" data-i18n-title="help.title">?</button>
+        </div>
+
+        <div class="theme-btn" data-i18n-attr="title" data-i18n-title="theme.ui.light">
+            <svg class="theme-icon-sun" viewBox="0 0 24 24">
+                <path d="M23,11H18.92a6.924,6.924,0,0,0-.429-1.607l3.527-2.044a1,1,0,1,0-1-1.731l-3.53,2.047a7.062,7.062,0,0,0-1.149-1.15l2.046-3.531a1,1,0,0,0-1.731-1L14.607,5.509A6.9,6.9,0,0,0,13,5.08V1a1,1,0,0,0-2,0V5.08a6.9,6.9,0,0,0-1.607.429L7.349,1.982a1,1,0,0,0-1.731,1L7.664,6.515a7.062,7.062,0,0,0-1.149,1.15L2.985,5.618a1,1,0,1,0-1,1.731L5.509,9.393A6.924,6.924,0,0,0,5.08,11H1a1,1,0,0,0,0,2H5.08a6.924,6.924,0,0,0,.429,1.607L1.982,16.651a1,1,0,1,0,1,1.731l3.53-2.047a7.062,7.062,0,0,0,1.149,1.15L5.618,21.016a1,1,0,0,0,1.731,1l2.044-3.527A6.947,6.947,0,0,0,11,18.92V23a1,1,0,0,0,2,0V18.92a6.947,6.947,0,0,0,1.607-.429l2.044,3.527a1,1,0,0,0,1.731-1l-2.046-3.531a7.062,7.062,0,0,0,1.149-1.15l3.53,2.047a1,1,0,1,0,1-1.731l-3.527-2.044A6.924,6.924,0,0,0,18.92,13H23A1,1,0,0,0,23,11ZM12,17c-6.608-.21-6.606-9.791,0-10C18.608,7.21,18.606,16.791,12,17Z"/>
+            </svg>
+            <svg class="theme-icon-moon" viewBox="0 0 24 24" style="display:none">
+                <path d="M12.009,24A12.067,12.067,0,0,1,.075,10.725,12.121,12.121,0,0,1,10.1.152a13,13,0,0,1,5.03.206,2.5,2.5,0,0,1,1.8,1.8,2.47,2.47,0,0,1-.7,2.425c-4.559,4.168-4.165,10.645.807,14.412h0a2.5,2.5,0,0,1-.7,4.319A13.875,13.875,0,0,1,12.009,24Zm.074-22a10.776,10.776,0,0,0-1.675.127,10.1,10.1,0,0,0-8.344,8.8A9.928,9.928,0,0,0,4.581,18.7a10.473,10.473,0,0,0,11.093,2.734.5.5,0,0,0,.138-.856h0C9.883,16.1,9.417,8.087,14.865,3.124a.459.459,0,0,0,.127-.465.491.491,0,0,0-.356-.362A10.68,10.68,0,0,0,12.083,2ZM20.5,12a1,1,0,0,1-.97-.757l-.358-1.43L17.74,9.428a1,1,0,0,1,.035-1.94l1.4-.325.351-1.406a1,1,0,0,1,1.94,0l.355,1.418,1.418.355a1,1,0,0,1,0,1.94l-1.418.355-.355,1.418A1,1,0,0,1,20.5,12ZM16,14a1,1,0,0,0,2,0A1,1,0,0,0,16,14Zm6,4a1,1,0,0,0,2,0A1,1,0,0,0,22,18Z"/>
+            </svg>
+        </div>
+
+        <!-- Контейнер для скрываемого контента -->
+        <div class="hud-info-collapsible" data-old-id="helpContentWrapper">
+            <div class="hud-info-content">
+                <div class="info-section" id="helpAppMode">
+                    <h4 data-i18n-html="help.appMode.title">☝️ Настройка (с приложения)</h4>
+                    <p data-i18n-html="help.appMode.warning"><strong>• ВАЖНО!</strong> Для настройки виджета, окно с HTML должно иметь достаточную высоту, иначе включается упрощённый режим виджета. <strong>Все настройки сохраняются в виде пресетов. Вы можете создать несколько пресетов для каждой игры.</strong></p>
+                    <p data-i18n-html="help.appMode.step1"><strong>1.</strong> Кликните на пустой слот оси или кнопки</p>
+                    <p data-i18n-html="help.appMode.step2"><strong>2.</strong> Подвигайте ось или нажмите кнопку</p>
+                    <p data-i18n-html="help.appMode.step3"><strong>3.</strong> Если нужно, настройте диапазон оси и инверсию</p>
+                    <p data-i18n-html="help.appMode.step4"><strong>4.</strong> Не стесняйтесь потыкать другие кнопочки 😉</p>
+                    <p data-i18n-html="help.appMode.step5"><strong>5.</strong> Нажмите «Сохранить» и настроенный пресет сохранится в папку <code>presets</code> в папке программы</p>
+                    <p data-i18n-html="help.appMode.step6"><strong>6. Для работы UDP-телеметрии</strong> оставьте приложение включённым</p>
+                </div>
+                <div class="info-section" id="helpStandaloneMode" style="display:none">
+                    <h4 data-i18n-html="help.standalone.title">☝️ Настройка (браузерный вариант)</h4>
+                    <p data-i18n-html="help.standalone.warning"><strong>• ВАЖНО!</strong> Для настройки виджета, окно с HTML должно иметь достаточную высоту, иначе включается упрощённый режим виджета. После настройки и сохранения изменений <strong>основной HTML-файл и файл конфигурации <code>NoApp.js</code> должны лежать в одной папке!</strong></p>
+                    <p data-i18n-html="help.standalone.step1"><strong>1.</strong> Кликните на пустой слот оси или кнопки</p>
+                    <p data-i18n-html="help.standalone.step2"><strong>2.</strong> Подвигайте ось или нажмите кнопку</p>
+                    <p data-i18n-html="help.standalone.step3"><strong>3.</strong> Если нужно, настройте диапазон оси и инверсию</p>
+                    <p data-i18n-html="help.standalone.step4"><strong>4.</strong> Не стесняйтесь потыкать другие кнопочки 😉</p>
+                    <p data-i18n-html="help.standalone.step5"><strong>5.</strong> Нажмите «Сохранить» и настроенный файл скачается в «Загрузки». <strong>Скорее всего, сработает защита браузера 🥴</strong>, не пугайтесь, она среагирует так же на скачивание любого другого JS-файла</p>
+                    <p data-i18n-html="help.standalone.step6"><strong>6.</strong> Поместите загруженный файл в папку с основным HTML-файлом</p>
+                    <p data-i18n-html="help.standalone.step7"><strong>7. Пресеты и телеметрия игры</strong> доступны только при использовании приложения!</p>
+                </div>
+                <div class="info-section">
+                    <h4 data-i18n-html="help.obs.title">☝️ Использование в OBS</h4>
+                    <p data-i18n-html="help.obs.source"><strong>Источник:</strong> Браузер</p>
+                    <p data-i18n-html="help.obs.url"><strong>URL:</strong> <code id="pageUrl" class="copyable-text" title="Копировать URL"></code></p>
+                    <p data-i18n-html="help.obs.resolution"><strong>Минимальное разрешение:</strong> <code id="widgetSize" title="Копировать размер"></code></p>
+                </div>
+                <div class="info-section">
+                    <h4 data-i18n-html="help.urlParams.title">☝️ Параметры в адресной строке</h4>
+                    <p data-i18n-html="help.urlParams.preset"><strong>•</strong> Параметр <code>?preset=X</code> загружает пресет <code>presets/X.js</code></p>
+                    <p data-i18n-html="help.urlParams.config"><strong>•</strong> Параметр <code>?config=X.js</code> загружает произвольный JS-конфиг из корня</p>
+                    <p data-i18n-html="help.urlParams.steering"><strong>•</strong> Параметр <code>?steering=X</code> устанавливает угол поворота руля на X градусов</p>
+                    <p data-i18n-html="help.urlParams.scale"><strong>•</strong> Параметр <code>?scale=X</code> устанавливает масштаб виджета в процентах (100–300)</p>
+                    <p data-i18n-html="help.urlParams.nogears"><strong>•</strong> Параметр <code>?nogears</code> полностью отключает индикатор передач</p>
+                    <p data-i18n-html="help.urlParams.mw"><strong>•</strong> Параметр <code>?mw=N</code> выбирает слот мультивиджета (1-6)</p>
+                    <p data-i18n-html="help.urlParams.combine"><strong>•</strong> <strong>Возможно использовать параметры вместе</strong> через <strong>&</strong>, например: <code class="example-url" title="Это просто пример URL">...HUD.html?preset=DR2&steering=420</code></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Окно захвата -->
+    <div class="modal-overlay" id="captureOverlay">
+        <div class="modal-content">
+            <div class="modal-title" id="captureTitle">Ось руля</div>
+            <div class="modal-text" id="captureText">Покрутите руль...</div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary modal-cancel-btn" id="cancelCapture">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <!-- Несохранённые изменения -->
+    <div class="modal-overlay notification-modal" id="notificationUnsaved">
+        <div class="modal-content">
+            <div class="modal-title">Несохранённые изменения!</div>
+            <div class="modal-text">Сохранить изменения перед сменой пресета?</div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="unsavedOkBtn">Да</button>
+                <button class="btn btn-primary modal-cancel-btn" id="unsavedCancelBtn">Нет</button>
+            </div>
+        </div>
+    </div>
+    <!-- Новый пресет -->
+    <div class="modal-overlay notification-modal" id="notificationNewPreset">
+        <div class="modal-content">
+            <div class="modal-title">Новый пресет</div>
+            <div class="modal-text">
+                <input type="text" id="newPresetName" class="preset-name-input" data-i18n-placeholder="modal.presetPlaceholder" placeholder="Введите название..."
+                    autofocus data-i18n-attr="title" data-i18n-title="modal.presetName" title="Название пресета">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="newPresetOkBtn">Сохранить</button>
+                <button class="btn btn-primary modal-cancel-btn" id="newPresetCancelBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <!-- Пустой конфиг -->
+    <div class="modal-overlay notification-modal" id="notificationEmptyConfig">
+        <div class="modal-content">
+            <div class="modal-title">А чего сохранять-то? 🤔</div>
+            <div class="modal-text">Для начала настройте что-нибудь!</div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="emptyConfigOkBtn">OK</button>
+            </div>
+        </div>
+    </div>
+    <!-- Удаление пресета -->
+    <div class="modal-overlay notification-modal" id="notificationDeletePreset">
+        <div class="modal-content">
+            <div class="modal-title" id="deletePresetTitle">Удалить пресет?!</div>
+            <div class="modal-text" id="deletePresetMessage"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" id="deletePresetOkBtn">Удалить</button>
+                <button class="btn btn-primary modal-cancel-btn" id="deletePresetCancelBtn">Отмена</button>
+            </div>
+        </div>
+    </div>
+    <!-- Status Message (авто-скрытие) -->
+    <div id="notificationStatus">
+        <div id="statusMessageText"></div>
+    </div>
+    <!-- Общий контейнер виджета и графика -->
+    <div class="main-wrapper">
+        <!-- HUD Виджет -->
+        <div class="hud-container-wrapper">
+            <div class="hud-container">
+                <!-- Индикатор передачи (отдельный) -->
+                <div class="gear-display-independent hidden-gear-independent" id="gearDisplayIndependent">N</div>
+                <!-- Руль -->
+                <div class="wheel-assembly roundable">
+                    <div class="wheel" id="wheel">
+                        <div class="wheel-rim">
+                            <div class="mark"></div>
+                        </div>
+                        <div class="spoke-hor"></div>
+                        <div class="spoke-ver"></div>
+                    </div>
+                    <!-- Индикатор передачи -->
+                    <div class="gear-display" id="gearDisplay">N</div>
+                </div>
+                <!-- G-meter -->
+                <div class="gmeter-display roundable hidden-independent" id="gmeterDisplay">
+                    <canvas class="gmeter-trail" id="gmeterTrail"></canvas>
+                    <div class="gmeter-ring gmeter-ring-40"></div>
+                    <div class="gmeter-ring gmeter-ring-80"></div>
+                    <div class="gmeter-ball" id="gmeterBall"></div>
+                </div>
+                <!-- Педали -->
+                <div class="pedals-row" id="pedals-row">
+                    <div class="pedal-container" id="handbrake">
+                        <div class="clip-container">
+                            <div class="pedal-bg"></div>
+                            <div class="fill" id="fill-handbrake"></div>
+                        </div>
+                        <div class="label">HANDBRAKE</div>
+                    </div>
+                    <div class="pedal-container" id="clutch">
+                        <div class="clip-container">
+                            <div class="pedal-bg"></div>
+                            <div class="fill" id="fill-clutch"></div>
+                        </div>
+                        <div class="label">CLUTCH</div>
+                    </div>
+                    <div class="pedal-container" id="brake">
+                        <div class="clip-container">
+                            <div class="pedal-bg"></div>
+                            <div class="fill" id="fill-brake"></div>
+                        </div>
+                        <div class="label">BRAKE</div>
+                    </div>
+                    <div class="pedal-container" id="throttle">
+                        <div class="clip-container">
+                            <div class="pedal-bg"></div>
+                            <div class="fill" id="fill-throttle"></div>
+                        </div>
+                        <div class="label">THROTTLE</div>
+                    </div>
+                </div>
+                <!-- Графики -->
+                <canvas id="graphBlock"></canvas>
+            </div>
+        </div>
+        <!-- Отдельный график -->
+        <div class="graph-container" id="graphContainer">
+            <canvas id="graphBlockIndependent"></canvas>
+        </div>
+    </div>
+
+    <!-- JS модули -->
+    <script src="js/locales.js"></script>
+    <script src="js/constants.js"></script>
+    <script src="js/cars.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/multiwidget.js"></script>
+    <script src="js/core.js"></script>
+</body>
+
+</html>

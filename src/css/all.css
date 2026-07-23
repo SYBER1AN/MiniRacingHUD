@@ -1,0 +1,2117 @@
+        :root {
+            /* Базовые размеры (при scale=1) */
+            --scale-factor: 1;
+            --widget-height-base: 120px;
+            --widget-radius-base: 12px;
+            --widget-font-size-base: 12px;
+            --widget-padding-base: 10px;
+            --widget-gap-base: 14px;
+            --graph-width-base: 180px;
+            --graph-width-independent-base: 240px;
+            --wheel-size-base: 100px;
+            --wheel-thickness-base: 10px;
+            --spoke-thickness-base: 8px;
+            --marker-width-base: 8px;
+            --pedal-radius-base: 6px;
+            --pedal-width-base: 25px;
+            --pedal-width-compact-base: 19px;
+            --pedal-height-base: 100px;
+            --pedal-gap-base: 8px;
+            --gear-font-size-base: 24px;
+            --gear-display-size-base: 30px;
+            --gear-scale-factor: 1;
+            --gmeter-ball-size: 20%;
+            --glow-blur-base: 6px;
+            /* Переключение ширины педалей при скрытых подписях */
+            /* Класс .pedals-no-labels на <html> переопределяет --pedal-width-base */
+            /* Масштабируемые размеры через calc() */
+            --widget-height: calc(var(--widget-height-base) * var(--scale-factor));
+            --widget-radius: calc(var(--widget-radius-base) * var(--scale-factor));
+            --widget-font-size: calc(var(--widget-font-size-base) * var(--scale-factor));
+            --widget-padding: calc(var(--widget-padding-base) * var(--scale-factor));
+            --graph-width-independent: calc(var(--graph-width-independent-base) * var(--scale-factor));
+            --wheel-size: calc(var(--wheel-size-base) * var(--scale-factor));
+            --wheel-thickness: calc(var(--wheel-thickness-base) * var(--scale-factor));
+            --spoke-thickness: calc(var(--spoke-thickness-base) * var(--scale-factor));
+            --marker-width: calc(var(--marker-width-base) * var(--scale-factor));
+            --pedal-radius: calc(var(--pedal-radius-base) * var(--scale-factor));
+            --pedal-width: calc(var(--pedal-width-base) * var(--scale-factor));
+            --pedal-height: calc(var(--pedal-height-base) * var(--scale-factor));
+            --widget-gap: calc(var(--widget-gap-base) * var(--scale-factor));
+            --gear-font-size: calc(var(--gear-font-size-base) * var(--scale-factor) * var(--gear-scale-factor));
+            --gear-display-size: calc(var(--gear-display-size-base) * var(--scale-factor) * var(--gear-scale-factor));
+            --gap-xs: 6px;
+            --gap-sm: 8px;
+            --gap-md: 14px;
+            --gap-lg: 18px;
+            /* Анимация */
+            --anim-duration: 0.3s;
+            --anim-timing: cubic-bezier(0.25, 0.8, 0.25, 1);
+            --anim: var(--anim-duration) var(--anim-timing);
+            --anim-ui: background var(--anim), color var(--anim), opacity var(--anim);
+
+            /* Плавное скрытие текста передачи (КПП) */
+            --gear-transition: var(--anim);
+            /* Базовые цвета и стили */
+            --gear-font-family: 'Roboto Mono', monospace;
+            --page-bg: #1a1a1a;
+            --panel-bg: #363636;
+            --section-bg: #484848;
+            --element-bg: #191919;
+            --accent: #5bb436;
+            --bind-cont: #5bb436;
+            --danger-bg: #ab2626;
+            --danger-cont: #e0e0e0;
+            --panel-cont: #e0e0e0;
+            --element-cont: #bbbbbb;
+            --help-bg: #242424;
+            --help-cont: #bbbbbb;
+            --help-heading: #e0e0e0;
+            --disabled-bg: #242424;
+            --disabled-cont: #595959;
+            --border: #797979;
+            --last-active: #797979;
+            --scrollbar-track: #191919;
+            --toggle-off: #5aac37;
+            --toggle-on: #363636;
+            --code-bg: #191919;
+            --code-cont: #5bb436;
+        }
+
+        :root[data-theme-ui="dark"] {
+            --page-bg: #1a1a1a;
+            --panel-bg: #363636;
+            --section-bg: #484848;
+            --element-bg: #191919;
+            --accent: #5bb436;
+            --bind-cont: #5bb436;
+            --danger-bg: #ab2626;
+            --danger-cont: #e0e0e0;
+            --panel-cont: #e0e0e0;
+            --element-cont: #bbbbbb;
+            --help-bg: #242424;
+            --help-cont: #bbbbbb;
+            --help-heading: #e0e0e0;
+            --disabled-bg: #242424;
+            --disabled-cont: #595959;
+            --border: #797979;
+            --last-active: #797979;
+            --scrollbar-track: #191919;
+            --toggle-off: #5aac37;
+            --toggle-on: #363636;
+            --code-bg: #191919;
+            --code-cont: #5bb436;
+        }
+
+        :root[data-theme-ui="light"] {
+            --page-bg: #777777;
+            --panel-bg: #c8c8c8;
+            --section-bg: #dbdbdb;
+            --element-bg: #2b2b2b;
+            --accent: #59c27a;
+            --bind-cont: #64df8a;
+            --danger-bg: #f45332;
+            --danger-cont: #ffffff;
+            --panel-cont: #000000;
+            --element-cont: #ffffff;
+            --help-bg: #d7d7d7;
+            --help-cont: #000000;
+            --help-heading: #2b2b2b;
+            --disabled-bg: #c3c3c3;
+            --disabled-cont: #686868;
+            --border: #686868;
+            --last-active: #777777;
+            --scrollbar-track: #2b2b2b;
+            --toggle-off: #59c27a;
+            --toggle-on: #2b2b2b;
+            --code-bg: #2b2b2b;
+            --code-cont: #64df8a;
+        }
+
+
+
+        /* === 1.1. ПЕРЕКЛЮЧЕНИЕ ШИРИНЫ ПЕДАЛЕЙ === */
+        /* При скрытых подписях используем уменьшенную ширину */
+        :root.pedals-no-labels {
+            --pedal-width-base: var(--pedal-width-compact-base);
+            --pedal-gap-base: 10px;
+        }
+
+        /* === 2. БАЗОВЫЕ СТИЛИ И СБРОС === */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--page-bg);
+            background-image:
+                url(bg.png),
+                repeating-linear-gradient(
+                    0deg, transparent, transparent 39px,
+                    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+                ),
+                repeating-linear-gradient(
+                    90deg, transparent, transparent 39px,
+                    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+                );
+            background-size: cover, auto, auto, auto;
+            background-position: 50% 50%, 0 0, 0 0, 50% 50%;
+            background-repeat: no-repeat, repeat, repeat, no-repeat;
+            margin: 0;
+            padding: 0;
+            padding-right: 54px;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            font-family: 'Noto Sans', 'Segoe UI', sans-serif;
+            color: var(--panel-cont);
+        }
+
+        /* === 3. УТИЛИТЫ И КОМПОНЕНТЫ UI === */
+        /* Кнопки - базовый стиль */
+        .btn {
+            padding: 3px 8px;
+            border: 0;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            background: var(--element-bg);
+            color: var(--element-cont);
+            transition: var(--anim-ui);
+        }
+
+        .btn.drag-active,
+        .invert-btn.drag-active,
+        .graph-toggle-btn.drag-active {
+            background: color-mix(in oklab, var(--element-bg), black 10%) !important;
+        }
+        .btn-primary.drag-active,
+        .invert-btn.active.drag-active,
+        .graph-toggle-btn.active.drag-active {
+            background: color-mix(in oklab, var(--accent), black 10%) !important;
+        }
+
+        /* Вариации кнопок */
+        .btn-primary {
+            background: var(--accent);
+            color: var(--panel-cont);
+            font-weight: bold;
+        }
+
+        .preset-btn.active {
+            background: var(--accent);
+            color: var(--panel-cont);
+            font-weight: bold;
+        }
+
+        /* === HOVER/ACTIVE — color-mix === */
+        .btn:hover, .custom-select-trigger:hover,
+        .axis-value:hover, .handbrake-btn-slot:hover, .gear-btn-slot:hover,
+        .widget-toggle:hover, .mw-tab:hover, .invert-btn:hover,
+        .graph-toggle-btn:hover,
+        .mw-cb:hover input[type="checkbox"], .mw-cb input[type="checkbox"]:hover {
+            background: color-mix(in oklab, var(--element-bg), white 10%);
+        }
+        .btn:hover:active, .custom-select-trigger:hover:active,
+        .axis-value:hover:active, .handbrake-btn-slot:hover:active, .gear-btn-slot:hover:active,
+        .widget-toggle:hover:active, .mw-tab:hover:active, .invert-btn:hover:active,
+        .graph-toggle-btn:hover:active,
+        .mw-cb input[type="checkbox"]:hover:active,
+        .mw-cb:hover input[type="checkbox"]:active {
+            background: color-mix(in oklab, var(--element-bg), black 10%);
+        }
+
+        .btn-primary:hover, .preset-btn.active:hover,
+        .invert-btn.active:hover, .gear-btn-slot.assigned:hover,
+        .widget-toggle.active:hover, .mw-tab.active:hover,
+        .help-btn:hover, .custom-option.selected:hover,
+        .steering-slider::-webkit-slider-thumb:hover,
+        .mw-cb input[type="checkbox"]:checked:hover {
+            background: color-mix(in oklab, var(--accent), white 10%);
+        }
+        .btn-primary:hover:active, .preset-btn.active:hover:active,
+        .invert-btn.active:hover:active, .gear-btn-slot.assigned:hover:active,
+        .widget-toggle.active:hover:active, .mw-tab.active:hover:active,
+        .custom-option.selected:hover:active, .help-btn:hover:active,
+        .steering-slider::-webkit-slider-thumb:hover:active,
+        .mw-cb input[type="checkbox"]:checked:hover:active {
+            background: color-mix(in oklab, var(--accent), black 10%);
+        }
+
+        .theme-btn {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hud-info.collapsed .theme-btn {
+            display: flex;
+        }
+
+        .theme-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--accent);
+            transition: fill var(--anim);
+            cursor: pointer;
+        }
+
+        .theme-btn:hover svg {
+            fill: color-mix(in oklab, var(--accent), white 10%);
+        }
+
+        .theme-btn:hover:active svg {
+            fill: color-mix(in oklab, var(--accent), black 10%);
+        }
+
+        .settings-column::-webkit-scrollbar-thumb:hover,
+        .hud-info-content::-webkit-scrollbar-thumb:hover,
+        .settings-column::-webkit-scrollbar-button:hover,
+        .hud-info-content::-webkit-scrollbar-button:hover {
+            background: color-mix(in oklab, var(--accent), white 10%);
+        }
+
+        .mw-btn:hover {
+            background: color-mix(in oklab, var(--section-bg), white 10%);
+        }
+        .mw-btn:hover:active {
+            background: color-mix(in oklab, var(--section-bg), black 10%);
+        }
+
+        .custom-option:hover {
+            background: color-mix(in oklab, var(--element-bg), white 10%);
+            color: color-mix(in oklab, var(--accent), white 10%);
+        }
+        .copyable-text.copied,
+        .copyable-text:hover {
+            background: color-mix(in oklab, var(--code-bg), white 10%);
+            color: color-mix(in oklab, var(--code-cont), white 10%);
+        }
+        #presetOptions .preset-delete-btn:hover,
+        #presetOptions .custom-option.selected .preset-delete-btn:hover,
+        #themeOptions .preset-delete-btn:hover,
+        #themeOptions .custom-option.selected .preset-delete-btn:hover {
+            opacity: 1;
+            color: color-mix(in oklab, var(--danger-bg), white 10%);
+        }
+        .clear-axis:hover, .mw-tab-remove:hover {
+            background: color-mix(in oklab, var(--danger-bg), white 10%);
+        }
+        .clear-axis:hover:active, .mw-tab-remove:hover:active {
+            background: color-mix(in oklab, var(--danger-bg), black 10%);
+        }
+        .custom-option:hover:active {
+            background: color-mix(in oklab, var(--element-bg), black 10%);
+        }
+        .copyable-text:hover:active {
+            color: color-mix(in oklab, var(--code-cont), black 10%);
+        }
+        #presetOptions .preset-delete-btn:hover:active,
+        #themeOptions .preset-delete-btn:hover:active {
+            color: color-mix(in oklab, var(--danger-bg), black 10%);
+        }
+        /* Инпуты и Слайдеры */
+        .steering-input {
+            height: 24px;
+            width: 42px;
+            text-align: center;
+            background: var(--element-bg);
+            border: 0;
+            border-radius: 4px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 24px;
+            outline: none;
+            font-family: monospace;
+            -moz-appearance: textfield;
+            appearance: textfield;
+            padding: 0;
+        }
+
+        .steering-input::-webkit-inner-spin-button,
+        .steering-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .steering-slider {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--element-bg);
+            border-radius: 3px;
+            outline: none;
+            border: 0;
+            cursor: pointer;
+        }
+
+        .steering-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 0;
+            cursor: pointer;
+            transition: var(--anim-ui), transform var(--anim);
+        }
+
+        .steering-slider::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent);
+            cursor: pointer;
+            border: 0;
+            transition: var(--anim-ui), transform var(--anim);
+        }
+
+        /* Кастомный селект - базовый */
+        .custom-select {
+            position: relative;
+            display: inline-block;
+        }
+
+        .custom-select-trigger {
+            height: 24px;
+            width: auto;
+            background: var(--element-bg);
+            color: var(--element-cont);
+            border: 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 5px 16px 5px 7px;
+            cursor: pointer;
+            position: relative;
+            outline: none;
+            transition: var(--anim-ui);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: normal;
+        }
+
+        .car-select .custom-select-trigger.placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-select-trigger::after {
+            content: '';
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent);
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.41,9H17.59a1,1,0,0,1,.7,1.71l-5.58,5.58a1,1,0,0,1-1.42,0L5.71,10.71A1,1,0,0,1,6.41,9Z'/%3E%3C/svg%3E") no-repeat center;
+            mask-size: contain;
+            -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.41,9H17.59a1,1,0,0,1,.7,1.71l-5.58,5.58a1,1,0,0,1-1.42,0L5.71,10.71A1,1,0,0,1,6.41,9Z'/%3E%3C/svg%3E") no-repeat center;
+            -webkit-mask-size: contain;
+            pointer-events: none;
+            transition: transform var(--anim);
+        }
+
+        .custom-select.active .custom-select-trigger::after {
+            transform: translateY(-50%) rotate(180deg);
+        }
+
+        .custom-options {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: var(--element-bg);
+            border-radius: 4px;
+            z-index: 6;
+            display: none;
+            margin-top: 0;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            width: max-content;
+        }
+
+        .custom-select.active .custom-options {
+            display: block;
+        }
+
+        .custom-option {
+            padding: 5px 16px 5px 7px;
+            color: var(--element-cont);
+            cursor: pointer;
+            font-family: monospace;
+            font-size: 12px;
+            transition: var(--anim-ui);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .custom-option.selected {
+            background: var(--accent);
+            color: var(--panel-cont);
+        }
+
+        .preset-separator {
+            border-top: 1px dashed var(--border);
+        }
+
+        .option-icon {
+            width: 14px;
+            height: 14px;
+            vertical-align: middle;
+            margin-right: 0;
+            margin-bottom: 2px;
+            fill: currentColor;
+        }
+
+        #presetOptions .preset-delete-btn,
+        #themeOptions .preset-delete-btn {
+            position: absolute;
+            right: 4px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: var(--anim-ui);
+            border-radius: 3px;
+            color: var(--element-cont);
+            user-select: none;
+        }
+
+        #presetOptions .custom-option.selected .preset-delete-btn,
+        #themeOptions .custom-option.selected .preset-delete-btn {
+            color: var(--panel-cont);
+        }
+
+        /* Специфичные ширины селекторов */
+        #wheelRangeSelect,
+        #throttleRangeSelect,
+        #brakeRangeSelect,
+        #clutchRangeSelect,
+        #handbrakeRangeSelect {
+            width: 70px;
+        }
+
+        /* Кнопки инверсии и графика - объединённые стили */
+        .invert-btn,
+        .graph-toggle-btn {
+            height: 24px;
+            background: var(--element-bg);
+            color: var(--element-cont);
+            padding: 2px 6px;
+            border-radius: 4px;
+            line-height: 1;
+            border: 0;
+            cursor: pointer;
+            transition: var(--anim-ui);
+            font-size: 12px;
+        }
+
+        .invert-btn {
+            width: 24px;
+            aspect-ratio: 1;
+            padding: 0;
+            flex-shrink: 0;
+        }
+
+
+        .invert-btn.active,
+        .graph-toggle-btn.active {
+            background: var(--accent);
+            color: var(--panel-cont);
+        }
+
+        .graph-toggle-btn.inactive {
+            background: var(--disabled-bg);
+            color: var(--disabled-cont);
+            cursor: default;
+            pointer-events: none;
+        }
+
+        /* Копируемые элементы */
+        .copyable-text {
+            font-family: monospace;
+            line-height: 1.4;
+            color: var(--code-cont);
+            background: var(--code-bg);
+            padding: 2px 4px;
+            border-radius: 3px;
+            vertical-align: middle;
+            display: inline-block;
+            cursor: pointer;
+            position: relative;
+            transition: var(--anim-ui);
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+
+
+        /* === 4. ПАНЕЛЬ НАСТРОЕК И СПРАВКА === */
+        .settings-container {
+            position: relative;
+            display: flex;
+            gap: 0;
+            height: 536px;
+        }
+
+        @media (max-height: 780px) {
+            html, body {
+                background: transparent !important;
+            }
+            body {
+                padding: 0 !important;
+            }
+
+            .settings-container {
+                display: none !important;
+            }
+
+            .hud-info {
+                display: none !important;
+            }
+
+            #notificationStatus {
+                display: none !important;
+            }
+
+            .multi-widget-tabs {
+                display: none !important;
+            }
+        }
+
+        .settings-panel {
+            margin: 0;
+            padding: 15px;
+            position: relative;
+            z-index: 5;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            background: var(--panel-bg);
+            border-radius: 12px;
+            width: 1100px;
+        }
+
+        /* === 5. БЛОК ИНФО (отдельный, справа, на всю высоту) === */
+        .hud-info {
+            margin: 0;
+            padding: 15px;
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            background: var(--help-bg);
+            border-radius: 0;
+            width: 490px;
+            color: var(--help-cont);
+            border: 0;
+            border-left: 0;
+            transition: width var(--anim), opacity var(--anim);
+            overflow: hidden;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Состояние свёрнутого блока - упрощено */
+        .hud-info.collapsed {
+            width: 54px;
+        }
+
+        .hud-info.collapsed .hud-info-title,
+        .hud-info.collapsed .hud-info-collapsible {
+            display: none;
+        }
+
+        .hud-info-collapsible {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .hud-info.collapsed .settings-header {
+            justify-content: flex-end;
+            margin-bottom: 8px;
+        }
+
+        /* Кнопка справки */
+        .help-btn {
+            background: var(--accent);
+            color: var(--panel-cont);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--anim-ui), transform var(--anim);
+            flex-shrink: 0;
+        }
+
+        /* === АНИМАЦИЯ КНОПКИ СПРАВКИ (КОГДА СВЁРНУТО) === */
+        .hud-info.collapsed .help-btn {
+            position: relative;
+            overflow: visible;
+        }
+
+        .hud-info.collapsed .help-btn::before,
+        .hud-info.collapsed .help-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--accent);
+            border-radius: 4px;
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .hud-info.collapsed .help-btn::before {
+            animation: ripple-effect 5s ease-out infinite 0s;
+        }
+
+        /* Остановка анимации */
+        .hud-info.collapsed .help-btn.animation-stopped::before {
+            display: none;
+        }
+
+        @keyframes ripple-effect {
+            0% {
+                border-color: #ffffff;
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.5;
+                border-width: 2px;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(2.5);
+                opacity: 0;
+                border-radius: 50%;
+            }
+        }
+
+        /* Заголовки */
+        .settings-header {
+            height: 38px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--gap-lg);
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .hud-info-title {
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+            color: var(--help-heading);
+        }
+
+        .settings-title {
+            height: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0;
+            color: var(--panel-cont);
+        }
+
+        .settings-version-link {
+            color: var(--panel-cont);
+            text-decoration: none;
+        }
+
+        .settings-version-link:hover {
+            color: color-mix(in oklab, var(--panel-cont), white 10%);
+            text-decoration: underline;
+        }
+
+        /* Тело настроек */
+        .settings-body {
+            display: flex;
+            margin-bottom: var(--gap-md);
+            flex: 1;
+            overflow: hidden;
+            gap: 0;
+        }
+
+        .settings-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-md);
+            padding-right: var(--gap-md);
+            min-width: 0;
+            overflow-y: auto;
+        }
+
+        .settings-column-mid {
+            border-left: 1px dashed var(--border);
+            padding-left: var(--gap-md);
+            padding-right: var(--gap-md);
+        }
+
+        .settings-column-right {
+            border-left: 1px dashed var(--border);
+            padding-left: var(--gap-md);
+            padding-right: 0;
+        }
+
+        /* Скроллбары - объединённые стили */
+        .settings-column::-webkit-scrollbar,
+        .hud-info-content::-webkit-scrollbar {
+            background: transparent;
+            width: 8px;
+        }
+
+        .settings-column::-webkit-scrollbar-track,
+        .hud-info-content::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+            border-radius: 4px;
+            margin: 0;
+        }
+
+        .settings-column::-webkit-scrollbar-thumb,
+        .hud-info-content::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+            border: 2px solid var(--scrollbar-track);
+            box-sizing: border-box;
+        }
+
+        /* Кнопки скроллбара */
+        .settings-column::-webkit-scrollbar-button,
+        .hud-info-content::-webkit-scrollbar-button {
+            display: contents;
+            background: var(--accent);
+            border: 2px solid var(--scrollbar-track);
+            width: 8px;
+            height: 8px;
+            border-radius: 4px;
+            color: var(--panel-cont);
+        }
+
+        /* Стрелка ВВЕРХ */
+        .settings-column::-webkit-scrollbar-button:vertical:start:decrement,
+        .hud-info-content::-webkit-scrollbar-button:vertical:start:decrement {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M7 14l5-5 5 5z'/%3E%3C/svg%3E");
+            border-radius: 4px;
+        }
+
+        /* Стрелка ВНИЗ */
+        .settings-column::-webkit-scrollbar-button:vertical:end:increment,
+        .hud-info-content::-webkit-scrollbar-button:vertical:end:increment {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+            border-radius: 4px;
+        }
+
+        /* Контент справки */
+        .hud-info-content {
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            border-radius: 6px;
+            padding: var(--gap-sm) var(--gap-md);
+            padding-right: 4px;
+        }
+
+        .hud-info h4 {
+            color: var(--help-heading);
+            font-size: 16px;
+            font-weight: bold;
+            margin: 0 0 var(--gap-sm) 0;
+            padding-bottom: var(--gap-xs);
+            line-height: 1.4;
+        }
+
+        .hud-info p {
+            margin: var(--gap-xs) 0;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+        }
+
+        .hud-info strong {
+            font-weight: normal;
+            color: var(--help-heading);
+        }
+
+        .hud-info .info-section {
+            margin-bottom: var(--gap-md);
+        }
+
+        .hud-info .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .device-info {
+            font-size: 11px;
+            color: var(--last-active);
+            margin: 0;
+            font-family: monospace;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+            width: -webkit-fill-available;
+            width: stretch;
+            height: 30px;
+            line-height: 1.3;
+        }
+
+        /* Секции настроек */
+        .settings-section,
+        .axis-assignment {
+            padding: var(--gap-sm) var(--gap-md);
+            background: var(--section-bg);
+            border-radius: 6px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scale-set,
+        .steering-set,
+        .gear-scale-set {
+            flex-shrink: 2;
+            height: auto;
+        }
+
+        .setting-title,
+        .axis-title {
+            font-weight: bold;
+            margin-bottom: var(--gap-sm);
+            font-size: 14px;
+            color: var(--panel-cont);
+        }
+
+        .other-settings {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: var(--gap-sm);
+        }
+
+        .other-settings:first-child {
+            padding-bottom: var(--gap-sm);
+        }
+
+        .other-settings.udp-section {
+            padding-top: var(--gap-sm);
+            border-top: 1px dashed var(--border);
+            margin-top: var(--gap-sm);
+        }
+
+        .other-settings-col {
+            display: flex;
+            flex-direction: column;
+            gap: var(--gap-xs);
+            width: 50%;
+        }
+
+        .steering-angle-row,
+        .axis-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--gap-sm);
+        }
+
+        .axis-row {
+            padding: var(--gap-xs) 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .axis-row:last-child {
+            border-bottom: none;
+            margin-bottom: var(--gap-xs);
+        }
+
+        .axis-label {
+            flex: 1;
+            font-weight: 500;
+            color: var(--panel-cont);
+        }
+
+        .axis-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        .steering-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--gap-xs);
+            align-items: center;
+            margin-top: var(--gap-sm);
+        }
+
+        .steering-presets .btn {
+            flex: auto;
+            height: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .btn-group-inner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .select-group {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-md);
+            margin-left: auto;
+        }
+
+        #presetGroup {
+            display: none;
+        }
+
+
+        .language-group,
+        .theme-group,
+        .preset-group,
+        .car-selector-group {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+        }
+
+        #interfaceLanguageSelect .custom-select-trigger,
+        #languageSelect .custom-select-trigger,
+        #themeSelect .custom-select-trigger,
+        #presetSelect .custom-select-trigger {
+            width: 100px;
+            box-sizing: border-box;
+        }
+
+        .language-group .axis-label,
+        .theme-group .axis-label,
+        .preset-group .axis-label,
+        .car-selector-group .axis-label {
+            flex: none;
+        }
+
+        .car-selector-group {
+            margin-top: var(--gap-sm);
+        }
+
+        #themeSelect,
+        #presetSelect {
+            width: 100px;
+            flex: none;
+        }
+
+        #presetSelect .custom-options {
+            left: auto;
+            right: 0;
+        }
+
+        #carSelect {
+            width: -webkit-fill-available;
+            width: stretch;
+        }
+
+        #carSelect.active #carOptions {
+            display: grid !important;
+            grid-template-columns: repeat(3, 1fr);
+            grid-auto-flow: column;
+            grid-template-rows: repeat(16, auto);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: var(--element-bg) !important;
+            border-radius: 4px !important;
+            padding: 2px 0;
+            margin-top: 0 !important;
+            border-bottom: 1px dashed var(--border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        #carOptions .custom-option {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+
+        .car-class-header {
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            user-select: none;
+        }
+
+        .custom-option.last-in-group {
+            border-bottom: 1px dashed var(--border);
+        }
+
+        #wheelRangeSelect .custom-options,
+        #throttleRangeSelect .custom-options,
+        #brakeRangeSelect .custom-options,
+        #clutchRangeSelect .custom-options,
+        #handbrakeRangeSelect .custom-options {
+            width: max-content !important;
+        }
+
+        .btn-group .btn,
+        .mw-row .btn,
+        .modal-content .btn.btn-primary {
+            padding: 10px 28px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .mw-row .btn {
+            width: 155px;
+            border-radius: 6px;
+            flex: none;
+            overflow: hidden;
+            transition: var(--anim-ui), width var(--anim);
+        }
+        #mwPanel.mw-panel {
+            border-radius: 6px;
+        }
+
+        /* === МУЛЬТИВИДЖЕТ ПАНЕЛЬ === */
+        .mw-row {
+            display: flex;
+            align-items: center;
+            gap: var(--gap-sm);
+            margin-bottom: var(--gap-sm);
+        }
+        .mw-panel {
+            flex: 1;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            padding: 0 var(--gap-md);
+            height: 30px;
+        }
+        .mw-panel-toggle {
+            flex: 0 0 auto;
+        }
+        .mw-panel-inner {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .mw-toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .mw-toggle-label {
+            font-size: 12px;
+            font-weight: bold;
+            color: var(--panel-cont);
+        }
+        
+
+        .mw-checkboxes {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .mw-cb {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 11px;
+            color: var(--panel-cont);
+            cursor: pointer;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .mw-cb input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 13px;
+            height: 13px;
+            margin: 0;
+            cursor: pointer;
+            background: var(--element-bg);
+            border-radius: 3px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .mw-cb input[type="checkbox"]:checked {
+            background: var(--accent);
+        }
+
+        .mw-cb input[type="checkbox"]::after {
+            content: '';
+            position: absolute;
+            display: none;
+            left: 4px;
+            top: 1px;
+            width: 4px;
+            height: 7px;
+            border: solid var(--panel-cont);
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .mw-cb input[type="checkbox"]:checked::after {
+            display: block;
+        }
+        /* === 6. ЗНАЧЕНИЯ ОСЕЙ И СЛОТЫ === */
+.axis-value,
+.handbrake-btn-slot,
+.gear-btn-slot {
+    height: 24px;
+    font-family: monospace;
+    color: var(--bind-cont);
+    text-align: center;
+    font-size: 12px;
+    background: var(--element-bg);
+    cursor: pointer;
+    position: relative;
+    transition: var(--anim-ui);
+    border-radius: 4px;
+    padding: 5px 8px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        /* Специфичные размеры */
+        .axis-value {
+            flex: 0 0 70px;
+            min-width: 60px;
+        }
+
+        .handbrake-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+            flex-grow: 1;
+        }
+
+        .handbrake-btn-slot {
+            padding-top: 4px;
+            width: 39px;
+        }
+
+        .gear-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+        }
+
+        .gear-btn-slot {
+            padding-top: 4px;
+            width: 24px;
+        }
+
+        .gear-btn-slot.assigned {
+            background: var(--accent);
+            color: var(--panel-cont);
+        }
+
+        /* Кнопка очистки привязки */
+        .clear-axis {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: var(--danger-bg);
+            border-radius: 50%;
+            color: var(--danger-cont);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0;
+            border: 0;
+            z-index: 6;
+            transition: background var(--anim), color var(--anim);
+        }
+
+        .axis-value:hover .clear-axis,
+        .handbrake-btn-slot:hover .clear-axis,
+        .gear-btn-slot:hover .clear-axis {
+            opacity: 1;
+        }
+
+        .gear-btn-slot .clear-axis {
+            top: -4px;
+            right: -4px;
+        }
+
+        /* === 7. ПЕРЕКЛЮЧАТЕЛИ ВИДЖЕТА === */
+        .widget-toggle-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--gap-sm);
+        }
+
+        .widget-toggle-label {
+            flex: 1;
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--panel-cont);
+            white-space: nowrap;
+        }
+
+        .widget-toggle {
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            background: var(--element-bg);
+            border: 0;
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 0;
+            flex: 0 0 26px;
+            height: 16px;
+            transition: var(--anim-ui);
+            font-size: 0;
+        }
+
+        .widget-toggle::before {
+            content: '';
+            position: absolute;
+            left: 2px;
+            top: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--toggle-off);
+            transition: var(--anim-ui), transform var(--anim);
+        }
+
+        .widget-toggle:hover::before {
+            background: color-mix(in oklab, var(--toggle-off), white 10%);
+        }
+        .widget-toggle.active:hover::before {
+            background: color-mix(in oklab, var(--toggle-on), white 10%);
+        }
+
+        .widget-toggle.active {
+            background: var(--accent);
+        }
+
+        .widget-toggle.active::before {
+            transform: translateX(10px);
+            background: var(--toggle-on);
+        }
+
+
+        .hud-container.labels-hidden .label {
+            display: none;
+        }
+
+        /* Стиль для неактивного переключателя */
+        .widget-toggle.disabled {
+            cursor: default;
+            background: var(--disabled-bg);
+        }
+
+        .widget-toggle.disabled::before {
+            background: var(--disabled-cont);
+        }
+
+        /* === 8. HUD ВИДЖЕТ === */
+        .hud-container-wrapper {
+            overflow: hidden;
+            display: inline-block;
+            border-radius: var(--widget-radius);
+            transition: border-radius var(--anim), opacity var(--anim);
+        }
+
+        .hud-container-wrapper.no-bg {
+            border-radius: 0 !important;
+        }
+
+        .hud-container {
+            overflow: visible !important;
+            display: flex;
+            align-items: center;
+            gap: var(--widget-gap);
+            box-sizing: border-box;
+            background: var(--widget-bg);
+            padding: var(--widget-padding);
+            position: relative;
+            transition: width var(--anim), height var(--anim);
+            will-change: width;
+        }
+
+
+        /* График */
+        #graphBlock {
+            background: transparent;
+            position: relative;
+            display: flex;
+            z-index: auto;
+            flex-shrink: 0;
+            transition: transform var(--anim), opacity var(--anim);
+            order: 99;
+            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 10%);
+            mask-image: linear-gradient(to right, transparent 0%, black 10%, black 10%);
+        }
+
+        #graphBlock.hiding {
+            opacity: 0;
+        }
+
+        /* Главный обёрточный контейнер */
+        .main-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            position: relative;
+        }
+
+        .main-wrapper.graph-independent {
+            gap: 16px;
+        }
+
+        /* Только графики — плавное скрытие виджета (opacity + схлопывание через JS) */
+        .main-wrapper.graphs-only .hud-container-wrapper {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .main-wrapper.graphs-only {
+            gap: 0;
+        }
+
+        /* Отдельный график */
+        .graph-container {
+            background: var(--widget-bg);
+            border-radius: var(--widget-radius);
+            overflow: hidden;
+            opacity: 0;
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            transition: opacity var(--anim), width var(--anim), height var(--anim), border-radius var(--anim);
+            flex-shrink: 0;
+        }
+
+        .graph-container.no-bg {
+            border-radius: 0 !important;
+        }
+
+        .graph-container.visible {
+            opacity: 1;
+            width: var(--graph-width-independent);
+            height: var(--widget-height);
+        }
+
+        #graphBlockIndependent {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Руль */
+        .wheel-assembly {
+            position: relative;
+            flex-shrink: 0;
+            transition: width var(--anim), height var(--anim), margin-right var(--anim);
+            clip-path: circle(50% at 50% 50%);
+        }
+
+        .wheel-assembly.hidden {
+            display: none !important;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotate(0deg);
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .wheel.visible {
+            opacity: 1;
+        }
+
+        .wheel-rim {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: var(--wheel-thickness) solid var(--wheel-rim);
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: transparent !important;
+            z-index: 1;
+        }
+
+        .mark {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: var(--marker-width);
+            height: calc(var(--marker-width) * 2);
+            background: var(--wheel-marker);
+            transform: translate(-50%, -99%);
+            z-index: 2;
+        }
+
+        .spoke-hor,
+        .spoke-ver {
+            position: absolute;
+            background: var(--wheel-spoke);
+            z-index: 0;
+        }
+
+        .spoke-hor {
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: var(--spoke-thickness);
+            transform: translateY(-50%);
+        }
+
+        .spoke-ver {
+            bottom: 0;
+            left: 50%;
+            width: var(--spoke-thickness);
+            height: calc(50% - var(--spoke-thickness) / 2);
+            transform: translateX(-50%);
+        }
+
+        /* Индикатор передачи */
+        .gear-display {
+            white-space: nowrap;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transform-origin: center center !important;
+            font-family: var(--gear-font-family);
+            font-weight: bold;
+            color: var(--gear-n-text);
+            opacity: 1;
+            border: solid;
+            border-width: calc(var(--marker-width) / 4);
+            border-color: var(--wheel-spoke);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            line-height: 0;
+            padding-bottom: 0.06em;
+            background: var(--gear-n-bg);
+            border-radius: 50%;
+            width: var(--gear-display-size);
+            height: var(--gear-display-size);
+            flex-shrink: 0;
+            margin: 0;
+            z-index: 1;
+            overflow: hidden;
+            will-change: transform, width, height, color;
+            transition: width var(--anim), height var(--anim), font-size var(--anim), background-color var(--anim), color var(--gear-transition);
+        }
+
+        .gear-display.forward {
+            background: var(--gear-bg);
+            color: var(--gear-text);
+        }
+
+        .gear-display.reverse {
+            background: var(--gear-r-bg);
+            color: var(--gear-r-text);
+        }
+
+        /* G-meter */
+        .gmeter-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: solid;
+            border-width: calc(var(--marker-width) / 4);
+            border-color: var(--gmeter-border);
+            border-radius: 50%;
+            width: var(--gear-display-size);
+            height: var(--gear-display-size);
+            flex-shrink: 0;
+            margin: 0;
+            z-index: 1;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle closest-side at center, var(--gmeter-inner) 0%, var(--gmeter-inner) 38%, var(--gmeter-middle) 42%, var(--gmeter-middle) 78%, var(--gmeter-outer) 82%, var(--gmeter-outer) 100%);
+            transition: width var(--anim), height var(--anim), opacity var(--anim);
+            will-change: width, height;
+        }
+
+        .gmeter-display::before,
+        .gmeter-display::after {
+            content: '';
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .gmeter-display::before {
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 0;
+            border-top: 1px dashed var(--gmeter-crosshair-dashed);
+            transform: translateY(-50%);
+        }
+
+        .gmeter-display::after {
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            border-left: 1px dashed var(--gmeter-crosshair-dashed);
+            transform: translateX(-50%);
+        }
+
+        .gmeter-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px dashed var(--gmeter-rings-dashed);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .gmeter-ring-40 {
+            width: 40%;
+            height: 40%;
+        }
+
+        .gmeter-ring-80 {
+            width: 79%;
+            height: 79%;
+        }
+
+        canvas.gmeter-trail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .gmeter-ball {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 2;
+            width: var(--gmeter-ball-size);
+            height: var(--gmeter-ball-size);
+            border-radius: 50%;
+            background: var(--gmeter-ball);
+            transform: translate(-50%, -50%);
+            transition: transform 0.08s linear;
+        }
+
+        /* G-meter independent (в hud-container) */
+        .hud-container>.gmeter-display {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            transform: none !important;
+            align-self: center;
+            width: var(--wheel-size);
+            height: var(--wheel-size);
+            order: 2;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            background: radial-gradient(circle closest-side at center, var(--gmeter-inner) 0%, var(--gmeter-inner) 38%, var(--gmeter-middle) 42%, var(--gmeter-middle) 78%, var(--gmeter-outer) 82%, var(--gmeter-outer) 100%);
+            transition: width var(--anim), height var(--anim), opacity var(--anim);
+            will-change: width, height;
+        }
+
+        .hud-container>.gmeter-display .gmeter-ball {
+            width: var(--gmeter-ball-size);
+            height: var(--gmeter-ball-size);
+        }
+
+        /* Скрытие G-meter */
+        .gmeter-display.hidden-independent {
+            display: none !important;
+        }
+
+        .hud-container>.gmeter-display .gmeter-ball {
+            width: var(--gmeter-ball-size);
+            height: var(--gmeter-ball-size);
+        }
+
+        /* Скрытие G-meter на руле */
+        .wheel-assembly .gmeter-display.hidden-independent {
+            display: none !important;
+        }
+
+        /* Педали */
+        .pedals-row {
+            display: flex;
+            transition: margin-right var(--anim);
+        }
+
+        .pedals-row.layout-reverse {
+            justify-content: flex-end;
+        }
+
+        .pedal-container {
+            height: var(--pedal-height);
+            position: relative;
+            border-radius: var(--pedal-radius);
+            overflow: clip;
+            opacity: 0;
+            flex-shrink: 0;
+            flex-basis: 0;
+            margin-right: 0;
+        }
+
+        .pedal-container.visible {
+            opacity: 1;
+            flex-basis: var(--pedal-width);
+        }
+
+        .clip-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: var(--pedal-radius);
+            overflow: hidden;
+        }
+
+        .pedal-bg {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: top;
+            transform: scaleY(1);
+            transition: transform 0.05s ease;
+            background: var(--pedal-bg);
+            z-index: 1;
+            transition: height 0.05s ease, width var(--anim);
+        }
+
+        .fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: bottom;
+            transform: scaleY(0);
+            will-change: transform;
+            z-index: 2;
+            transition: transform 0.05s ease;
+        }
+
+        .label {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            color: var(--pedal-text);
+            font-size: var(--widget-font-size);
+            font-weight: bold;
+            white-space: nowrap;
+            z-index: 3;
+            transition: font-size var(--anim);
+            padding-bottom: 0.1em;
+        }
+
+        #fill-handbrake {
+            background: var(--pedal-handbrake);
+        }
+
+        #fill-clutch {
+            background: var(--pedal-clutch);
+        }
+
+        #fill-brake {
+            background: var(--pedal-brake);
+        }
+
+        #fill-throttle {
+            background: var(--pedal-throttle);
+        }
+
+        /* Анимация масштабирования */
+        .hud-container,
+        .wheel-assembly {
+            will-change: width, height, transform;
+        }
+
+        .hud-container {
+            transition: width var(--anim), height var(--anim);
+        }
+
+        .wheel,
+        .spoke-hor,
+        .spoke-ver {
+            transition: background var(--anim), width var(--anim), height var(--anim);
+        }
+
+        .wheel-rim {
+            transition: background var(--anim), width var(--anim), height var(--anim), border-color var(--anim), border-width var(--anim);
+        }
+
+        .pedal-container,
+        .clip-container,
+        .fill {
+            transition: height var(--anim), width var(--anim), border-radius var(--anim), flex-basis var(--anim), margin-right var(--anim);
+        }
+
+        /* === 9. ОТДЕЛЬНЫЙ ИНДИКАТОР КПП === */
+        .gear-display-independent {
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            align-self: center;
+            width: var(--wheel-size);
+            height: var(--wheel-size);
+            order: 2;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            border: solid;
+            border-width: calc(var(--marker-width) / 4);
+            border-color: var(--wheel-spoke);
+            border-radius: 50%;
+            background: var(--gear-n-bg);
+            color: var(--gear-n-text);
+            font-family: var(--gear-font-family);
+            font-weight: bold;
+            font-size: var(--gear-font-size);
+            line-height: 0;
+            padding-bottom: 0.05em;
+            flex-shrink: 0;
+            transition: width var(--anim), height var(--anim), font-size var(--anim), background-color var(--anim), color var(--gear-transition);
+        }
+
+        /* Скрытие отдельного индикатора */
+        .gear-display-independent.hidden-gear-independent {
+            display: none !important;
+        }
+
+        /* Скрытие индикатора на руле, если он вынесен отдельно */
+        .wheel-assembly .gear-display.hidden-gear-independent {
+            display: none !important;
+        }
+
+        .gear-display-independent.forward {
+            background: var(--gear-bg);
+            color: var(--gear-text);
+        }
+
+        .gear-display-independent.reverse {
+            background: var(--gear-r-bg);
+            color: var(--gear-r-text);
+        }
+
+        /* === 10. МОДАЛЬНЫЕ ОКНА === */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #notificationStatus {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--element-bg);
+            display: flex;
+            align-items: center;
+            padding: 6px 7px;
+            font-size: 11px;
+            color: var(--element-cont);
+            z-index: 101;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            pointer-events: none;
+        }
+        #notificationStatus.show {
+            transform: translateY(0);
+        }
+
+        .modal-content {
+            background: var(--element-bg);
+            padding: 25px 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            min-width: 510px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 16px;
+            font-weight: bold;
+            color: var(--element-cont);
+        }
+
+        .modal-text {
+            font-size: 16px;
+            margin: 24px 16px;
+            color: var(--element-cont);
+            line-height: 1.6;
+        }
+
+        /* Базовый стиль для кода в модальных окнах */
+        .modal-text code {
+            font-family: monospace;
+            line-height: 1.6;
+        }
+
+        /* Поле ввода имени пресета */
+        .preset-name-input {
+            width: 100%;
+            height: 28px;
+            background: var(--element-bg);
+            border: 1px solid var(--accent);
+            border-radius: 4px;
+            color: var(--element-cont);
+            font-size: 14px;
+            padding: 0 8px;
+            outline: none;
+            font-family: monospace;
+            box-sizing: border-box;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .modal-cancel-btn {
+            background: var(--section-bg) !important;
+            color: var(--panel-cont) !important;
+        }
+
+        .modal-cancel-btn:hover {
+            filter: brightness(1.05);
+        }
+
+        /* Скрытие картинки фона (CSS-паттерн остаётся) */
+        .hide-bg body {
+            background-image:
+                repeating-linear-gradient(
+                    0deg, transparent, transparent 39px,
+                    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+                ),
+                repeating-linear-gradient(
+                    90deg, transparent, transparent 39px,
+                    rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px
+                );
+        }
+
+        /* Состояние 'no-data': текст невидим, фон — нейтральный */
+        .gear-display.no-data,
+        .gear-display-independent.no-data {
+            color: transparent !important;
+            background: var(--gear-n-bg) !important;
+        }
+
+/* ==========================================
+   MultiWidget вкладки (оверлей поверх виджета)
+   ========================================== */
+.multi-widget-tabs {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    transform: translateY(-100%);
+    transition: transform var(--anim);
+    z-index: 4;
+    user-select: none;
+}
+.mw-tabs-block {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    padding: 0 var(--gap-md);
+    height: 30px;
+}
+.multi-widget-tabs.visible {
+    transform: translateY(12px);
+}
+.mw-btn {
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--panel-cont);
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+    transition: var(--anim-ui);
+}
+.mw-tabs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.mw-tab {
+    position: relative;
+    min-width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    background: var(--element-bg);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    transition: var(--anim-ui);
+}
+.mw-tab.active {
+    background: var(--accent);
+    color: var(--panel-cont);
+}
+
+.mw-tab-remove {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    background: var(--danger-bg);
+    border-radius: 50%;
+    color: var(--danger-cont);
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0;
+    border: 0;
+    z-index: 1;
+    pointer-events: auto;
+    transition: background var(--anim), color var(--anim);
+}
+
+.mw-tab:hover .mw-tab-remove {
+    opacity: 1;
+}
+
+body.cross-visible .clear-axis,
+body.cross-visible .mw-tab-remove,
+.clear-axis.drag-active,
+.mw-tab-remove.drag-active {
+    opacity: 1;
+}
+
+.clear-axis.drag-active,
+.mw-tab-remove.drag-active {
+    filter: brightness(0.7);
+}
+

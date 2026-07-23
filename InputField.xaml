@@ -1,0 +1,40 @@
+<UserControl x:Class="MiniRacingHUD.InputField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="root">
+    <Border x:Name="border"
+            Background="{StaticResource InputBgBrush}"
+            BorderBrush="{StaticResource BorderBrush}"
+            BorderThickness="1"
+            CornerRadius="4"
+            Height="{Binding Height, ElementName=root}"
+            Padding="{Binding Padding, ElementName=root}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="labelBlock"
+                       Grid.Column="0"
+                       Text="{Binding Label, ElementName=root}"
+                       FontSize="{Binding LabelFontSize, ElementName=root}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       VerticalAlignment="Center"
+                       Margin="{Binding LabelMargin, ElementName=root}"
+                       Cursor="{Binding LabelCursor, ElementName=root}"
+                       MouseDown="Label_MouseDown"/>
+            <TextBox x:Name="inputBox"
+                     Grid.Column="1"
+                     FontFamily="Consolas"
+                     FontSize="{Binding FontSize, ElementName=root}"
+                     Width="{Binding InputWidth, ElementName=root}"
+                     MaxLength="{Binding MaxLength, ElementName=root}"
+                     TextAlignment="{Binding TextAlignment, ElementName=root}"
+                     BorderThickness="0"
+                     Padding="0"
+                     VerticalAlignment="Center"
+                     HorizontalAlignment="Stretch"
+                     Style="{StaticResource MinimalTextBox}"/>
+        </Grid>
+    </Border>
+</UserControl>

@@ -1,0 +1,97 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>MiniRacingHUD</AssemblyName>
+    <!-- Versioning -->
+    <Version>1.0.0.210</Version>
+    <ApplicationIcon>MiniRacingHUD.ico</ApplicationIcon>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <RuntimeIdentifier Condition="'$(_IsPublishing)'=='true'">win-x64</RuntimeIdentifier>
+    <WebView2NeverCopyLoaderDllToOutputDirectory>true</WebView2NeverCopyLoaderDllToOutputDirectory>
+    <!-- �� ���������� XML ������������ �� ������� -->
+    <AllowedReferenceRelatedFileExtensions>*.none</AllowedReferenceRelatedFileExtensions>
+    <!-- Exclude duplicate/backup directories from compilation -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);src\**;backupische\**;obj\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <!-- Self-contained single-file (dotnet publish -c Release) > bin\Publish\ -->
+    <PublishDir Condition="'$(PublishFD)'!='true'">bin\Publish\</PublishDir>
+    <SelfContained Condition="'$(PublishFD)'!='true'">true</SelfContained>
+    <!-- Framework-dependent single-file (dotnet publish -c Release /p:PublishFD=true) > bin\PublishFD\ -->
+    <PublishDir Condition="'$(PublishFD)'=='true'">bin\PublishFD\</PublishDir>
+    <SelfContained Condition="'$(PublishFD)'=='true'">false</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="MiniRacingHUD.ico" />
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <PackageReference Include="Fleck" Version="1.2.0" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3912.50" />
+    <PackageReference Include="Vortice.DirectInput" Version="3.8.3" />
+  </ItemGroup>
+
+  <!-- ������ ������� �������� ����� ����� Release ������� -->
+  <Target Name="WipeOutputDir" BeforeTargets="BeforeBuild" Condition="'$(Configuration)'=='Release'">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>
+
+  <!-- ������� ����� ���������� ����� publish -->
+  <Target Name="WipeObjBeforePublish" BeforeTargets="BeforePublish" Condition="'$(Configuration)'=='Release'">
+    <RemoveDir Directories="$(ProjectDir)obj\Release\net10.0-windows" />
+  </Target>
+
+  <Target Name="WipePublishDir" BeforeTargets="BeforePublish" Condition="'$(PublishFD)'!='true'">
+    <RemoveDir Directories="$(ProjectDir)bin\Publish" />
+  </Target>
+  <Target Name="WipePublishFDDir" BeforeTargets="BeforePublish" Condition="'$(PublishFD)'=='true'">
+    <RemoveDir Directories="$(ProjectDir)bin\PublishFD" />
+  </Target>
+
+  <!-- ���������� HTML + README ����� ������ ����������� -->
+  <Target Name="RunBuildScript" BeforeTargets="BeforeBuild">
+    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)build.ps1&quot;" />
+  </Target>
+
+  <Target Name="CopyWidgetFiles" AfterTargets="Build">
+    <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(OutDir)Widget" />
+    <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(OutDir)Widget" />
+    <Copy SourceFiles="$(ProjectDir)build\NoApp.js" DestinationFolder="$(OutDir)Widget" />
+  </Target>
+
+  <!-- ����������� Widget/ � ����� publish -->
+  <Target Name="CopyWidgetToPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+    <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(PublishDir)Widget" />
+    <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(PublishDir)Widget" />
+    <Copy SourceFiles="$(ProjectDir)build\NoApp.js" DestinationFolder="$(PublishDir)Widget" />
+  </Target>
+
+  <Target Name="CopyReadme" AfterTargets="Build">
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(OutDir)" />
+  </Target>
+
+  <Target Name="CopyReadmeToPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+    <Copy SourceFiles="$(ProjectDir)README.md" DestinationFolder="$(PublishDir)" />
+  </Target>
+
+  <!-- Clean stale _wpftmp.csproj after build -->
+  <Target Name="CleanWpfTempProjects" AfterTargets="Build">
+    <Delete Files="$(ProjectDir)*_wpftmp.csproj" />
+  </Target>
+
+</Project>
+

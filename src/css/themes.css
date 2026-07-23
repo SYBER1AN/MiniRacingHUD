@@ -1,0 +1,283 @@
+/* ==========================================
+   UI-цвета (синхронизировать с :root в all.css)
+   ========================================== */
+/* --page-bg: #1a1a1a;           — Фон страницы */
+/* --panel-bg: #c5c5c5;          — Фон интерфейса (панель настроек) */
+/* --section-bg: #bbbbbb;        — Фон подразделов */
+/* --element-bg: #0c1a1f;        — Фон кнопок (и тогглов, осей, селектов) */
+/* --accent: #97dd7a;             — Акцент (primary-кнопки, активные тогглы) */
+/* --panel-cont: #0c1a1f;        — Основной текст (на панели) */
+/* --element-cont: #ffffff;       — Контент кнопок (текст на кнопках/списках) */
+/* --help-bg: #0c1a1f;           — Фон справки */
+/* --help-cont: #bbbbbb;         — Текст справки */
+/* --help-heading: #ffffff;      — Заголовки справки */
+/* --disabled-bg: #4a4a4a;       — Фон неактивных элементов */
+/* --disabled-cont: #777777;     — Контент неактивных элементов */
+/* --last-active: #777777;       — Текст последнего действия */
+/* --scrollbar-track: #142a39;    — Фон скроллбара (дорожка) */
+/* --toggle-off: #909090;        — Кружки выкл. тогглов */
+/* --toggle-on: #0c1a1f;         — Кружки вкл. тогглов */
+
+/* ==========================================
+   Темы
+   ========================================== */
+:root[data-theme="Default"] {
+    --widget-bg: #b9b9b9;
+    --wheel-rim: #2b2b2b;
+    --wheel-spoke: #868686;
+    --gmeter-border: #2b2b2b;
+    --wheel-marker: #64df8a;
+    --gmeter-middle: #6c706d;
+    --gmeter-inner: #5d625e;
+    --gmeter-outer: #818181;
+    --gmeter-ball: #64df8a;
+    --gmeter-crosshair-dashed: #2b2b2b;
+    --gmeter-rings-dashed: #414642;
+    --gmeter-trail: #dbdbdb;
+    --gear-bg: #2b2b2b;
+    --gear-text: #64df8a;
+    --gear-n-bg: #2b2b2b;
+    --gear-n-text: #525252;
+    --gear-r-bg: #2b2b2b;
+    --gear-r-text: #f65365;
+    --pedal-bg: #dbdbdb;
+    --pedal-handbrake: #e94646;
+    --pedal-clutch: #78b8f0;
+    --pedal-brake: #f65365;
+    --pedal-throttle: #3ed66d;
+    --pedal-text: #000000;
+    --graph-grid: #2b2b2b;
+    --graph-text: #2b2b2b;
+}
+
+:root[data-theme="Dark"] {
+    --widget-bg: #363636;
+    --wheel-rim: #121212;
+    --wheel-spoke: #484848;
+    --gmeter-border: #121212;
+    --wheel-marker: #5bb436;
+    --gmeter-middle: #3c3c3c;
+    --gmeter-inner: #333333;
+    --gmeter-outer: #484848;
+    --gmeter-ball: #5bb436;
+    --gmeter-crosshair-dashed: #5aac37;
+    --gmeter-rings-dashed: #1e1e1e;
+    --gmeter-trail: #5bb436;
+    --gear-bg: #1b1b1b;
+    --gear-text: #5bb436;
+    --gear-n-bg: #1b1b1b;
+    --gear-n-text: #484848;
+    --gear-r-bg: #1b1b1b;
+    --gear-r-text: #d52d2d;
+    --pedal-bg: #121212;
+    --pedal-handbrake: #d04c25;
+    --pedal-clutch: #57a1c3;
+    --pedal-brake: #d52d2d;
+    --pedal-throttle: #5bb436;
+    --pedal-text: #484848;
+    --graph-grid: #121212;
+    --graph-text: #121212;
+}
+
+:root[data-theme="Pastel"] {
+    --widget-bg: #c8cdce;
+    --wheel-rim: #4a565a;
+    --wheel-spoke: #827e6c;
+    --gmeter-border: #827e6c;
+    --wheel-marker: #ffc107;
+    --gmeter-middle: #4a565a;
+    --gmeter-inner: #5a666a;
+    --gmeter-outer: #3a464a;
+    --gmeter-ball: #ffc107;
+    --gmeter-crosshair-dashed: #827e6c;
+    --gmeter-rings-dashed: #878168;
+    --gmeter-trail: #c8cdce;
+    --gear-bg: #4a565a;
+    --gear-text: #ffc107;
+    --gear-n-bg: #4a565a;
+    --gear-n-text: #aeaeae;
+    --gear-r-bg: #4a565a;
+    --gear-r-text: #eb5348;
+    --pedal-bg: #4a565a;
+    --pedal-handbrake: #cc9459;
+    --pedal-clutch: #83a9b4;
+    --pedal-brake: #ca8b61;
+    --pedal-throttle: #6bb3a2;
+    --pedal-text: #c8cdce;
+    --graph-grid: #9ea6a8;
+    --graph-text: #4a565a;
+}
+
+:root[data-theme="Vintage"] {
+    --widget-bg: #bcb8b0;
+    --wheel-rim: #524434;
+    --wheel-spoke: #877f69;
+    --gmeter-border: #877f69;
+    --wheel-marker: #d5d0c2;
+    --gmeter-middle: #2b3134;
+    --gmeter-inner: #3b4144;
+    --gmeter-outer: #1b2124;
+    --gmeter-ball: #d5d0c2;
+    --gmeter-crosshair-dashed: #877f69;
+    --gmeter-rings-dashed: #877E65;
+    --gmeter-trail: #bcb8b0;
+    --gear-bg: #2b3134;
+    --gear-text: #d5d0c2;
+    --gear-n-bg: #2b3134;
+    --gear-n-text: #7e898d;
+    --gear-r-bg: #2b3134;
+    --gear-r-text: #d5d0c2;
+    --pedal-bg: #2b3134;
+    --pedal-handbrake: #9c691c;
+    --pedal-clutch: #4c859e;
+    --pedal-brake: #a13623;
+    --pedal-throttle: #37871f;
+    --pedal-text: #bcb8b0;
+    --graph-grid: #877f69;
+    --graph-text: #877f69;
+}
+
+:root[data-theme="Black"] {
+    --widget-bg: #404040;
+    --wheel-rim: #111111;
+    --wheel-spoke: #222222;
+    --gmeter-border: #222222;
+    --wheel-marker: #cebd3a;
+    --gmeter-middle: #222222;
+    --gmeter-inner: #111111;
+    --gmeter-outer: #111111;
+    --gmeter-ball: #cebd3a;
+    --gmeter-crosshair-dashed: #6b6b6b;
+    --gmeter-rings-dashed: #4F4F4F;
+    --gmeter-trail: #6b6b6b;
+    --gear-bg: #cebd3a;
+    --gear-text: #000000;
+    --gear-n-bg: #111111;
+    --gear-n-text: #6b6b6b;
+    --gear-r-bg: #ea352b;
+    --gear-r-text: #111111;
+    --pedal-bg: #111111;
+    --pedal-handbrake: #ff7b00;
+    --pedal-clutch: #639cf7;
+    --pedal-brake: #ea352b;
+    --pedal-throttle: #63df47;
+    --pedal-text: #6b6b6b;
+    --graph-grid: #6b6b6b;
+    --graph-text: #6b6b6b;
+}
+
+:root[data-theme="White"] {
+    --widget-bg: #444444;
+    --wheel-rim: #ffffff;
+    --wheel-spoke: #b9b9b9;
+    --gmeter-border: #ffffff;
+    --wheel-marker: #eda918;
+    --gmeter-middle: #9c9c9c;
+    --gmeter-inner: #848484;
+    --gmeter-outer: #b1b1b1;
+    --gmeter-ball: #eda918;
+    --gmeter-crosshair-dashed: #ffffff;
+    --gmeter-rings-dashed: #FFFFFF;
+    --gmeter-trail: #eda918;
+    --gear-bg: #5a5a5a;
+    --gear-text: #ffffff;
+    --gear-n-bg: #e6e6e6;
+    --gear-n-text: #b1b1b1;
+    --gear-r-bg: #ef5a69;
+    --gear-r-text: #ffffff;
+    --pedal-bg: #ffffff;
+    --pedal-handbrake: #f67541;
+    --pedal-clutch: #6fbde2;
+    --pedal-brake: #fe6060;
+    --pedal-throttle: #abe65a;
+    --pedal-text: #5a5a5a;
+    --graph-grid: #e6e6e6;
+    --graph-text: #e6e6e6;
+}
+
+:root[data-theme="Monochrome"] {
+    --widget-bg: #454545;
+    --wheel-rim: #000000;
+    --wheel-spoke: #202020;
+    --gmeter-border: #202020;
+    --wheel-marker: #ffffff;
+    --gmeter-middle: #202020;
+    --gmeter-inner: #000000;
+    --gmeter-outer: #000000;
+    --gmeter-ball: #ffffff;
+    --gmeter-crosshair-dashed: #ffffff;
+    --gmeter-rings-dashed: #636363;
+    --gmeter-trail: #a7a7a7;
+    --gear-bg: #000000;
+    --gear-text: #ffffff;
+    --gear-n-bg: #000000;
+    --gear-n-text: #454545;
+    --gear-r-bg: #ffffff;
+    --gear-r-text: #000000;
+    --pedal-bg: #000000;
+    --pedal-handbrake: #ffffff;
+    --pedal-clutch: #a7a7a7;
+    --pedal-brake: #d6d6d6;
+    --pedal-throttle: #ffffff;
+    --pedal-text: #454545;
+    --graph-grid: #606060;
+    --graph-text: #7a7a7a;
+}
+
+:root[data-theme="DR2"] {
+    --widget-bg: #44464a;
+    --wheel-rim: #c8c8c8;
+    --wheel-spoke: #ffffff;
+    --gmeter-border: #ffffff;
+    --wheel-marker: #ff003c;
+    --gmeter-middle: #44464a;
+    --gmeter-inner: #54565b;
+    --gmeter-outer: #34363a;
+    --gmeter-ball: #ff003c;
+    --gmeter-crosshair-dashed: #ffffff;
+    --gmeter-rings-dashed: #A2A2A2;
+    --gmeter-trail: #ffffff;
+    --gear-bg: #54565b;
+    --gear-text: #ffffff;
+    --gear-n-bg: #c8c8c8;
+    --gear-n-text: #54565b;
+    --gear-r-bg: #ff003c;
+    --gear-r-text: #ffffff;
+    --pedal-bg: #3b3e43;
+    --pedal-handbrake: #fe001b;
+    --pedal-clutch: #06aaf9;
+    --pedal-brake: #ff003c;
+    --pedal-throttle: #c8c8c8;
+    --pedal-text: #ffffff;
+    --graph-grid: #54565b;
+    --graph-text: #ffffff;
+}
+
+:root[data-theme="BeamNG"] {
+    --widget-bg: #000000;
+    --wheel-rim: #1e1e1e;
+    --wheel-spoke: #343434;
+    --wheel-marker: #ff6600;
+    --gmeter-middle: #282828;
+    --gmeter-inner: #1e1e1e;
+    --gmeter-outer: #343434;
+    --gmeter-ball: #ff6600;
+    --gmeter-crosshair-dashed: #dadde8;
+    --gmeter-rings-dashed: #91939a;
+    --gmeter-trail: #ffffff;
+    --gmeter-border: #1e1e1e;
+    --gear-bg: #1e1e1e;
+    --gear-text: #dadde8;
+    --gear-n-bg: #1e1e1e;
+    --gear-n-text: #54565b;
+    --gear-r-bg: #d70000;
+    --gear-r-text: #ffffff;
+    --pedal-bg: #1e1e1e;
+    --pedal-handbrake: #ff6600;
+    --pedal-clutch: #238be6;
+    --pedal-brake: #d70000;
+    --pedal-throttle: #009a1a;
+    --pedal-text: #ffffff;
+    --graph-grid: #343434;
+    --graph-text: #dadde8;
+}

@@ -1,0 +1,108 @@
+<Window x:Class="MiniRacingHUD.ThemeEditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MiniRacingHUD"
+        xmlns:res="clr-namespace:MiniRacingHUD.Properties"
+        xmlns:loc="clr-namespace:MiniRacingHUD"
+        Title="{loc:Loc WindowTitle_ThemeEditor}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ColorEditorShared.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <local:BaseDialogWindow x:Name="shell">
+        <local:BaseDialogWindow.BodyContent>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="300"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Панель выбора цвета + название темы -->
+                    <DockPanel Grid.Column="0" Margin="0,0,7.5,0" LastChildFill="True">
+                        <local:BlockPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                            <local:BlockPanel.Header>
+                                <TextBlock>
+                                    <Run Text="{loc:Loc Label_ThemeName}"/>
+                                    <Run Text="{loc:Loc Label_ThemeNameHint}"
+                                         Foreground="{StaticResource TextSecondaryBrush}"
+                                         FontSize="11"
+                                         FontWeight="Normal"/>
+                                </TextBlock>
+                            </local:BlockPanel.Header>
+                            <StackPanel>
+                                <local:InputField Tag="ThemeNameField"
+                                                  Label="{loc:Loc Label_Name}"
+                                                  MaxLength="40"
+                                                  ToolTipText="{loc:Loc Tooltip_EditThemeName}"/>
+                            </StackPanel>
+                        </local:BlockPanel>
+
+                        <local:BlockPanel Header="{loc:Loc Label_ColorSelection}">
+                            <local:ColorPicker/>
+                        </local:BlockPanel>
+                    </DockPanel>
+
+                    <!-- Группы «Руль», «КПП», «Педали» (индекс 0–2) -->
+                    <ItemsControl Grid.Column="1" Margin="7.5,0,7.5,0"
+                                  ItemsSource="{Binding LeftGroups}"
+                                  ItemTemplate="{StaticResource ColorGroupTemplate}"
+                                  VerticalContentAlignment="Stretch"
+                                  PreviewMouseLeftButtonDown="ColorItem_PreviewMouseDown">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="DockPanel.Dock" Value="Top"/>
+                                <Setter Property="Margin" Value="0,0,0,10"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel LastChildFill="True" Margin="0,0,0,-10"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+
+                    <!-- Группы «G-meter», «Графики», «Виджет» (индекс 3–5) -->
+                    <ItemsControl Grid.Column="2" Margin="7.5,0,0,0"
+                                  ItemsSource="{Binding RightGroups}"
+                                  ItemTemplate="{StaticResource ColorGroupTemplate}"
+                                  VerticalContentAlignment="Stretch"
+                                  PreviewMouseLeftButtonDown="ColorItem_PreviewMouseDown">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="DockPanel.Dock" Value="Top"/>
+                                <Setter Property="Margin" Value="0,0,0,10"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <DockPanel LastChildFill="True" Margin="0,0,0,-10"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+<Button Content="{loc:Loc Button_Ok}" Style="{StaticResource GreenButton}"
+        Width="120" Height="32" Click="SaveButton_Click"/>
+                    <Button Content="{loc:Loc Button_Cancel}" Style="{StaticResource GrayButton}"
+                            Width="120" Height="32" Margin="10,0,0,0" Click="CancelButton_Click"/>
+                    <Button Content="{loc:Loc Button_Apply}" Style="{StaticResource GrayButton}"
+                            Width="120" Height="32" Margin="10,0,0,0" Click="ApplyButton_Click"/>
+                    <Button Content="{loc:Loc Button_ResetAll}" Style="{StaticResource GrayButton}"
+                            Width="120" Height="32" Margin="10,0,0,0" Click="ResetButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </local:BaseDialogWindow.BodyContent>
+    </local:BaseDialogWindow>
+</Window>

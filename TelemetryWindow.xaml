@@ -1,0 +1,65 @@
+<Window x:Class="MiniRacingHUD.TelemetryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MiniRacingHUD"
+        xmlns:res="clr-namespace:MiniRacingHUD.Properties"
+        xmlns:loc="clr-namespace:MiniRacingHUD"
+        Title="{loc:Loc WindowTitle_Telemetry}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <DataTemplate x:Key="TelemetryFieldTemplate" DataType="{x:Type local:TelemetryFieldViewModel}">
+            <Border CornerRadius="2" Padding="0,2,0,2"
+                    Background="{Binding RowBackground}">
+                <Grid Width="315">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="155"/>
+                        <ColumnDefinition Width="160"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Label}"
+                               FontSize="11"
+                               Foreground="{StaticResource TextPrimaryBrush}"
+                               Margin="0,0,4,0"
+                               VerticalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Tag="{Binding Key}"
+                               FontFamily="Consolas"
+                               FontSize="12"
+                               Foreground="Gray"
+                               Text="---"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center"/>
+                </Grid>
+            </Border>
+        </DataTemplate>
+
+    </Window.Resources>
+    <local:BaseDialogWindow x:Name="shell" Title="{loc:Loc WindowTitle_Telemetry}">
+        <local:BaseDialogWindow.BodyContent>
+            <StackPanel Margin="12,8,12,12">
+                <TextBlock Tag="StatusText"
+                           Text="{loc:Loc Status_WaitingForData}"
+                           Foreground="Orange"
+                           Margin="0,0,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <Border BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="4"
+                            Padding="6" Background="{StaticResource SurfaceBrush}">
+                        <ItemsControl ItemsSource="{Binding PrimaryColumn.Fields}"
+                                      ItemTemplate="{StaticResource TelemetryFieldTemplate}"
+                                      AlternationCount="2"/>
+                    </Border>
+                    <Border Tag="SecondaryCol"
+                            BorderBrush="{StaticResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="4"
+                            Padding="6" Background="{StaticResource SurfaceBrush}"
+                            Margin="8,0,0,0"
+                            Visibility="Collapsed">
+                        <ItemsControl ItemsSource="{Binding SecondaryColumn.Fields}"
+                                      ItemTemplate="{StaticResource TelemetryFieldTemplate}"
+                                      AlternationCount="2"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </local:BaseDialogWindow.BodyContent>
+    </local:BaseDialogWindow>
+</Window>

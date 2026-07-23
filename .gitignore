@@ -1,0 +1,48 @@
+# .NET
+bin/
+obj/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+
+# Сборка (генерируется build.ps1)
+build/
+
+# Иконки
+Icons/
+
+# Adobe Illustrator
+*.ai
+
+# Логотипы (не используются в коде)
+MiniRacingHUD.png
+MiniRacingHUD.svg
+
+# Документация, не для GitHub
+CHANGELOG.md
+PROJECT.md
+AGENTS.md
+GIT.md
+
+# OpenCode
+.opencode/
+
+# VS Code
+*.code-workspace
+
+# Личные пресеты (не для GitHub)
+src/presets/
+
+# Dev-утилиты (не для GitHub)
+backup.ps1
+unpackHTML.ps1
+migrate_presets.ps1
+
+# Мусор
+Новый текстовый документ.txt
+*.bak*
+*.backup
+*.log
+*.tmp

@@ -1,0 +1,268 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- MainWindow.xaml -->
+  <data name="Toggle_DirectInput" xml:space="preserve"><value>DirectInput</value></data>
+  <data name="Toggle_Telemetry" xml:space="preserve"><value>Телеметрия</value></data>
+  <data name="Toggle_AutoSelect" xml:space="preserve"><value>Автовыбор</value></data>
+  <data name="Toggle_MinimizeOnStart" xml:space="preserve"><value>Сворачивать при запуске</value></data>
+  <data name="Toggle_MinimizeToTray" xml:space="preserve"><value>Сворачивать в трей</value></data>
+  <data name="Tooltip_DirectInput" xml:space="preserve"><value>Использовать DirectInput вместо Gamepad API для USB/HID-устройств</value></data>
+  <data name="Tooltip_Telemetry" xml:space="preserve"><value>Принимать телеметрию игры</value></data>
+  <data name="Tooltip_UdpPort" xml:space="preserve"><value>UDP-порт для телеметрии игры</value></data>
+  <data name="Tooltip_ShowTelemetry" xml:space="preserve"><value>Посмотреть всю доступную телеметрию игры</value></data>
+  <data name="Tooltip_ColorEditor" xml:space="preserve"><value>Редактор цветов UI</value></data>
+  <data name="Tooltip_ThemeEditor" xml:space="preserve"><value>Редактор тем виджета</value></data>
+  <data name="Tooltip_GameSelect" xml:space="preserve"><value>Выбор игры для телеметрии</value></data>
+  <data name="Tooltip_AutoDetect" xml:space="preserve"><value>Автоматически переключаться на запущенную игру</value></data>
+  <data name="Tooltip_MinimizeOnStart" xml:space="preserve"><value>Сворачивать окно при запуске приложения</value></data>
+  <data name="Tooltip_MinimizeToTray" xml:space="preserve"><value>Сворачивать приложение в системный трей</value></data>
+  <data name="Tooltip_RefreshPage" xml:space="preserve"><value>Обновить страницу</value></data>
+  <data name="Tooltip_CopyUrl" xml:space="preserve"><value>Копировать URL виджета для OBS</value></data>
+  <data name="Tooltip_BrowseHtml" xml:space="preserve"><value>Выбрать HTML-файл виджета</value></data>
+  <data name="Tooltip_UdpStatus" xml:space="preserve"><value>Статус приёма телеметрии</value></data>
+  <data name="Tooltip_WsStatus" xml:space="preserve"><value>Состояние WebSocket</value></data>
+  <data name="Tooltip_ClientsCount" xml:space="preserve"><value>Количество подключённых клиентов</value></data>
+  <data name="Status_SharedMemoryOff" xml:space="preserve"><value>Shared Memory: OFF</value></data>
+  <data name="Status_WsOff" xml:space="preserve"><value>WebSocket: OFF</value></data>
+  <data name="Status_Clients" xml:space="preserve"><value>Клиенты: {0}</value></data>
+  <data name="Menu_Change" xml:space="preserve"><value>Изменить</value></data>
+  <data name="Menu_CopyUrl" xml:space="preserve"><value>Копировать URL</value></data>
+  <data name="Menu_Default" xml:space="preserve"><value>По умолчанию</value></data>
+  <data name="Tooltip_MenuChange" xml:space="preserve"><value>Указать новый путь к HTML-файлу виджета</value></data>
+  <data name="Tooltip_MenuCopyUrl" xml:space="preserve"><value>Копировать URL виджета для OBS</value></data>
+  <data name="Tooltip_MenuDefault" xml:space="preserve"><value>Установить путь по умолчанию</value></data>
+  <data name="Overlay_Loading" xml:space="preserve"><value>Пожалуйста, подождите...</value></data>
+  <data name="Overlay_NoHtmlPath" xml:space="preserve"><value>Укажите путь к HTML-файлу виджета</value></data>
+  <!-- MainWindow.xaml.cs -->
+  <data name="WindowTitle_MainWithVersion" xml:space="preserve"><value>Mini Racing HUD v{0}</value></data>
+  <data name="Error_ConfigLoad" xml:space="preserve"><value>Ошибка загрузки AppConfig.json, используются настройки по умолчанию</value></data>
+  <data name="Error_ConfigSave" xml:space="preserve"><value>Ошибка сохранения настроек: {0}</value></data>
+  <data name="Error_ColorsSave" xml:space="preserve"><value>Ошибка сохранения цветов: {0}</value></data>
+  <data name="Error_ConfigParse" xml:space="preserve"><value>Ошибка загрузки config: {0}</value></data>
+  <data name="Error_WebViewNotLoaded" xml:space="preserve"><value>WebView не загружен: {0}</value></data>
+  <data name="Error_NavigationFailed" xml:space="preserve"><value>Ошибка: {0}</value></data>
+  <data name="Error_InitFailed" xml:space="preserve"><value>Ошибка инициализации: {0}</value></data>
+  <data name="Error_HtmlNotFound" xml:space="preserve"><value>HTML-файл не найден: {0}</value></data>
+  <data name="Error_PresetSave" xml:space="preserve"><value>Ошибка сохранения пресета: {0}</value></data>
+  <data name="Error_PresetList" xml:space="preserve"><value>Ошибка списка пресетов: {0}</value></data>
+  <data name="Error_PresetLoad" xml:space="preserve"><value>Ошибка загрузки пресета: {0}</value></data>
+  <data name="Error_PresetDelete" xml:space="preserve"><value>Ошибка удаления пресета: {0}</value></data>
+  <data name="Error_ThemeDelete" xml:space="preserve"><value>Ошибка удаления темы: {0}</value></data>
+  <data name="Error_ThemeSave" xml:space="preserve"><value>Ошибка сохранения темы: {0}</value></data>
+  <data name="Error_NoTelemetryProvider" xml:space="preserve"><value>Нет провайдера телеметрии для "{0}"</value></data>
+  <data name="Error_UdpGeneric" xml:space="preserve"><value>Ошибка UDP: {0}</value></data>
+  <data name="Error_WebSocket" xml:space="preserve"><value>Ошибка WebSocket: {0}</value></data>
+  <data name="Error_PortSave" xml:space="preserve"><value>Ошибка сохранения порта: {0}</value></data>
+  <data name="Error_PortRange" xml:space="preserve"><value>Порт должен быть в диапазоне 1024-65535</value></data>
+  <data name="Error_NoHtmlPath" xml:space="preserve"><value>Не указан путь к HTML-файлу</value></data>
+  <data name="Status_TelemetryOn" xml:space="preserve"><value>UDP-телеметрия включена на порту {0}</value></data>
+  <data name="Status_TelemetryOff" xml:space="preserve"><value>Телеметрия отключена</value></data>
+  <data name="Status_TelemetryOnShort" xml:space="preserve"><value>Телеметрия включена</value></data>
+  <data name="Status_TelemetryOffShort" xml:space="preserve"><value>Телеметрия отключена</value></data>
+  <data name="Status_PortChanged" xml:space="preserve"><value>Порт UDP изменён на {0}</value></data>
+  <data name="Status_WsOn" xml:space="preserve"><value>WebSocket: Вкл</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Готово!</value></data>
+  <data name="Status_Copied" xml:space="preserve"><value>✓ Скопировано</value></data>
+  <data name="Tooltip_RestoreDown" xml:space="preserve"><value>Свернуть в окно</value></data>
+  <data name="Tooltip_Maximize" xml:space="preserve"><value>Развернуть</value></data>
+  <data name="Button_ThemeEditor" xml:space="preserve"><value>Редактор тем</value></data>
+  <data name="Tray_Open" xml:space="preserve"><value>Открыть</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Выйти</value></data>
+  <data name="Tray_Tooltip" xml:space="preserve"><value>Mini Racing HUD</value></data>
+  <data name="Dialog_DonationTitle" xml:space="preserve"><value>Приветствую!</value></data>
+  <data name="Dialog_DonationBody" xml:space="preserve"><value>В Mini Racing HUD было вложено много сил и времени. Если оно приносит вам пользу — буду благодарен за поддержку на </value></data>
+  <data name="Dialog_DonationLink" xml:space="preserve"><value>стримах</value></data>
+  <data name="Dialog_DonationPostscript" xml:space="preserve"><value>.&#10;Приятного использования!</value></data>
+  <data name="Dialog_DonationClose" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Dialog_ConfirmTitle" xml:space="preserve"><value>Подтверждение</value></data>
+  <data name="Dialog_ConfirmDeleteGame" xml:space="preserve"><value>Вы уверены, что хотите удалить игру "{0}"?</value></data>
+  <data name="Dialog_ButtonYes" xml:space="preserve"><value>Да</value></data>
+  <data name="Dialog_ButtonNo" xml:space="preserve"><value>Нет</value></data>
+  <data name="Dialog_ButtonCancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Dialog_UdpDataError" xml:space="preserve"><value>UDP Data Error</value></data>
+  <data name="Filter_HtmlFiles" xml:space="preserve"><value>HTML files (*.html)|*.html</value></data>
+  <data name="Filter_ExecutableFiles" xml:space="preserve"><value>Исполняемые файлы (*.exe)|*.exe</value></data>
+  <data name="Dialog_SelectExecutable" xml:space="preserve"><value>Выберите исполняемый файл игры</value></data>
+  <data name="Status_UdpOff" xml:space="preserve"><value>UDP: OFF</value></data>
+  <data name="Status_UdpErr" xml:space="preserve"><value>UDP: ERR</value></data>
+  <data name="Status_UdpDash" xml:space="preserve"><value>UDP: —</value></data>
+  <data name="Status_SharedMemoryOn" xml:space="preserve"><value>Shared Memory: Вкл</value></data>
+  <data name="Status_UdpPortLabel_SharedMemory" xml:space="preserve"><value>Shared Memory mode</value></data>
+  <data name="Status_UdpPortLabel_Udp" xml:space="preserve"><value>UDP</value></data>
+  <data name="Status_NotRunning" xml:space="preserve"><value>Телеметрия: Не запущена</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Телеметрия: Принимается</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Телеметрия: Ожидание...</value></data>
+  <data name="Status_UdpOn" xml:space="preserve"><value>UDP {0}: Вкл</value></data>
+  <data name="Status_ShmemOff" xml:space="preserve"><value>Shared Memory: ВЫКЛ</value></data>
+  <!-- ColorEditorWindow.xaml -->
+  <data name="WindowTitle_ColorEditor" xml:space="preserve"><value>Редактор цветов UI</value></data>
+  <data name="Button_Ok" xml:space="preserve"><value>Ок</value></data>
+  <data name="Button_Cancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Button_Apply" xml:space="preserve"><value>Применить</value></data>
+  <data name="Button_ResetAll" xml:space="preserve"><value>Сбросить всё</value></data>
+  <!-- ColorEditorWindow.xaml.cs -->
+  <data name="ColorGroup_Background" xml:space="preserve"><value>Фон</value></data>
+  <data name="ColorGroup_Controls" xml:space="preserve"><value>Элементы управления</value></data>
+  <data name="ColorGroup_Other" xml:space="preserve"><value>Остальное</value></data>
+  <data name="ColorGroup_Help" xml:space="preserve"><value>Справка</value></data>
+  <data name="ColorItem_PageBg" xml:space="preserve"><value>Фон страницы</value></data>
+  <data name="ColorItem_PanelBg" xml:space="preserve"><value>Основной фон UI</value></data>
+  <data name="ColorItem_SectionBg" xml:space="preserve"><value>Фон разделов</value></data>
+  <data name="ColorItem_PanelCont" xml:space="preserve"><value>Основной текст</value></data>
+  <data name="ColorItem_Accent" xml:space="preserve"><value>Акцентный цвет</value></data>
+  <data name="ColorItem_BindCont" xml:space="preserve"><value>Текст в слотах биндов</value></data>
+  <data name="ColorItem_ToggleOn" xml:space="preserve"><value>Кружки переключателей (вкл.)</value></data>
+  <data name="ColorItem_ToggleOff" xml:space="preserve"><value>Кружки переключателей (выкл.)</value></data>
+  <data name="ColorItem_ElementBg" xml:space="preserve"><value>Фон кнопок</value></data>
+  <data name="ColorItem_ElementCont" xml:space="preserve"><value>Контент кнопок</value></data>
+  <data name="ColorItem_DisabledBg" xml:space="preserve"><value>Фон неактивных элементов</value></data>
+  <data name="ColorItem_DisabledCont" xml:space="preserve"><value>Контент неактивных элементов</value></data>
+  <data name="ColorItem_ScrollbarTrack" xml:space="preserve"><value>Трек скроллбара</value></data>
+  <data name="ColorItem_CodeBg" xml:space="preserve"><value>Фон текста со стилем кода</value></data>
+  <data name="ColorItem_CodeCont" xml:space="preserve"><value>Текст со стилем кода</value></data>
+  <data name="ColorItem_LastActive" xml:space="preserve"><value>Текст последнего действия</value></data>
+  <data name="ColorItem_DangerBg" xml:space="preserve"><value>Фон опасных действий</value></data>
+  <data name="ColorItem_DangerCont" xml:space="preserve"><value>Контент опасных действий</value></data>
+  <data name="ColorItem_Border" xml:space="preserve"><value>Разделители</value></data>
+  <data name="ColorItem_HelpBg" xml:space="preserve"><value>Фон справки</value></data>
+  <data name="ColorItem_HelpCont" xml:space="preserve"><value>Текст справки</value></data>
+  <data name="ColorItem_HelpHeading" xml:space="preserve"><value>Заголовки и главное</value></data>
+  <!-- ThemeEditorWindow.xaml -->
+  <data name="WindowTitle_ThemeEditor" xml:space="preserve"><value>Редактор тем</value></data>
+  <data name="Label_ThemeName" xml:space="preserve"><value>Название темы</value></data>
+  <data name="Label_ThemeNameHint" xml:space="preserve"><value> (a-z, 0-9, -, _)</value></data>
+  <data name="Label_Name" xml:space="preserve"><value>Имя</value></data>
+  <data name="Label_ColorSelection" xml:space="preserve"><value>Выбор цвета</value></data>
+  <!-- ThemeEditorWindow.xaml.cs -->
+  <data name="WindowTitle_ThemeEditorWithName" xml:space="preserve"><value>Редактор темы: {0}</value></data>
+  <data name="ThemeGroup_Wheel" xml:space="preserve"><value>Руль</value></data>
+  <data name="ThemeGroup_Pedals" xml:space="preserve"><value>Педали</value></data>
+  <data name="ThemeGroup_Gearbox" xml:space="preserve"><value>КПП</value></data>
+  <data name="ThemeGroup_Gmeter" xml:space="preserve"><value>G-meter</value></data>
+  <data name="ThemeGroup_General" xml:space="preserve"><value>Общее</value></data>
+  <data name="ThemeItem_WheelRim" xml:space="preserve"><value>Обод</value></data>
+  <data name="ThemeItem_WheelSpoke" xml:space="preserve"><value>Спицы</value></data>
+  <data name="ThemeItem_WheelMarker" xml:space="preserve"><value>Маркер</value></data>
+  <data name="ThemeItem_PedalBg" xml:space="preserve"><value>Фон</value></data>
+  <data name="ThemeItem_PedalText" xml:space="preserve"><value>Текст</value></data>
+  <data name="ThemeItem_PedalThrottle" xml:space="preserve"><value>Газ</value></data>
+  <data name="ThemeItem_PedalBrake" xml:space="preserve"><value>Тормоз</value></data>
+  <data name="ThemeItem_PedalClutch" xml:space="preserve"><value>Сцепление</value></data>
+  <data name="ThemeItem_PedalHandbrake" xml:space="preserve"><value>Ручник</value></data>
+  <data name="ThemeItem_GearBg" xml:space="preserve"><value>Фон (Передачи 1+)</value></data>
+  <data name="ThemeItem_GearText" xml:space="preserve"><value>Текст (Передачи 1+)</value></data>
+  <data name="ThemeItem_GearRBg" xml:space="preserve"><value>Фон (Передача R)</value></data>
+  <data name="ThemeItem_GearRText" xml:space="preserve"><value>Текст (Передача R)</value></data>
+  <data name="ThemeItem_GearNBg" xml:space="preserve"><value>Фон (Передача N)</value></data>
+  <data name="ThemeItem_GearNText" xml:space="preserve"><value>Текст (Передача N)</value></data>
+  <data name="ThemeItem_GmeterBorder" xml:space="preserve"><value>Обод</value></data>
+  <data name="ThemeItem_GmeterOuter" xml:space="preserve"><value>Внешнее кольцо</value></data>
+  <data name="ThemeItem_GmeterMiddle" xml:space="preserve"><value>Среднее кольцо</value></data>
+  <data name="ThemeItem_GmeterInner" xml:space="preserve"><value>Центр</value></data>
+  <data name="ThemeItem_GmeterRingsDashed" xml:space="preserve"><value>Границы колец</value></data>
+  <data name="ThemeItem_GmeterCrosshairDashed" xml:space="preserve"><value>Перекрестие</value></data>
+  <data name="ThemeItem_GmeterBall" xml:space="preserve"><value>Шарик</value></data>
+  <data name="ThemeItem_GmeterTrail" xml:space="preserve"><value>Шлейф шарика</value></data>
+  <data name="ThemeItem_WidgetBg" xml:space="preserve"><value>Фон</value></data>
+  <data name="ThemeItem_GraphGrid" xml:space="preserve"><value>Сетка графиков</value></data>
+  <data name="ThemeItem_GraphText" xml:space="preserve"><value>Подписи графиков</value></data>
+  <!-- AddGameDialog -->
+  <data name="WindowTitle_AddGame" xml:space="preserve"><value>Новая игра</value></data>
+  <data name="Label_GameName" xml:space="preserve"><value>Имя</value></data>
+  <data name="Tooltip_GameName" xml:space="preserve"><value>Название игры в списке (может быть любым)</value></data>
+  <data name="Button_Add" xml:space="preserve"><value>Добавить</value></data>
+  <data name="Validation_AllowedChars" xml:space="preserve"><value>Только буквы, цифры, пробел, - и _</value></data>
+  <data name="Validation_EnterGameName" xml:space="preserve"><value>Введите имя игры</value></data>
+  <!-- NewThemeDialog -->
+  <data name="WindowTitle_NewTheme" xml:space="preserve"><value>Новая тема</value></data>
+  <data name="Tooltip_NewThemeName" xml:space="preserve"><value>Название новой темы</value></data>
+  <data name="Tooltip_EditThemeName" xml:space="preserve"><value>Название редактируемой темы</value></data>
+  <data name="Button_Create" xml:space="preserve"><value>Создать</value></data>
+  <data name="Validation_EnterThemeName" xml:space="preserve"><value>Введите название темы</value></data>
+  <data name="Validation_ThemeNameTaken" xml:space="preserve"><value>Укажите другое имя, это встроенная тема</value></data>
+  <!-- App.xaml.cs -->
+  <data name="Dialog_AppTitle" xml:space="preserve"><value>Mini Racing HUD</value></data>
+  <data name="Dialog_AlreadyRunning" xml:space="preserve"><value>Mini Racing HUD уже запущен.</value></data>
+  <!-- Models.cs -->
+  <data name="Constants_NoTelemetry" xml:space="preserve"><value>Игра без телеметрии</value></data>
+  <data name="Constants_AddGame" xml:space="preserve"><value>Добавить игру...</value></data>
+  <!-- ColorPicker.xaml -->
+  <data name="Tooltip_Eyedropper" xml:space="preserve"><value>Пипетка</value></data>
+  <data name="Tooltip_ColorPreview" xml:space="preserve"><value>Цвет До/После</value></data>
+  <data name="Tooltip_HexCode" xml:space="preserve"><value>HEX-код цвета</value></data>
+  <data name="Tooltip_CopyHex" xml:space="preserve"><value>Копировать HEX</value></data>
+  <data name="Tooltip_PasteHex" xml:space="preserve"><value>Вставить HEX</value></data>
+  <data name="Button_Reset" xml:space="preserve"><value>Сбросить</value></data>
+  <!-- BaseDialogWindow.xaml -->
+  <data name="Tooltip_Minimize" xml:space="preserve"><value>Свернуть</value></data>
+  <data name="Tooltip_Close" xml:space="preserve"><value>Закрыть</value></data>
+  <!-- TelemetryWindow -->
+  <data name="WindowTitle_Telemetry" xml:space="preserve"><value>Телеметрия</value></data>
+  <data name="Status_WaitingForData" xml:space="preserve"><value>Ожидание данных...</value></data>
+  <data name="Status_LiveTelemetry" xml:space="preserve"><value>Live @ {0}Hz</value></data>
+  <!-- ColorEditorShared.xaml -->
+  <!-- Language -->
+  <data name="Status_Language" xml:space="preserve"><value>Язык: {0}</value></data>
+  <!-- MainWindow labels -->
+  <data name="Label_Language" xml:space="preserve"><value>Язык:</value></data>
+  <data name="Label_Game" xml:space="preserve"><value>Игра:</value></data>
+  <data name="Label_Html" xml:space="preserve"><value>HTML</value></data>
+</root>

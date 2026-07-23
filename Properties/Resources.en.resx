@@ -1,0 +1,198 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="Toggle_DirectInput" xml:space="preserve"><value>DirectInput</value></data>
+  <data name="Toggle_Telemetry" xml:space="preserve"><value>Telemetry</value></data>
+  <data name="Toggle_AutoSelect" xml:space="preserve"><value>Auto-detect</value></data>
+  <data name="Toggle_MinimizeOnStart" xml:space="preserve"><value>Minimize on start</value></data>
+  <data name="Toggle_MinimizeToTray" xml:space="preserve"><value>Minimize to tray</value></data>
+  <data name="Tooltip_DirectInput" xml:space="preserve"><value>Use DirectInput instead of Gamepad API for USB/HID devices</value></data>
+  <data name="Tooltip_Telemetry" xml:space="preserve"><value>Receive game telemetry</value></data>
+  <data name="Tooltip_UdpPort" xml:space="preserve"><value>UDP port for game telemetry</value></data>
+  <data name="Tooltip_ShowTelemetry" xml:space="preserve"><value>View all available game telemetry</value></data>
+  <data name="Tooltip_ColorEditor" xml:space="preserve"><value>UI Color Editor</value></data>
+  <data name="Tooltip_ThemeEditor" xml:space="preserve"><value>Widget Theme Editor</value></data>
+  <data name="Tooltip_GameSelect" xml:space="preserve"><value>Select game for telemetry</value></data>
+  <data name="Tooltip_AutoDetect" xml:space="preserve"><value>Automatically switch to running game</value></data>
+  <data name="Tooltip_MinimizeOnStart" xml:space="preserve"><value>Minimize window on app start</value></data>
+  <data name="Tooltip_MinimizeToTray" xml:space="preserve"><value>Minimize app to system tray</value></data>
+  <data name="Tooltip_RefreshPage" xml:space="preserve"><value>Refresh page</value></data>
+  <data name="Tooltip_CopyUrl" xml:space="preserve"><value>Copy widget URL for OBS</value></data>
+  <data name="Tooltip_BrowseHtml" xml:space="preserve"><value>Select widget HTML file</value></data>
+  <data name="Tooltip_UdpStatus" xml:space="preserve"><value>Telemetry receive status</value></data>
+  <data name="Tooltip_WsStatus" xml:space="preserve"><value>WebSocket status</value></data>
+  <data name="Tooltip_ClientsCount" xml:space="preserve"><value>Connected clients count</value></data>
+  <data name="Status_SharedMemoryOff" xml:space="preserve"><value>Shared Memory: OFF</value></data>
+  <data name="Status_WsOff" xml:space="preserve"><value>WebSocket: OFF</value></data>
+  <data name="Status_Clients" xml:space="preserve"><value>Clients: {0}</value></data>
+  <data name="Menu_Change" xml:space="preserve"><value>Change</value></data>
+  <data name="Menu_CopyUrl" xml:space="preserve"><value>Copy URL</value></data>
+  <data name="Menu_Default" xml:space="preserve"><value>Default</value></data>
+  <data name="Tooltip_MenuChange" xml:space="preserve"><value>Specify new path to widget HTML file</value></data>
+  <data name="Tooltip_MenuCopyUrl" xml:space="preserve"><value>Copy widget URL for OBS</value></data>
+  <data name="Tooltip_MenuDefault" xml:space="preserve"><value>Reset to default path</value></data>
+  <data name="Overlay_Loading" xml:space="preserve"><value>Please wait...</value></data>
+  <data name="Overlay_NoHtmlPath" xml:space="preserve"><value>Specify the path to the widget HTML file</value></data>
+  <data name="WindowTitle_MainWithVersion" xml:space="preserve"><value>Mini Racing HUD v{0}</value></data>
+  <data name="Error_ConfigLoad" xml:space="preserve"><value>Error loading AppConfig.json, using default settings</value></data>
+  <data name="Error_ConfigSave" xml:space="preserve"><value>Error saving settings: {0}</value></data>
+  <data name="Error_ColorsSave" xml:space="preserve"><value>Error saving colors: {0}</value></data>
+  <data name="Error_ConfigParse" xml:space="preserve"><value>Error loading config: {0}</value></data>
+  <data name="Error_WebViewNotLoaded" xml:space="preserve"><value>WebView not loaded: {0}</value></data>
+  <data name="Error_NavigationFailed" xml:space="preserve"><value>Error: {0}</value></data>
+  <data name="Error_InitFailed" xml:space="preserve"><value>Initialization error: {0}</value></data>
+  <data name="Error_HtmlNotFound" xml:space="preserve"><value>HTML file not found: {0}</value></data>
+  <data name="Error_PresetSave" xml:space="preserve"><value>Error saving preset: {0}</value></data>
+  <data name="Error_PresetList" xml:space="preserve"><value>Error listing presets: {0}</value></data>
+  <data name="Error_PresetLoad" xml:space="preserve"><value>Error loading preset: {0}</value></data>
+  <data name="Error_PresetDelete" xml:space="preserve"><value>Error deleting preset: {0}</value></data>
+  <data name="Error_ThemeDelete" xml:space="preserve"><value>Error deleting theme: {0}</value></data>
+  <data name="Error_ThemeSave" xml:space="preserve"><value>Error saving theme: {0}</value></data>
+  <data name="Error_NoTelemetryProvider" xml:space="preserve"><value>No telemetry provider for &quot;{0}&quot;</value></data>
+  <data name="Error_UdpGeneric" xml:space="preserve"><value>UDP error: {0}</value></data>
+  <data name="Error_WebSocket" xml:space="preserve"><value>WebSocket error: {0}</value></data>
+  <data name="Error_PortSave" xml:space="preserve"><value>Error saving port: {0}</value></data>
+  <data name="Error_PortRange" xml:space="preserve"><value>Port must be in range 1024-65535</value></data>
+  <data name="Error_NoHtmlPath" xml:space="preserve"><value>No HTML file path specified</value></data>
+  <data name="Status_TelemetryOn" xml:space="preserve"><value>UDP telemetry enabled on port {0}</value></data>
+  <data name="Status_TelemetryOff" xml:space="preserve"><value>Telemetry disabled</value></data>
+  <data name="Status_TelemetryOnShort" xml:space="preserve"><value>Telemetry on</value></data>
+  <data name="Status_TelemetryOffShort" xml:space="preserve"><value>Telemetry off</value></data>
+  <data name="Status_PortChanged" xml:space="preserve"><value>UDP port changed to {0}</value></data>
+  <data name="Status_WsOn" xml:space="preserve"><value>WebSocket: On</value></data>
+  <data name="Status_Ready" xml:space="preserve"><value>Ready!</value></data>
+  <data name="Status_Copied" xml:space="preserve"><value>✓ Copied!</value></data>
+  <data name="Tooltip_RestoreDown" xml:space="preserve"><value>Restore down</value></data>
+  <data name="Tooltip_Maximize" xml:space="preserve"><value>Maximize</value></data>
+  <data name="Button_ThemeEditor" xml:space="preserve"><value>Theme Editor</value></data>
+  <data name="Tray_Open" xml:space="preserve"><value>Open</value></data>
+  <data name="Tray_Exit" xml:space="preserve"><value>Exit</value></data>
+  <data name="Tray_Tooltip" xml:space="preserve"><value>Mini Racing HUD</value></data>
+  <data name="Dialog_DonationTitle" xml:space="preserve"><value>Welcome!</value></data>
+  <data name="Dialog_DonationBody" xml:space="preserve"><value>Mini Racing HUD took a lot of effort and time. If you find it useful, I would appreciate your support on </value></data>
+  <data name="Dialog_DonationLink" xml:space="preserve"><value>streams</value></data>
+  <data name="Dialog_DonationPostscript" xml:space="preserve"><value>. Enjoy!</value></data>
+  <data name="Dialog_DonationClose" xml:space="preserve"><value>Close</value></data>
+  <data name="Dialog_ConfirmTitle" xml:space="preserve"><value>Confirmation</value></data>
+  <data name="Dialog_ConfirmDeleteGame" xml:space="preserve"><value>Are you sure you want to delete game &quot;{0}&quot;? </value></data>
+  <data name="Dialog_ButtonYes" xml:space="preserve"><value>Yes</value></data>
+  <data name="Dialog_ButtonNo" xml:space="preserve"><value>No</value></data>
+  <data name="Dialog_ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Dialog_UdpDataError" xml:space="preserve"><value>UDP Data Error</value></data>
+  <data name="Filter_HtmlFiles" xml:space="preserve"><value>HTML files (*.html)|*.html</value></data>
+  <data name="Filter_ExecutableFiles" xml:space="preserve"><value>Executable files (*.exe)|*.exe</value></data>
+  <data name="Dialog_SelectExecutable" xml:space="preserve"><value>Select game executable file</value></data>
+  <data name="Status_UdpOff" xml:space="preserve"><value>UDP: OFF</value></data>
+  <data name="Status_UdpErr" xml:space="preserve"><value>UDP: ERR</value></data>
+  <data name="Status_UdpDash" xml:space="preserve"><value>UDP: ---</value></data>
+  <data name="Status_SharedMemoryOn" xml:space="preserve"><value>Shared Memory: On</value></data>
+  <data name="Status_UdpPortLabel_SharedMemory" xml:space="preserve"><value>Shared Memory mode</value></data>
+  <data name="Status_UdpPortLabel_Udp" xml:space="preserve"><value>UDP</value></data>
+  <data name="Status_NotRunning" xml:space="preserve"><value>Telemetry: Not running</value></data>
+  <data name="Status_Connected" xml:space="preserve"><value>Telemetry: Receiving</value></data>
+  <data name="Status_Disconnected" xml:space="preserve"><value>Telemetry: Waiting...</value></data>
+  <data name="Status_UdpOn" xml:space="preserve"><value>UDP {0}: On</value></data>
+  <data name="Status_ShmemOff" xml:space="preserve"><value>Shared Memory: OFF</value></data>
+  <data name="WindowTitle_ColorEditor" xml:space="preserve"><value>UI Color Editor</value></data>
+  <data name="Button_Ok" xml:space="preserve"><value>OK</value></data>
+  <data name="Button_Cancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Button_Apply" xml:space="preserve"><value>Apply</value></data>
+  <data name="Button_ResetAll" xml:space="preserve"><value>Reset All</value></data>
+  <data name="ColorGroup_Background" xml:space="preserve"><value>Background</value></data>
+  <data name="ColorGroup_Controls" xml:space="preserve"><value>Controls</value></data>
+  <data name="ColorGroup_Other" xml:space="preserve"><value>Other</value></data>
+  <data name="ColorGroup_Help" xml:space="preserve"><value>Help</value></data>
+  <data name="ColorItem_PageBg" xml:space="preserve"><value>Page background</value></data>
+  <data name="ColorItem_PanelBg" xml:space="preserve"><value>Main UI background</value></data>
+  <data name="ColorItem_SectionBg" xml:space="preserve"><value>Sections background</value></data>
+  <data name="ColorItem_PanelCont" xml:space="preserve"><value>Primary text</value></data>
+  <data name="ColorItem_Accent" xml:space="preserve"><value>Accent color</value></data>
+  <data name="ColorItem_BindCont" xml:space="preserve"><value>Binding slots text</value></data>
+  <data name="ColorItem_ToggleOn" xml:space="preserve"><value>Toggle dots (on)</value></data>
+  <data name="ColorItem_ToggleOff" xml:space="preserve"><value>Toggle dots (off)</value></data>
+  <data name="ColorItem_ElementBg" xml:space="preserve"><value>Button background</value></data>
+  <data name="ColorItem_ElementCont" xml:space="preserve"><value>Button content</value></data>
+  <data name="ColorItem_DisabledBg" xml:space="preserve"><value>Disabled background</value></data>
+  <data name="ColorItem_DisabledCont" xml:space="preserve"><value>Disabled content</value></data>
+  <data name="ColorItem_ScrollbarTrack" xml:space="preserve"><value>Scrollbar track</value></data>
+  <data name="ColorItem_CodeBg" xml:space="preserve"><value>Code text background</value></data>
+  <data name="ColorItem_CodeCont" xml:space="preserve"><value>Code text</value></data>
+  <data name="ColorItem_LastActive" xml:space="preserve"><value>Last action text</value></data>
+  <data name="ColorItem_DangerBg" xml:space="preserve"><value>Danger background</value></data>
+  <data name="ColorItem_DangerCont" xml:space="preserve"><value>Danger content</value></data>
+  <data name="ColorItem_Border" xml:space="preserve"><value>Dividers</value></data>
+  <data name="ColorItem_HelpBg" xml:space="preserve"><value>Help background</value></data>
+  <data name="ColorItem_HelpCont" xml:space="preserve"><value>Help text</value></data>
+  <data name="ColorItem_HelpHeading" xml:space="preserve"><value>Headings and main</value></data>
+  <data name="WindowTitle_ThemeEditor" xml:space="preserve"><value>Theme Editor</value></data>
+  <data name="Label_ThemeName" xml:space="preserve"><value>Theme name</value></data>
+  <data name="Label_ThemeNameHint" xml:space="preserve"><value> (a-z, 0-9, -, _)</value></data>
+  <data name="Label_Name" xml:space="preserve"><value>Name</value></data>
+  <data name="Label_ColorSelection" xml:space="preserve"><value>Color selection</value></data>
+  <data name="WindowTitle_ThemeEditorWithName" xml:space="preserve"><value>Theme Editor: {0}</value></data>
+  <data name="ThemeGroup_Wheel" xml:space="preserve"><value>Wheel</value></data>
+  <data name="ThemeGroup_Pedals" xml:space="preserve"><value>Pedals</value></data>
+  <data name="ThemeGroup_Gearbox" xml:space="preserve"><value>Gearbox</value></data>
+  <data name="ThemeGroup_Gmeter" xml:space="preserve"><value>G-meter</value></data>
+  <data name="ThemeGroup_General" xml:space="preserve"><value>General</value></data>
+  <data name="ThemeItem_WheelRim" xml:space="preserve"><value>Rim</value></data>
+  <data name="ThemeItem_WheelSpoke" xml:space="preserve"><value>Spokes</value></data>
+  <data name="ThemeItem_WheelMarker" xml:space="preserve"><value>Marker</value></data>
+  <data name="ThemeItem_PedalBg" xml:space="preserve"><value>Background</value></data>
+  <data name="ThemeItem_PedalText" xml:space="preserve"><value>Text</value></data>
+  <data name="ThemeItem_PedalThrottle" xml:space="preserve"><value>Throttle</value></data>
+  <data name="ThemeItem_PedalBrake" xml:space="preserve"><value>Brake</value></data>
+  <data name="ThemeItem_PedalClutch" xml:space="preserve"><value>Clutch</value></data>
+  <data name="ThemeItem_PedalHandbrake" xml:space="preserve"><value>Handbrake</value></data>
+  <data name="ThemeItem_GearBg" xml:space="preserve"><value>Background (1+ gears)</value></data>
+  <data name="ThemeItem_GearText" xml:space="preserve"><value>Text (1+ gears)</value></data>
+  <data name="ThemeItem_GearRBg" xml:space="preserve"><value>Background (R gear)</value></data>
+  <data name="ThemeItem_GearRText" xml:space="preserve"><value>Text (R gear)</value></data>
+  <data name="ThemeItem_GearNBg" xml:space="preserve"><value>Background (N gear)</value></data>
+  <data name="ThemeItem_GearNText" xml:space="preserve"><value>Text (N gear)</value></data>
+  <data name="ThemeItem_GmeterBorder" xml:space="preserve"><value>Border</value></data>
+  <data name="ThemeItem_GmeterOuter" xml:space="preserve"><value>Outer ring</value></data>
+  <data name="ThemeItem_GmeterMiddle" xml:space="preserve"><value>Middle ring</value></data>
+  <data name="ThemeItem_GmeterInner" xml:space="preserve"><value>Center</value></data>
+  <data name="ThemeItem_GmeterRingsDashed" xml:space="preserve"><value>Ring boundaries</value></data>
+  <data name="ThemeItem_GmeterCrosshairDashed" xml:space="preserve"><value>Crosshair</value></data>
+  <data name="ThemeItem_GmeterBall" xml:space="preserve"><value>Ball</value></data>
+  <data name="ThemeItem_GmeterTrail" xml:space="preserve"><value>Ball trail</value></data>
+  <data name="ThemeItem_WidgetBg" xml:space="preserve"><value>Background</value></data>
+  <data name="ThemeItem_GraphGrid" xml:space="preserve"><value>Graph grid</value></data>
+  <data name="ThemeItem_GraphText" xml:space="preserve"><value>Graph labels</value></data>
+  <data name="WindowTitle_AddGame" xml:space="preserve"><value>New Game</value></data>
+  <data name="Label_GameName" xml:space="preserve"><value>Name</value></data>
+  <data name="Tooltip_GameName" xml:space="preserve"><value>Game name in the list (can be anything)</value></data>
+  <data name="Button_Add" xml:space="preserve"><value>Add</value></data>
+  <data name="Validation_AllowedChars" xml:space="preserve"><value>Only letters, numbers, space, - and _</value></data>
+  <data name="Validation_EnterGameName" xml:space="preserve"><value>Enter game name</value></data>
+  <data name="WindowTitle_NewTheme" xml:space="preserve"><value>New Theme</value></data>
+  <data name="Tooltip_NewThemeName" xml:space="preserve"><value>New theme name</value></data>
+  <data name="Tooltip_EditThemeName" xml:space="preserve"><value>Editing theme name</value></data>
+  <data name="Button_Create" xml:space="preserve"><value>Create</value></data>
+  <data name="Validation_EnterThemeName" xml:space="preserve"><value>Enter theme name</value></data>
+  <data name="Validation_ThemeNameTaken" xml:space="preserve"><value>Choose a different name, this is a built-in theme</value></data>
+  <data name="Dialog_AppTitle" xml:space="preserve"><value>Mini Racing HUD</value></data>
+  <data name="Dialog_AlreadyRunning" xml:space="preserve"><value>Mini Racing HUD is already running.</value></data>
+  <data name="Constants_NoTelemetry" xml:space="preserve"><value>No telemetry game</value></data>
+  <data name="Constants_AddGame" xml:space="preserve"><value>Add game...</value></data>
+  <data name="Tooltip_Eyedropper" xml:space="preserve"><value>Eyedropper</value></data>
+  <data name="Tooltip_ColorPreview" xml:space="preserve"><value>Color Before/After</value></data>
+  <data name="Tooltip_HexCode" xml:space="preserve"><value>HEX color code</value></data>
+  <data name="Tooltip_CopyHex" xml:space="preserve"><value>Copy HEX</value></data>
+  <data name="Tooltip_PasteHex" xml:space="preserve"><value>Paste HEX</value></data>
+  <data name="Button_Reset" xml:space="preserve"><value>Reset</value></data>
+  <data name="Tooltip_Minimize" xml:space="preserve"><value>Minimize</value></data>
+  <data name="Tooltip_Close" xml:space="preserve"><value>Close</value></data>
+  <data name="WindowTitle_Telemetry" xml:space="preserve"><value>Telemetry</value></data>
+  <data name="Status_WaitingForData" xml:space="preserve"><value>Waiting for data...</value></data>
+  <data name="Status_LiveTelemetry" xml:space="preserve"><value>Live @ {0}Hz</value></data>
+  <data name="Status_Language" xml:space="preserve"><value>Language: {0}</value></data>
+  <data name="Label_Language" xml:space="preserve"><value>Language:</value></data>
+  <data name="Label_Game" xml:space="preserve"><value>Game:</value></data>
+  <data name="Label_Html" xml:space="preserve"><value>HTML</value></data>
+</root>

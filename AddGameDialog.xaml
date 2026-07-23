@@ -1,0 +1,14 @@
+<Window x:Class="MiniRacingHUD.AddGameDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:MiniRacingHUD"
+        xmlns:res="clr-namespace:MiniRacingHUD.Properties"
+        xmlns:loc="clr-namespace:MiniRacingHUD"
+        Title="{loc:Loc WindowTitle_AddGame}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        PreviewMouseDown="Window_PreviewMouseDown">
+    <local:BaseDialogWindow x:Name="shell" Title="{loc:Loc WindowTitle_AddGame}"/>
+</Window>
