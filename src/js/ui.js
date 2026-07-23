@@ -33,7 +33,7 @@ function calculateWidgetSizes() {
     let showGear = isVisible('gb') && (hasUdpGear() || hasGearButtons);
 
     const wheelHasSource = hasWheelUdp || hasWheelGamepad;
-    let showAssembly = (isVisible('wh') && wheelHasSource) || (!wheelHasSource && isVisible('gb') && (hasUdpGear() || hasGearButtons));
+    let showAssembly = (isVisible('wh') && wheelHasSource) || (isVisible('gb') && (hasUdpGear() || hasGearButtons) && !currentConfig.gearIndependent);
     let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear());
     let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
 

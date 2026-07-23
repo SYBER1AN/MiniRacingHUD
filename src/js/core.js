@@ -2075,7 +2075,7 @@ const hasGearButtonsGamepad = currentConfig.gearButtons && currentConfig.gearBut
 const showGear = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
 const hasGearDataSource = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
 const wheelHasSource = hasWheelGamepad || hasWheelUdp;
-const showAssembly = showWheel || (!wheelHasSource && showGear);
+const showAssembly = showWheel || (showGear && !currentConfig.gearIndependent);
 
 // Управление классом no-data для текста передачи (плавное скрытие/появление)
 const isGearInd = currentConfig.gearIndependent && hasGearDataSource && showWheel;
