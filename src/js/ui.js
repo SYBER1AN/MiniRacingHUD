@@ -43,7 +43,7 @@ function calculateWidgetSizes() {
         if (type === 'handbrake') {
             return currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1);
         }
-        if (hasUdpPedals()) return true;
+        if (hasUdpPedals() && !_pedalUdpBlock[type]) return true;
         return currentConfig[`${type}Axis`] !== null;
     }).length;
 

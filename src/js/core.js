@@ -2062,9 +2062,9 @@ function start() {
         const hasWheelUdp = wheelFromUdp;
         const showWheel = (hasWheelUdp || hasWheelGamepad);
 
-        const showThrottle = (pedalsFromUdp || currentConfig.throttleAxis !== null);
-        const showBrake = (pedalsFromUdp || currentConfig.brakeAxis !== null);
-        const showClutch = (pedalsFromUdp || currentConfig.clutchAxis !== null);
+        const showThrottle = (pedalsFromUdp && !_pedalUdpBlock.throttle) || currentConfig.throttleAxis !== null;
+        const showBrake = (pedalsFromUdp && !_pedalUdpBlock.brake) || currentConfig.brakeAxis !== null;
+        const showClutch = (pedalsFromUdp && !_pedalUdpBlock.clutch) || currentConfig.clutchAxis !== null;
         const hasHandbrakeAxisGamepad = currentConfig.handbrakeAxis !== null;
         const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1);
         const showHandbrake = (hasHandbrakeAxisGamepad || hasHandbrakeButtons || (handbrakeFromUdp && udpState.data && 'handbrake' in udpState.data));
