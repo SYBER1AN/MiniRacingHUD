@@ -474,6 +474,7 @@ function sendMultiWidgetState() {
 // ==========================================
 
 function isVisible(name) {
+    if (name === 'gb' && typeof URL_HIDE_GEAR !== 'undefined' && URL_HIDE_GEAR) return false;
     if (!window._urlOverlayExplicit && typeof URL_HIDE_PARAM !== 'undefined' && URL_HIDE_PARAM !== null) {
         var h = URL_HIDE_PARAM === '' ? [] : URL_HIDE_PARAM.split(',');
         if (h.includes(name)) return false;

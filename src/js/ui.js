@@ -30,10 +30,10 @@ function calculateWidgetSizes() {
     let showWheel = isVisible('wh') && (hasWheelUdp || hasWheelGamepad);
 
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
-    let showGear = isVisible('gb') && (hasUdpGear() || (hasGearButtons && !URL_HIDE_GEAR));
+    let showGear = isVisible('gb') && (hasUdpGear() || hasGearButtons);
 
-    let showAssembly = (isVisible('wh') && (hasWheelUdp || hasWheelGamepad)) || (isVisible('gb') && (hasUdpGear() || (hasGearButtons && !URL_HIDE_GEAR)));
-    let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear()) && !URL_HIDE_GEAR;
+    let showAssembly = (isVisible('wh') && (hasWheelUdp || hasWheelGamepad)) || (isVisible('gb') && (hasUdpGear() || hasGearButtons));
+    let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear());
     let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
 
     // === 3. ПОДСЧЁТ ВИДИМЫХ ПЕДАЛЕЙ ===
@@ -254,7 +254,7 @@ function updateGearDisplaySize(sizes) {
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
     const wheelAssigned = currentConfig.wheelAxis !== null || (currentConfig.useUdpTelemetry && currentConfig.showWheelUdp);
 
-    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || URL_HIDE_GEAR || (!isVisible('gb') && !wheelAssigned)) {
+    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || (!isVisible('gb') && !wheelAssigned)) {
         DOM.gearDisplay.style.width = '0';
         DOM.gearDisplay.style.height = '0';
         DOM.gearDisplay.style.borderWidth = '0';
@@ -1102,7 +1102,7 @@ function updateGearPosition() {
     const showGmeter = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
 
     // Скрываем только если нет НИЧЕГО: ни КПП, ни руля
-    const hideGear = (!hasGear && !wheelAssigned) || URL_HIDE_GEAR || (!isVisible('gb') && !wheelAssigned);
+    const hideGear = (!hasGear && !wheelAssigned) || (!isVisible('gb') && !wheelAssigned);
 
     // На-рульный gear: виден всегда (не зависит от independent)
     if (DOM.gearDisplay) {

@@ -2072,9 +2072,9 @@ function start() {
         const showHandbrake = isVisible('hb') && (hasHandbrakeAxisGamepad || hasHandbrakeButtons || (handbrakeFromUdp && udpState.data && 'handbrake' in udpState.data));
 
 const hasGearButtonsGamepad = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
-const showGear = isVisible('gb') && (gearFromUdp || (hasGearButtonsGamepad && !URL_HIDE_GEAR));
+const showGear = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
 const hasGearDataSource = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
-const showAssembly = showWheel || (showGear && !URL_HIDE_GEAR);
+const showAssembly = showWheel || showGear;
 
 // Управление классом no-data для текста передачи (плавное скрытие/появление)
 const isGearInd = currentConfig.gearIndependent && hasGearDataSource && showWheel;
@@ -2160,7 +2160,7 @@ if (DOM.gearDisplayIndependent) {
                 else if (g === -1) gear = 'R';
                 else gear = String(g);
             }
-        } else if (hasGearButtonsGamepad && !URL_HIDE_GEAR) {
+        } else if (hasGearButtonsGamepad) {
             gear = readGearInput(deviceMap);
         } else {
             gear = null;
