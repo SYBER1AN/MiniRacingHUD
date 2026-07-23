@@ -642,9 +642,9 @@ function copyBindingsToClipboard() {
 
 function pasteBindingsFromClipboard() {
     if (!_bindingsClipboard) { showStatusMessage(t('bindings.nothing')); return; }
+    Object.assign(_diBindings, _bindingsClipboard.diBindings);
+    Object.assign(_gpBindings, _bindingsClipboard.gpBindings);
     var target = _useDiMode ? _diBindings : _gpBindings;
-    var source = _useDiMode ? _bindingsClipboard.diBindings : _bindingsClipboard.gpBindings;
-    Object.assign(target, source);
     loadBindings(target);
     showStatusMessage(t('bindings.pasted'));
 }
@@ -1984,6 +1984,10 @@ function resetConfig() {
 
     // Повторная синхронизация — теперь fallback покажет правильное active
     updateAllToggleStates();
+
+    // Сброс временных хранилищ биндов
+    _diBindings = JSON.parse(JSON.stringify(BINDING_DEFAULTS));
+    _gpBindings = JSON.parse(JSON.stringify(BINDING_DEFAULTS));
 
     updateDeviceInfo();
     updateGearPosition();

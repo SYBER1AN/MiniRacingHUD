@@ -958,35 +958,37 @@
 
         .axis-row:last-child {
             border-bottom: none;
-            margin-bottom: var(--gap-xs);
         }
 
         .binding-row {
             justify-content: flex-end;
             gap: 6px;
             padding-top: 8px;
-            border-top: 1px dashed var(--border);
-            margin-top: 4px;
+            margin-top: auto;
         }
 
         .bind-copy-btn,
         .bind-paste-btn {
-            height: 24px;
+            height: 30px;
+            width: 30px;
             background: var(--element-bg);
             color: var(--element-cont);
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 0;
+            border-radius: 6px;
             line-height: 1;
             border: 0;
             cursor: pointer;
             transition: var(--anim-ui);
-            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .bind-copy-btn:hover,
-        .bind-paste-btn:hover {
-            background: var(--accent);
-            color: var(--panel-cont);
+        .bind-copy-btn svg,
+        .bind-paste-btn svg {
+            fill: currentColor;
+            width: 14px;
+            height: 14px;
         }
 
         .axis-label {

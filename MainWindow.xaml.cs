@@ -848,6 +848,11 @@ public partial class MainWindow : Window
             await webView.EnsureCoreWebView2Async(env);
 
             webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+            webView.CoreWebView2.NewWindowRequested += (_, args) =>
+            {
+                args.Handled = true;
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(args.Uri) { UseShellExecute = true });
+            };
 #if DEBUG
             webView.CoreWebView2.Settings.AreDevToolsEnabled = true;
 #endif

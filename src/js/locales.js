@@ -141,11 +141,11 @@ const LOCALES = {
         'status.axis': 'Ось {0}',
         'status.button': 'Кнопка {0}',
         // ---- Bindings copy/paste ----
-        'bindings.copy': 'Копировать бинды',
-        'bindings.paste': 'Вставить бинды',
-        'bindings.copied': 'Бинды скопированы',
-        'bindings.pasted': 'Бинды вставлены',
-        'bindings.nothing': 'Нет скопированных биндов',
+        'bindings.copy': 'Копировать назначения',
+        'bindings.paste': 'Вставить назначения',
+        'bindings.copied': 'Назначения скопированы',
+        'bindings.pasted': 'Назначения вставлены',
+        'bindings.nothing': 'Нет скопированных назначений',
         // ---- Theme ----
         'theme.ui.light': 'Светлая тема',
         'theme.ui.dark': 'Тёмная тема',

@@ -288,8 +288,12 @@ ru - Копировать URL
 en - Copy URL
 
 multiwidget.title
-ru - Мультиконфиг
-en - Multi-config
+ru - Мультивиджет
+en - Multi-widget
+
+multiwidget.tooltip
+ru - Несколько наборов видимости в одном пресете
+en - Multiple visibility slots in one preset
 
 multiwidget.urlCopied
 ru - URL скопирован
@@ -310,6 +314,10 @@ en - Clutch
 mw.gearbox
 ru - КПП
 en - Gearbox
+
+mw.gmeter
+ru - G-meter
+en - G-meter
 
 mw.graphs
 ru - Графики
@@ -342,6 +350,10 @@ en - Save
 help.title
 ru - Справка
 en - Help
+
+help.urlParams.mw
+ru - Параметр ?mw=N выбирает слот мультивиджета (1-6)
+en - Parameter ?mw=N selects multi-widget slot (1-6)
 
 ## Capture overlay
 
@@ -513,6 +525,28 @@ status.savedAs
 ru - Сохранить как...
 en - Save as...
 
+## Bindings copy/paste
+
+bindings.copy
+ru - Копировать назначения
+en - Copy bindings
+
+bindings.paste
+ru - Вставить назначения
+en - Paste bindings
+
+bindings.copied
+ru - Назначения скопированы
+en - Bindings copied
+
+bindings.pasted
+ru - Назначения вставлены
+en - Bindings pasted
+
+bindings.nothing
+ru - Нет скопированных назначений
+en - No bindings copied
+
 ## Theme names
 
 theme.widget.BeamNG
@@ -535,9 +569,9 @@ theme.widget.DR2
 ru - DR2
 en - DR2
 
-theme.widget.Light
-ru - Светлая
-en - Light
+theme.widget.Pastel
+ru - Пастель
+en - Pastel
 
 theme.widget.Monochrome
 ru - Монохромная
