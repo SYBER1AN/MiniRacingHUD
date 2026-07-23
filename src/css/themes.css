@@ -79,62 +79,33 @@
     --graph-text: #121212;
 }
 
-:root[data-theme="Pastel"] {
-    --widget-bg: #c8cdce;
-    --wheel-rim: #4a565a;
-    --wheel-spoke: #827e6c;
-    --gmeter-border: #827e6c;
-    --wheel-marker: #ffc107;
-    --gmeter-middle: #4a565a;
-    --gmeter-inner: #5a666a;
-    --gmeter-outer: #3a464a;
-    --gmeter-ball: #ffc107;
-    --gmeter-crosshair-dashed: #827e6c;
-    --gmeter-rings-dashed: #878168;
-    --gmeter-trail: #c8cdce;
-    --gear-bg: #4a565a;
-    --gear-text: #ffc107;
-    --gear-n-bg: #4a565a;
-    --gear-n-text: #aeaeae;
-    --gear-r-bg: #4a565a;
-    --gear-r-text: #eb5348;
-    --pedal-bg: #4a565a;
-    --pedal-handbrake: #cc9459;
-    --pedal-clutch: #83a9b4;
-    --pedal-brake: #ca8b61;
-    --pedal-throttle: #6bb3a2;
-    --pedal-text: #c8cdce;
-    --graph-grid: #9ea6a8;
-    --graph-text: #4a565a;
-}
-
-:root[data-theme="Vintage"] {
-    --widget-bg: #bcb8b0;
-    --wheel-rim: #524434;
-    --wheel-spoke: #877f69;
-    --gmeter-border: #877f69;
-    --wheel-marker: #d5d0c2;
-    --gmeter-middle: #2b3134;
-    --gmeter-inner: #3b4144;
-    --gmeter-outer: #1b2124;
-    --gmeter-ball: #d5d0c2;
-    --gmeter-crosshair-dashed: #877f69;
-    --gmeter-rings-dashed: #877E65;
-    --gmeter-trail: #bcb8b0;
-    --gear-bg: #2b3134;
-    --gear-text: #d5d0c2;
-    --gear-n-bg: #2b3134;
-    --gear-n-text: #7e898d;
-    --gear-r-bg: #2b3134;
-    --gear-r-text: #d5d0c2;
-    --pedal-bg: #2b3134;
-    --pedal-handbrake: #9c691c;
-    --pedal-clutch: #4c859e;
-    --pedal-brake: #a13623;
-    --pedal-throttle: #37871f;
-    --pedal-text: #bcb8b0;
-    --graph-grid: #877f69;
-    --graph-text: #877f69;
+:root[data-theme="White"] {
+    --widget-bg: #444444;
+    --wheel-rim: #ffffff;
+    --wheel-spoke: #b9b9b9;
+    --gmeter-border: #ffffff;
+    --wheel-marker: #eda918;
+    --gmeter-middle: #9c9c9c;
+    --gmeter-inner: #848484;
+    --gmeter-outer: #b1b1b1;
+    --gmeter-ball: #eda918;
+    --gmeter-crosshair-dashed: #ffffff;
+    --gmeter-rings-dashed: #FFFFFF;
+    --gmeter-trail: #eda918;
+    --gear-bg: #5a5a5a;
+    --gear-text: #ffffff;
+    --gear-n-bg: #e6e6e6;
+    --gear-n-text: #b1b1b1;
+    --gear-r-bg: #ef5a69;
+    --gear-r-text: #ffffff;
+    --pedal-bg: #ffffff;
+    --pedal-handbrake: #f67541;
+    --pedal-clutch: #6fbde2;
+    --pedal-brake: #fe6060;
+    --pedal-throttle: #abe65a;
+    --pedal-text: #5a5a5a;
+    --graph-grid: #e6e6e6;
+    --graph-text: #e6e6e6;
 }
 
 :root[data-theme="Black"] {
@@ -166,35 +137,6 @@
     --graph-text: #6b6b6b;
 }
 
-:root[data-theme="White"] {
-    --widget-bg: #444444;
-    --wheel-rim: #ffffff;
-    --wheel-spoke: #b9b9b9;
-    --gmeter-border: #ffffff;
-    --wheel-marker: #eda918;
-    --gmeter-middle: #9c9c9c;
-    --gmeter-inner: #848484;
-    --gmeter-outer: #b1b1b1;
-    --gmeter-ball: #eda918;
-    --gmeter-crosshair-dashed: #ffffff;
-    --gmeter-rings-dashed: #FFFFFF;
-    --gmeter-trail: #eda918;
-    --gear-bg: #5a5a5a;
-    --gear-text: #ffffff;
-    --gear-n-bg: #e6e6e6;
-    --gear-n-text: #b1b1b1;
-    --gear-r-bg: #ef5a69;
-    --gear-r-text: #ffffff;
-    --pedal-bg: #ffffff;
-    --pedal-handbrake: #f67541;
-    --pedal-clutch: #6fbde2;
-    --pedal-brake: #fe6060;
-    --pedal-throttle: #abe65a;
-    --pedal-text: #5a5a5a;
-    --graph-grid: #e6e6e6;
-    --graph-text: #e6e6e6;
-}
-
 :root[data-theme="Monochrome"] {
     --widget-bg: #454545;
     --wheel-rim: #000000;
@@ -222,6 +164,64 @@
     --pedal-text: #454545;
     --graph-grid: #606060;
     --graph-text: #7a7a7a;
+}
+
+:root[data-theme="Vintage"] {
+    --widget-bg: #bcb8b0;
+    --wheel-rim: #524434;
+    --wheel-spoke: #877f69;
+    --gmeter-border: #877f69;
+    --wheel-marker: #d5d0c2;
+    --gmeter-middle: #2b3134;
+    --gmeter-inner: #3b4144;
+    --gmeter-outer: #1b2124;
+    --gmeter-ball: #d5d0c2;
+    --gmeter-crosshair-dashed: #877f69;
+    --gmeter-rings-dashed: #877E65;
+    --gmeter-trail: #bcb8b0;
+    --gear-bg: #2b3134;
+    --gear-text: #d5d0c2;
+    --gear-n-bg: #2b3134;
+    --gear-n-text: #7e898d;
+    --gear-r-bg: #2b3134;
+    --gear-r-text: #d5d0c2;
+    --pedal-bg: #2b3134;
+    --pedal-handbrake: #9c691c;
+    --pedal-clutch: #4c859e;
+    --pedal-brake: #a13623;
+    --pedal-throttle: #37871f;
+    --pedal-text: #bcb8b0;
+    --graph-grid: #877f69;
+    --graph-text: #877f69;
+}
+
+:root[data-theme="Pastel"] {
+    --widget-bg: #c8cdce;
+    --wheel-rim: #4a565a;
+    --wheel-spoke: #827e6c;
+    --gmeter-border: #827e6c;
+    --wheel-marker: #ffc107;
+    --gmeter-middle: #4a565a;
+    --gmeter-inner: #5a666a;
+    --gmeter-outer: #3a464a;
+    --gmeter-ball: #ffc107;
+    --gmeter-crosshair-dashed: #827e6c;
+    --gmeter-rings-dashed: #878168;
+    --gmeter-trail: #c8cdce;
+    --gear-bg: #4a565a;
+    --gear-text: #ffc107;
+    --gear-n-bg: #4a565a;
+    --gear-n-text: #aeaeae;
+    --gear-r-bg: #4a565a;
+    --gear-r-text: #eb5348;
+    --pedal-bg: #4a565a;
+    --pedal-handbrake: #bb8349;
+    --pedal-clutch: #7aa8b5;
+    --pedal-brake: #c6765b;
+    --pedal-throttle: #5ca666;
+    --pedal-text: #c8cdce;
+    --graph-grid: #9ea6a8;
+    --graph-text: #4a565a;
 }
 
 :root[data-theme="DR2"] {

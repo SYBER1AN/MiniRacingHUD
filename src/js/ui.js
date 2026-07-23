@@ -210,7 +210,7 @@ function calculateBorderRadius(sizes) {
     const widgetWheelRadius = sizes.widgetHeight / 2;
 
     const wheelVisible = sizes.showAssembly;
-    const gearOrGmeterVisible = sizes.showGmeter || (currentConfig.gearIndependent && sizes.hasGearButtons);
+    const gearOrGmeterVisible = sizes.showGmeter || sizes.isGearIndependent;
     const pedalsVisible = sizes.visiblePedals > 0;
     const hasGraph = sizes.anyGraphActive;
     const isReverse = currentConfig.layoutReverse;
@@ -252,7 +252,7 @@ function updateGearDisplaySize(sizes) {
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
     const wheelAssigned = currentConfig.wheelAxis !== null || (currentConfig.useUdpTelemetry && currentConfig.showWheelUdp);
 
-    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || !isVisible('gb')) {
+    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || (!wheelAssigned && !isVisible('gb'))) {
         DOM.gearDisplay.style.width = '0';
         DOM.gearDisplay.style.height = '0';
         DOM.gearDisplay.style.borderWidth = '0';
@@ -1100,7 +1100,7 @@ function updateGearPosition() {
     const showGmeter = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
 
     // Скрываем только если нет НИЧЕГО: ни КПП, ни руля
-    const hideGear = (!hasGear && !wheelAssigned) || !isVisible('gb');
+    const hideGear = (!hasGear && !wheelAssigned) || (!isVisible('gb') && !wheelAssigned);
 
     // На-рульный gear: виден всегда (не зависит от independent)
     if (DOM.gearDisplay) {

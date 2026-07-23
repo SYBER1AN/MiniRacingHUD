@@ -218,7 +218,7 @@ const PEDAL_TYPES = ['throttle', 'brake', 'clutch', 'handbrake'];
 const SCAN_CONFIG = { AXIS_MOVEMENT_THRESHOLD: 0.00025, BUTTON_MOVEMENT_THRESHOLD: 0.1, UPDATE_RATE: 30 };
 const HISTORY_SIZE = 180;
 const GRAPH_FRAME_DELAY = 1000 / 180;
-const THEME_NAMES = { Default: 'Стандартная', Dark: 'Тёмная', Pastel: 'Пастель', Vintage: 'Винтажная', Black: 'Чёрная', White: 'Белая', Monochrome: 'Монохромная', DR2: 'DR2', BeamNG: 'BeamNG' };
+const THEME_NAMES = { Default: 'Стандартная', Dark: 'Тёмная', White: 'Белая', Black: 'Чёрная', Monochrome: 'Монохромная', Vintage: 'Винтажная', Pastel: 'Пастель', DR2: 'DR2', BeamNG: 'BeamNG' };
 const LANGUAGE_NAMES = { en: 'Английский', ru: 'Русский', cn: 'Китайский' };
 
 // Кэш цветов для производительности

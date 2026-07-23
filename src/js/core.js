@@ -2096,7 +2096,7 @@ if (DOM.gearDisplayIndependent) {
         if (DOM.brake) DOM.brake.classList.toggle('visible', showBrake);
         if (DOM.throttle) DOM.throttle.classList.toggle('visible', showThrottle);
         if (DOM.gearDisplay) {
-            if (showGear && !showWheel && !wheelHasSource) {
+            if (showGear && !showWheel) {
                 DOM.gearDisplay.style.width = 'var(--wheel-size)';
                 DOM.gearDisplay.style.height = 'var(--wheel-size)';
                 DOM.gearDisplay.style.fontSize = 'calc(var(--gear-font-size-base) * var(--scale-factor) * 2.5)';
