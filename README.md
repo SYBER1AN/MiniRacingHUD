@@ -58,7 +58,7 @@ p.s.: Если вы не видите панель настройки, увел�
 
 p.s.: If you don't see the settings panel, increase the window height and it will appear ☝️😉
 
-### Настройка телеметрии DR2 / DR2 Telemetry Setup
+## Настройка телеметрии DR2 / DR2 Telemetry Setup
 
 В `Документы\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`
 в блоке `motion_platform` добавить строку, если порт 20777 уже используется:
@@ -68,10 +68,10 @@ Open `Documents\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_confi
 add this line inside the `motion_platform` block if port 20777 is already in use:
 <udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
 
-# Скачать последнюю версию: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
-# Download latest version: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+## Скачать последнюю версию: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+## Download latest version: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
-# Автор: SYBER1AN
+### Автор: SYBER1AN
 
-# https://t.me/SYBER1AN
-# https://live.vkvideo.ru/SYBER1AN
+### https://t.me/SYBER1AN
+### https://live.vkvideo.ru/SYBER1AN
