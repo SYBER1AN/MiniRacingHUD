@@ -138,18 +138,18 @@
 }
 
 :root[data-theme="Monochrome"] {
-    --widget-bg: #454545;
+    --widget-bg: #444444;
     --wheel-rim: #000000;
-    --wheel-spoke: #202020;
+    --wheel-spoke: #8e8e8e;
     --gmeter-border: #202020;
     --wheel-marker: #ffffff;
     --gmeter-middle: #202020;
     --gmeter-inner: #000000;
     --gmeter-outer: #000000;
-    --gmeter-ball: #ffffff;
-    --gmeter-crosshair-dashed: #ffffff;
+    --gmeter-ball: #efefef;
+    --gmeter-crosshair-dashed: #8e8e8e;
     --gmeter-rings-dashed: #636363;
-    --gmeter-trail: #a7a7a7;
+    --gmeter-trail: #8e8e8e;
     --gear-bg: #000000;
     --gear-text: #ffffff;
     --gear-n-bg: #000000;
@@ -158,10 +158,10 @@
     --gear-r-text: #000000;
     --pedal-bg: #000000;
     --pedal-handbrake: #ffffff;
-    --pedal-clutch: #a7a7a7;
-    --pedal-brake: #d6d6d6;
-    --pedal-throttle: #ffffff;
-    --pedal-text: #454545;
+    --pedal-clutch: #d2d2d2;
+    --pedal-brake: #ffffff;
+    --pedal-throttle: #efefef;
+    --pedal-text: #8e8e8e;
     --graph-grid: #606060;
     --graph-text: #7a7a7a;
 }
