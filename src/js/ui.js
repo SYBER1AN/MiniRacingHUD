@@ -32,7 +32,8 @@ function calculateWidgetSizes() {
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
     let showGear = isVisible('gb') && (hasUdpGear() || hasGearButtons);
 
-    let showAssembly = (isVisible('wh') && (hasWheelUdp || hasWheelGamepad)) || (isVisible('gb') && (hasUdpGear() || hasGearButtons));
+    const wheelHasSource = hasWheelUdp || hasWheelGamepad;
+    let showAssembly = (isVisible('wh') && wheelHasSource) || (!wheelHasSource && isVisible('gb') && (hasUdpGear() || hasGearButtons));
     let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear());
     let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
 
@@ -212,7 +213,7 @@ function calculateBorderRadius(sizes) {
     const widgetWheelRadius = sizes.widgetHeight / 2;
 
     const wheelVisible = sizes.showAssembly;
-    const gearOrGmeterVisible = sizes.showGmeter || (currentConfig.gearIndependent && sizes.hasGearButtons);
+    const gearOrGmeterVisible = sizes.showGmeter || sizes.isGearIndependent;
     const pedalsVisible = sizes.visiblePedals > 0;
     const hasGraph = sizes.anyGraphActive;
     const isReverse = currentConfig.layoutReverse;

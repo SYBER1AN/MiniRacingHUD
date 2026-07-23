@@ -2074,7 +2074,8 @@ function start() {
 const hasGearButtonsGamepad = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
 const showGear = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
 const hasGearDataSource = isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
-const showAssembly = showWheel || showGear;
+const wheelHasSource = hasWheelGamepad || hasWheelUdp;
+const showAssembly = showWheel || (!wheelHasSource && showGear);
 
 // Управление классом no-data для текста передачи (плавное скрытие/появление)
 const isGearInd = currentConfig.gearIndependent && hasGearDataSource && showWheel;
@@ -2097,7 +2098,7 @@ if (DOM.gearDisplayIndependent) {
         if (DOM.brake) DOM.brake.classList.toggle('visible', showBrake);
         if (DOM.throttle) DOM.throttle.classList.toggle('visible', showThrottle);
         if (DOM.gearDisplay) {
-            if (showGear && !showWheel) {
+            if (showGear && !showWheel && !wheelHasSource) {
                 DOM.gearDisplay.style.width = 'var(--wheel-size)';
                 DOM.gearDisplay.style.height = 'var(--wheel-size)';
                 DOM.gearDisplay.style.fontSize = 'calc(var(--gear-font-size-base) * var(--scale-factor) * 2.5)';
