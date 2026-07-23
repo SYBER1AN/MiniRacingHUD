@@ -27,27 +27,24 @@ function calculateWidgetSizes() {
     // === 2. ПРОВЕРКИ ВИДИМОСТИ КОМПОНЕНТОВ ===
     const hasWheelGamepad = currentConfig.wheelAxis !== null;
     const hasWheelUdp = hasUdpWheel();
-    let showWheel = isVisible('wh') && (hasWheelUdp || hasWheelGamepad);
+    let showWheel = (hasWheelUdp || hasWheelGamepad);
 
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
-    let showGear = isVisible('gb') && (hasUdpGear() || hasGearButtons);
+    let showGear = (hasUdpGear() || hasGearButtons);
 
     const wheelHasSource = hasWheelUdp || hasWheelGamepad;
-    let showAssembly = (isVisible('wh') && wheelHasSource) || (isVisible('gb') && (hasUdpGear() || hasGearButtons) && !currentConfig.gearIndependent);
-    let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear());
-    let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && isVisible('gm');
+    let showAssembly = showWheel || (showGear && !currentConfig.gearIndependent);
+    let isGearIndependent = currentConfig.gearIndependent && showGear;
+    let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && window.MultiWidget.isVisible('gm');
 
     // === 3. ПОДСЧЁТ ВИДИМЫХ ПЕДАЛЕЙ ===
     var pedalVisName = { throttle:'th', brake:'br', clutch:'cl', handbrake:'hb' };
     let visiblePedals = PEDAL_TYPES.filter(type => {
         if (type === 'handbrake') {
-            return isVisible('hb') && (currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1));
+            return currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1);
         }
-        // При UDP газ/тормоз/сцепление всегда видны если включены педали и WS подключён
-        if (hasUdpPedals()) {
-            return isVisible(pedalVisName[type]);
-        }
-        return isVisible(pedalVisName[type]) && currentConfig[`${type}Axis`] !== null;
+        if (hasUdpPedals()) return true;
+        return currentConfig[`${type}Axis`] !== null;
     }).length;
 
     // === GRAPHS-ONLY MODE: принудительно скрываем весь виджет ===
@@ -213,7 +210,7 @@ function calculateBorderRadius(sizes) {
     const widgetWheelRadius = sizes.widgetHeight / 2;
 
     const wheelVisible = sizes.showAssembly;
-    const gearOrGmeterVisible = sizes.showGmeter || sizes.isGearIndependent;
+    const gearOrGmeterVisible = sizes.showGmeter || (currentConfig.gearIndependent && sizes.hasGearButtons);
     const pedalsVisible = sizes.visiblePedals > 0;
     const hasGraph = sizes.anyGraphActive;
     const isReverse = currentConfig.layoutReverse;
@@ -255,7 +252,7 @@ function updateGearDisplaySize(sizes) {
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
     const wheelAssigned = currentConfig.wheelAxis !== null || (currentConfig.useUdpTelemetry && currentConfig.showWheelUdp);
 
-    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || (!isVisible('gb') && !wheelAssigned)) {
+    if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || (!wheelAssigned && !isVisible('gb'))) {
         DOM.gearDisplay.style.width = '0';
         DOM.gearDisplay.style.height = '0';
         DOM.gearDisplay.style.borderWidth = '0';

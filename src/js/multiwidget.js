@@ -1,42 +1,47 @@
 // ==========================================
 // MultiWidget — управление видимостью элементов HUD
-// Все настройки хранятся в пресете (currentConfig).
+// Чекбоксы НЕ через isVisible(), а напрямую null'ят/восстанавливают бинды.
+// Элементы без биндов (gm/gr/bg) — через isVisible() / hideXxx.
 // ==========================================
 'use strict';
 
 // --- Состояние ---
 var _multiWidgetSlots = [];
 var _multiWidgetActiveSlot = 0;
-var _savedOffModeHide = null;
-window._hideOverlay = window._hideOverlay || null;
-window._urlOverlayExplicit = window._urlOverlayExplicit || false;
+var _savedFullBindings = null;   // deep clone конфига при включении MW
+var _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
 
-// --- Драг-тугглинг ---
-var _mwDragActive = false;
-var _mwDragTarget = false;
-var _mwLastDragCb = null;
-
-// --- Маппинг shortcode → configKey / label ---
+// --- Маппинг: shortcode → ключи биндов / hide-ключ / UDP-флаг ---
 var MW_ENTRIES = [
-    { key: 'wh', config: 'hideWheel',     label: 'Руль', loc: 'wheel' },
-    { key: 'gb', config: 'hideGear',      label: 'КПП', loc: 'gearbox' },
-    { key: 'hb', config: 'hideHandbrake', label: 'Ручник', loc: 'handbrake' },
-    { key: 'cl', config: 'hideClutch',    label: 'Сцепление', loc: 'clutch' },
-    { key: 'br', config: 'hideBrake',     label: 'Тормоз', loc: 'brake' },
-    { key: 'th', config: 'hideThrottle',  label: 'Газ', loc: 'throttle' },
-    { key: 'gm', config: 'hideGmeter',    label: 'G-meter', loc: 'gmeter' },
-    { key: 'gr', config: 'hideGraphs',    label: 'Графики', loc: 'graphs' },
-    { key: 'bg', config: 'hideBg',        label: 'Фон', loc: 'bg' }
+    { key: 'wh', label: 'Руль', loc: 'wheel',
+      bindKeys: ['wheelAxis', 'wheelDeviceId', 'showWheelUdp'] },
+    { key: 'gb', label: 'КПП', loc: 'gearbox',
+      bindKeys: ['gearButtons', 'gearButtonsDeviceIds', 'showGearUdp'] },
+    { key: 'hb', label: 'Ручник', loc: 'handbrake',
+      bindKeys: ['handbrakeAxis', 'handbrakeAxisDeviceId', 'handbrakeButtons', 'handbrakeButtonsDeviceIds', 'showHandbrakeUdp'] },
+    { key: 'th', label: 'Газ', loc: 'throttle',
+      bindKeys: ['throttleAxis', 'throttleDeviceId'] },
+    { key: 'br', label: 'Тормоз', loc: 'brake',
+      bindKeys: ['brakeAxis', 'brakeDeviceId'] },
+    { key: 'cl', label: 'Сцепление', loc: 'clutch',
+      bindKeys: ['clutchAxis', 'clutchDeviceId'] },
+    { key: 'gm', label: 'G-meter', loc: 'gmeter',
+      bindKeys: null, hideKey: 'hideGmeter' },
+    { key: 'gr', label: 'Графики', loc: 'graphs',
+      bindKeys: null, hideKey: 'hideGraphs' },
+    { key: 'bg', label: 'Фон', loc: 'bg',
+      bindKeys: null, hideKey: 'hideBg' }
 ];
 
+var CHECKED_KEY = 'Wh'; // для совместимости с old slot objects
+
 // ==========================================
-// 1. ПАНЕЛЬ: рендер и обработчики
+// 1. ПАНЕЛЬ
 // ==========================================
 
 function buildMwPanel() {
     var panel = document.getElementById('mwPanel');
     if (!panel) return;
-
     var inner = panel.querySelector('.mw-panel-inner');
     if (!inner) return;
 
@@ -45,7 +50,6 @@ function buildMwPanel() {
     panel.parentNode.insertBefore(wrapper, panel);
     wrapper.appendChild(panel);
 
-    // --- Панель чекбоксов ---
     var cbsContainer = document.createElement('div');
     cbsContainer.id = 'mwCheckboxes';
     cbsContainer.className = 'mw-checkboxes';
@@ -53,15 +57,14 @@ function buildMwPanel() {
     MW_ENTRIES.forEach(function(entry) {
         var label = document.createElement('label');
         label.className = 'mw-cb';
-
         var cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.dataset.mw = entry.key;
         cb.checked = true;
         cb.addEventListener('click', function(e) {
             e.preventDefault();
+            onMwCheckboxClick(entry.key);
         });
-
         label.appendChild(cb);
         var span = document.createElement('span');
         span.setAttribute('data-i18n', 'mw.' + entry.loc);
@@ -72,7 +75,6 @@ function buildMwPanel() {
 
     inner.appendChild(cbsContainer);
 
-    // --- Кнопка копирования ---
     var copyBtn = document.createElement('button');
     copyBtn.id = 'mwCopyUrl';
     copyBtn.className = 'btn';
@@ -80,15 +82,418 @@ function buildMwPanel() {
     copyBtn.textContent = t('multiwidget.copyUrl');
     wrapper.appendChild(copyBtn);
 
-    // --- Обработчики ---
     cbsContainer.addEventListener('mousedown', onMwMouseDown);
     cbsContainer.addEventListener('mousemove', onMwMouseMove);
     cbsContainer.addEventListener('mouseup', onMwMouseUp);
     cbsContainer.addEventListener('click', function(e) { e.preventDefault(); });
     copyBtn.addEventListener('click', copyWidgetUrl);
-
     updateCopyBtnText();
 }
+
+// ==========================================
+// 2. ЧЕКБОКСЫ — null'ят/восстанавливают бинды
+// ==========================================
+
+function onMwCheckboxClick(key) {
+    var entry = getMwEntry(key);
+    if (!entry) return;
+    var cb = getMwCheckbox(key);
+    if (!cb) return;
+
+    var newChecked = !cb.checked;
+    cb.checked = newChecked;
+
+    if (entry.bindKeys) {
+        // Элемент с биндами — null'им или восстанавливаем
+        if (newChecked) {
+            restoreBinding(key);
+        } else {
+            saveAndNullBinding(key);
+        }
+    } else {
+        // Элемент без биндов — hideXxx (gm/gr/bg)
+        currentConfig[entry.hideKey] = !newChecked;
+    }
+
+    // Обновить hide-флаг в текущем слоте (MW mode)
+    if (currentConfig.multiWidgetMode && _multiWidgetSlots.length > 0) {
+        hideInCurrentSlot(key, !newChecked);
+    }
+
+    applyConfig();
+    syncPanelCheckboxes();
+    broadcastMwState();
+}
+
+function getMwEntry(key) {
+    for (var i = 0; i < MW_ENTRIES.length; i++) {
+        if (MW_ENTRIES[i].key === key) return MW_ENTRIES[i];
+    }
+    return null;
+}
+
+function getMwCheckbox(key) {
+    return document.querySelector('#mwCheckboxes input[data-mw="' + key + '"]');
+}
+
+// --- Null/restore binding helpers ---
+
+function saveAndNullBinding(key) {
+    if (currentConfig.multiWidgetMode && _savedFullBindings) {
+        // В MW режиме — _savedFullBindings уже содержит всё
+        nullBindingInConfig(key);
+    } else {
+        // В OFF-режиме — сохраняем в _savedCheckboxBindings при первом null
+        // (сделано прямо здесь)
+        nullBindingInConfig(key);
+    }
+}
+
+function restoreBinding(key) {
+    if (currentConfig.multiWidgetMode && _savedFullBindings) {
+        restoreBindingFromSource(key, _savedFullBindings);
+    } else {
+        // В OFF-режиме — берём из _savedCheckboxBindings
+        // Но пока не реализовано хранение per-checkbox
+        // Для OFF-режима пока оставляем старый hideXxx механизм
+        // TODO: implement _savedCheckboxBindings
+    }
+}
+
+function nullBindingInConfig(key) {
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys) return;
+    entry.bindKeys.forEach(function(k) {
+        if (k === 'gearButtons' || k === 'handbrakeButtons' || k === 'gearButtonsDeviceIds' || k === 'handbrakeButtonsDeviceIds') {
+            currentConfig[k] = Array.isArray(currentConfig[k]) ? currentConfig[k].map(function() { return -1; }) : currentConfig[k];
+        } else if (k === 'showWheelUdp' || k === 'showGearUdp' || k === 'showHandbrakeUdp' || k === 'showPedalsInUdp') {
+            currentConfig[k] = false;
+        } else {
+            currentConfig[k] = null;
+        }
+    });
+    // Для педалей с общим UDP
+    if (key === 'th' || key === 'br' || key === 'cl') {
+        _pedalUdpBlock[key] = true;
+    }
+}
+
+function restoreBindingFromSource(key, source) {
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys || !source) return;
+    entry.bindKeys.forEach(function(k) {
+        currentConfig[k] = JSON.parse(JSON.stringify(source[k]));
+    });
+    if (key === 'th' || key === 'br' || key === 'cl') {
+        _pedalUdpBlock[key] = false;
+    }
+}
+
+function copyBindingFromConfigToSource(key, source) {
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys) return;
+    entry.bindKeys.forEach(function(k) {
+        source[k] = JSON.parse(JSON.stringify(currentConfig[k]));
+    });
+}
+
+// --- Slot mask helpers ---
+
+function slotToHideKeys(slot) {
+    if (!slot) return [];
+    var hidden = [];
+    // slot — объект вида { Wheel: bool, Throttle: bool, ... }
+    var mapping = { Wheel: 'wh', Throttle: 'th', Brake: 'br', Clutch: 'cl',
+        Handbrake: 'hb', Gear: 'gb', Gmeter: 'gm', Graphs: 'gr', Background: 'bg' };
+    for (var prop in mapping) {
+        if (slot[prop] === false) hidden.push(mapping[prop]);
+    }
+    return hidden;
+}
+
+function applySlotToConfig(slotIndex) {
+    if (!_savedFullBindings) return;
+    if (slotIndex < 0 || slotIndex >= _multiWidgetSlots.length) return;
+
+    // Сначала восстанавливаем все бинды из сейва
+    restoreAllBindingsFromSave();
+
+    // Затем null'им то, что скрыто в слоте
+    var hidden = slotToHideKeys(_multiWidgetSlots[slotIndex]);
+    hidden.forEach(function(key) {
+        nullBindingInConfig(key);
+        var entry = getMwEntry(key);
+        if (!entry || entry.bindKeys !== null) {
+            // hideXxx для элементов без биндов
+            if (entry && entry.hideKey) currentConfig[entry.hideKey] = true;
+        }
+    });
+    // Для элементов, КОТОРЫЕ НЕ в hidden, сбрасываем hideXxx
+    MW_ENTRIES.forEach(function(entry) {
+        if (entry.hideKey && hidden.indexOf(entry.key) === -1) {
+            currentConfig[entry.hideKey] = false;
+        }
+    });
+}
+
+function restoreAllBindingsFromSave() {
+    if (!_savedFullBindings) return;
+    MW_ENTRIES.forEach(function(entry) {
+        if (entry.bindKeys) {
+            entry.bindKeys.forEach(function(k) {
+                currentConfig[k] = JSON.parse(JSON.stringify(_savedFullBindings[k]));
+            });
+        }
+    });
+    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
+}
+
+// --- Slot save ---
+
+function currentConfigToSlot() {
+    var slot = {};
+    MW_ENTRIES.forEach(function(entry) {
+        var checked = true;
+        if (entry.bindKeys) {
+            // Элемент с биндами — проверяем, не null'нуты ли бинды
+            var keyName = entry.key.charAt(0).toUpperCase() + entry.key.slice(1);
+            // Маппим shortcode → slot property name
+            var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
+                hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key] || entry.key;
+            if (propName === 'Gmeter' || propName === 'Graphs' || propName === 'Background') {
+                checked = !currentConfig[entry.hideKey];
+            } else {
+                // По умолчанию visible если не null'нуты
+                checked = !isBindingNulled(entry.key);
+            }
+        } else {
+            checked = !currentConfig[entry.hideKey];
+        }
+        var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
+            hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key] || entry.key;
+        slot[propName] = checked;
+    });
+    return slot;
+}
+
+function isBindingNulled(key) {
+    var entry = getMwEntry(key);
+    if (!entry || !entry.bindKeys) return false;
+    for (var i = 0; i < entry.bindKeys.length; i++) {
+        var k = entry.bindKeys[i];
+        var val = currentConfig[k];
+        if (k === 'gearButtons' || k === 'handbrakeButtons' || k === 'gearButtonsDeviceIds' || k === 'handbrakeButtonsDeviceIds') {
+            if (Array.isArray(val) && val.some(function(v) { return v !== -1 && v !== null; })) return false;
+        } else if (k === 'showWheelUdp' || k === 'showGearUdp' || k === 'showHandbrakeUdp') {
+            if (val) return false;
+        } else {
+            if (val !== null && val !== undefined) return false;
+        }
+    }
+    return true;
+}
+
+function hideInCurrentSlot(key, hide) {
+    if (_multiWidgetSlots.length === 0) return;
+    var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
+        hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[key];
+    if (!propName) return;
+    _multiWidgetSlots[_multiWidgetActiveSlot][propName] = !hide;
+}
+
+// ==========================================
+// 3. ВКЛАДКИ (слоты)
+// ==========================================
+
+function makeDefaultSlot() {
+    return { Wheel:true, Throttle:true, Brake:true, Clutch:true,
+        Handbrake:true, Gear:true, Gmeter:true, Graphs:true, Background:true };
+}
+
+function enableMultiWidget(slots, activeSlot) {
+    // Снапшот конфига для восстановления
+    _savedFullBindings = JSON.parse(JSON.stringify(currentConfig));
+    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
+
+    if (typeof URL_MW_PARAM !== 'undefined' && URL_MW_PARAM !== null) {
+        if (currentConfig.multiWidgetSlots && currentConfig.multiWidgetSlots.length > 0) {
+            _multiWidgetSlots = JSON.parse(JSON.stringify(currentConfig.multiWidgetSlots));
+        } else {
+            _multiWidgetSlots = slots && slots.length > 0 ? JSON.parse(JSON.stringify(slots)) : null;
+        }
+        _multiWidgetActiveSlot = activeSlot || 0;
+        if (!_multiWidgetSlots || _multiWidgetSlots.length === 0) {
+            _multiWidgetSlots = [makeDefaultSlot()];
+        }
+        var mwSlot = URL_MW_PARAM - 1;
+        if (mwSlot >= 0 && mwSlot < _multiWidgetSlots.length) {
+            _multiWidgetActiveSlot = mwSlot;
+        } else {
+            _multiWidgetActiveSlot = 0;
+        }
+    } else if (currentConfig.multiWidgetSlots && currentConfig.multiWidgetSlots.length > 0) {
+        _multiWidgetSlots = JSON.parse(JSON.stringify(currentConfig.multiWidgetSlots));
+        _multiWidgetActiveSlot = currentConfig.multiWidgetActiveSlot || 0;
+    } else {
+        _multiWidgetSlots = slots && slots.length > 0 ? JSON.parse(JSON.stringify(slots)) : null;
+        _multiWidgetActiveSlot = activeSlot || 0;
+        if (!_multiWidgetSlots || _multiWidgetSlots.length === 0) {
+            _multiWidgetSlots = [makeDefaultSlot()];
+        }
+    }
+    if (_multiWidgetActiveSlot >= _multiWidgetSlots.length) _multiWidgetActiveSlot = 0;
+
+    currentConfig.multiWidgetMode = true;
+    currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
+    currentConfig.multiWidgetActiveSlot = _multiWidgetActiveSlot;
+
+    var tabs = document.getElementById('multiWidgetTabs');
+    if (tabs) {
+        tabs.style.display = '';
+        tabs.classList.remove('visible');
+        void tabs.offsetHeight;
+        tabs.classList.add('visible');
+    }
+
+    applySlotToConfig(_multiWidgetActiveSlot);
+    renderMultiWidgetTabs();
+    updateCopyBtnText();
+    syncPanelCheckboxes();
+    broadcastMwState();
+}
+
+function disableMultiWidget() {
+    if (_savedFullBindings) {
+        restoreAllBindingsFromSave();
+        // hideXxx — сброс
+        MW_ENTRIES.forEach(function(entry) {
+            if (entry.hideKey) currentConfig[entry.hideKey] = false;
+        });
+    }
+
+    _multiWidgetSlots = [];
+    _multiWidgetActiveSlot = 0;
+    _savedFullBindings = null;
+    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
+
+    var tabs = document.getElementById('multiWidgetTabs');
+    if (tabs) tabs.classList.remove('visible');
+
+    currentConfig.multiWidgetMode = false;
+    applyConfig();
+    syncPanelCheckboxes();
+    broadcastMwState();
+    updateCopyBtnText();
+}
+
+function renderMultiWidgetTabs() {
+    var container = document.getElementById('mwTabContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    for (var i = 0; i < _multiWidgetSlots.length; i++) {
+        var btn = document.createElement('button');
+        btn.className = 'mw-tab' + (i === _multiWidgetActiveSlot ? ' active' : '');
+        btn.textContent = (i + 1).toString();
+        btn.dataset.slot = i;
+        btn.addEventListener('click', onMwTabClick);
+        var removeBtn = document.createElement('span');
+        removeBtn.className = 'mw-tab-remove';
+        removeBtn.textContent = '\u00d7';
+        removeBtn.addEventListener('click', function(idx) {
+            return function(e) {
+                e.stopPropagation();
+                removeMultiWidgetSlotAt(idx);
+            };
+        }(i));
+        btn.appendChild(removeBtn);
+        container.appendChild(btn);
+    }
+}
+
+function onMwTabClick(e) {
+    var slot = parseInt(e.currentTarget.dataset.slot, 10);
+    if (isNaN(slot) || slot === _multiWidgetActiveSlot) return;
+
+    // Сохранить текущий слот
+    _multiWidgetSlots[_multiWidgetActiveSlot] = currentConfigToSlot();
+    _multiWidgetActiveSlot = slot;
+
+    applySlotToConfig(slot);
+    renderMultiWidgetTabs();
+    updateCopyBtnText();
+    sendMultiWidgetState();
+    broadcastMwState();
+}
+
+function addMultiWidgetSlot() {
+    if (_multiWidgetSlots.length >= 6) return;
+
+    // Новый слот — инвертируем hide-флаги предыдущего
+    var prev = _multiWidgetSlots[_multiWidgetSlots.length - 1] || makeDefaultSlot();
+    var newSlot = {};
+    for (var prop in prev) {
+        newSlot[prop] = !prev[prop];
+    }
+    _multiWidgetSlots.push(newSlot);
+    _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
+
+    applySlotToConfig(_multiWidgetActiveSlot);
+    renderMultiWidgetTabs();
+    updateCopyBtnText();
+    sendMultiWidgetState();
+    broadcastMwState();
+}
+
+function removeMultiWidgetSlot() {
+    if (_multiWidgetSlots.length <= 1) return;
+    _multiWidgetSlots.splice(_multiWidgetActiveSlot, 1);
+    if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
+        _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
+    applySlotToConfig(_multiWidgetActiveSlot);
+    renderMultiWidgetTabs();
+    updateCopyBtnText();
+    sendMultiWidgetState();
+    broadcastMwState();
+}
+
+function removeMultiWidgetSlotAt(index) {
+    if (_multiWidgetSlots.length <= 1) return;
+    _multiWidgetSlots.splice(index, 1);
+    if (index < _multiWidgetActiveSlot) {
+        _multiWidgetActiveSlot--;
+    } else if (index === _multiWidgetActiveSlot) {
+        if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
+            _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
+    }
+    applySlotToConfig(_multiWidgetActiveSlot);
+    renderMultiWidgetTabs();
+    updateCopyBtnText();
+    sendMultiWidgetState();
+    broadcastMwState();
+}
+
+function sendMultiWidgetState() {
+    currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
+    currentConfig.multiWidgetActiveSlot = _multiWidgetActiveSlot;
+}
+
+// ==========================================
+// 4. ВИДИМОСТЬ — только для gm/gr/bg
+// ==========================================
+
+function isVisible(name) {
+    if (name === 'gb' && typeof URL_HIDE_GEAR !== 'undefined' && URL_HIDE_GEAR) return false;
+    var configKey = null;
+    MW_ENTRIES.forEach(function(e) {
+        if (e.key === name && e.hideKey) configKey = e.hideKey;
+    });
+    if (configKey) return !currentConfig[configKey];
+    return true;
+}
+
+// ==========================================
+// 5. ПАНЕЛЬ: синхронизация
+// ==========================================
 
 function onMwToggleChange(e) {
     if (e.currentTarget.classList.contains('active')) {
@@ -98,52 +503,26 @@ function onMwToggleChange(e) {
     }
 }
 
-function onVisibilityChanged() {
-    if (currentConfig.multiWidgetMode) {
-        // ON-режим: обновить оверлей из чекбоксов
-        var hidden = [];
-        MW_ENTRIES.forEach(function(entry) {
-            var cb = getMwCheckbox(entry.key);
-            if (cb && !cb.checked) hidden.push(entry.key);
-        });
-        applyVisibilityOverlay(hidden.length > 0 ? hidden : null);
-    } else {
-        // OFF-режим: обновить currentConfig.hideXxx из чекбоксов
-        MW_ENTRIES.forEach(function(entry) {
-            var cb = getMwCheckbox(entry.key);
-            if (cb) currentConfig[entry.config] = !cb.checked;
-        });
-        applyConfig();
-    }
-    // broadcast to OBS clients
-    broadcastMwState();
-}
-
-function getMwCheckbox(key) {
-    return document.querySelector('#mwCheckboxes input[data-mw="' + key + '"]');
-}
-
 function syncPanelCheckboxes() {
     var sources = mwGetAvailableSources();
-
     MW_ENTRIES.forEach(function(entry) {
         var cb = getMwCheckbox(entry.key);
         if (!cb) return;
-
-        // Скрыть чекбокс если нет источника данных
         var label = cb.closest('.mw-cb');
         if (label) {
             label.style.display = sources[entry.key] ? '' : 'none';
         }
-
-        if (currentConfig.multiWidgetMode) {
-            var overlay = window._hideOverlay || [];
-            cb.checked = overlay.indexOf(entry.key) === -1;
+        if (currentConfig.multiWidgetMode && _multiWidgetSlots.length > 0) {
+            var slot = _multiWidgetSlots[_multiWidgetActiveSlot];
+            if (slot) {
+                var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
+                    hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key];
+                cb.checked = propName ? !!slot[propName] : true;
+            }
         } else {
-            cb.checked = !currentConfig[entry.config];
+            cb.checked = !currentConfig[entry.hideKey || 'hideNone'];
         }
     });
-    // Синхронизировать тогглер
     var toggleBtn = document.getElementById('mwToggle');
     if (toggleBtn) toggleBtn.classList.toggle('active', !!currentConfig.multiWidgetMode);
 }
@@ -153,7 +532,6 @@ function mwGetAvailableSources() {
     var pedalsFromUdp = isUdpReady && currentConfig.showPedalsInUdp;
     var gearFromUdp = isUdpReady && currentConfig.showGearUdp;
     var wheelFromUdp = isUdpReady && currentConfig.showWheelUdp;
-
     return {
         wh: wheelFromUdp || currentConfig.wheelAxis !== null,
         th: pedalsFromUdp || currentConfig.throttleAxis !== null,
@@ -181,7 +559,7 @@ function copyWidgetUrl() {
     var wsport = new URLSearchParams(window.location.search).get('wsport');
     if (wsport && wsport !== '20888') url += '&wsport=' + wsport;
     if (currentConfig.multiWidgetMode) {
-        var slotNum = (currentConfig.multiWidgetActiveSlot ?? _multiWidgetActiveSlot ?? 0) + 1;
+        var slotNum = (_multiWidgetActiveSlot || 0) + 1;
         url += '&mw=' + slotNum;
     }
     try {
@@ -206,8 +584,12 @@ function updateCopyBtnText() {
 }
 
 // ==========================================
-// 2. ДРАГ-ТУГГЛИНГ
+// 6. ДРАГ-ТУГГЛИНГ
 // ==========================================
+
+var _mwDragActive = false;
+var _mwDragTarget = false;
+var _mwLastDragCb = null;
 
 function onMwMouseDown(e) {
     var cb = findMwCheckbox(e.target);
@@ -216,7 +598,8 @@ function onMwMouseDown(e) {
     _mwDragTarget = !cb.checked;
     _mwLastDragCb = null;
     cb.checked = _mwDragTarget;
-    onVisibilityChanged();
+    var key = cb.dataset.mw;
+    if (key) onMwCheckboxClick(key);
     e.preventDefault();
 }
 
@@ -227,7 +610,8 @@ function onMwMouseMove(e) {
     if (cb && cb !== _mwLastDragCb) {
         _mwLastDragCb = cb;
         cb.checked = _mwDragTarget;
-        onVisibilityChanged();
+        var key = cb.dataset.mw;
+        if (key) onMwCheckboxClick(key);
     }
 }
 
@@ -251,288 +635,7 @@ function findMwCheckbox(el) {
 }
 
 // ==========================================
-// 3. УПРАВЛЕНИЕ ВКЛАДКАМИ (слоты)
-// ==========================================
-
-function enableMultiWidget(slots, activeSlot) {
-    // Сохранить hideXxx OFF-режима для восстановления при выключении
-    _savedOffModeHide = MW_ENTRIES.map(function(e) { return currentConfig[e.config]; });
-
-    if (typeof URL_MW_PARAM !== 'undefined' && URL_MW_PARAM !== null) {
-        // Слоты — из currentConfig (сохраняем данные пресета), иначе из аргументов
-        if (currentConfig.multiWidgetSlots && currentConfig.multiWidgetSlots.length > 0) {
-            _multiWidgetSlots = JSON.parse(JSON.stringify(currentConfig.multiWidgetSlots));
-        } else {
-            _multiWidgetSlots = (slots && slots.length > 0) ? JSON.parse(JSON.stringify(slots)) : null;
-        }
-        _multiWidgetActiveSlot = activeSlot || 0;
-        if (!_multiWidgetSlots || _multiWidgetSlots.length === 0) {
-            _multiWidgetSlots = [{
-                Wheel: true, Throttle: true, Brake: true, Clutch: true,
-                Handbrake: true, Gear: true, Gmeter: true, Graphs: true, Background: true
-            }];
-        }
-        var mwSlot = URL_MW_PARAM - 1;
-        if (mwSlot >= 0 && mwSlot < _multiWidgetSlots.length) {
-            _multiWidgetActiveSlot = mwSlot;
-        } else {
-            _multiWidgetActiveSlot = 0;
-        }
-    } else if (currentConfig.multiWidgetSlots && currentConfig.multiWidgetSlots.length > 0) {
-        _multiWidgetSlots = JSON.parse(JSON.stringify(currentConfig.multiWidgetSlots));
-        _multiWidgetActiveSlot = currentConfig.multiWidgetActiveSlot || 0;
-    } else {
-        _multiWidgetSlots = (slots && slots.length > 0) ? slots : null;
-        _multiWidgetActiveSlot = activeSlot || 0;
-        if (!_multiWidgetSlots || _multiWidgetSlots.length === 0) {
-            _multiWidgetSlots = [{
-                Wheel: true, Throttle: true, Brake: true, Clutch: true,
-                Handbrake: true, Gear: true, Gmeter: true, Graphs: true, Background: true
-            }];
-        }
-    }
-
-    if (_multiWidgetActiveSlot >= _multiWidgetSlots.length) _multiWidgetActiveSlot = 0;
-
-    currentConfig.multiWidgetMode = true;
-    currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
-    currentConfig.multiWidgetActiveSlot = _multiWidgetActiveSlot;
-
-    var tabs = document.getElementById('multiWidgetTabs');
-    if (tabs) {
-        tabs.style.display = '';
-        tabs.classList.remove('visible');
-        void tabs.offsetHeight;
-        tabs.classList.add('visible');
-    }
-
-    applySlotToOverlay(_multiWidgetActiveSlot);
-    renderMultiWidgetTabs();
-    updateCopyBtnText();
-    syncPanelCheckboxes();
-    broadcastMwState();
-}
-
-function disableMultiWidget() {
-    _multiWidgetSlots = [];
-    _multiWidgetActiveSlot = 0;
-
-    // Восстановить hideXxx OFF-режима
-    if (_savedOffModeHide) {
-        MW_ENTRIES.forEach(function(entry, i) {
-            currentConfig[entry.config] = _savedOffModeHide[i];
-        });
-        _savedOffModeHide = null;
-    }
-
-    var tabs = document.getElementById('multiWidgetTabs');
-    if (tabs) tabs.classList.remove('visible');
-
-    window._hideOverlay = null;
-    window._urlOverlayExplicit = false;
-    currentConfig.multiWidgetMode = false;
-    applyConfig();
-    syncPanelCheckboxes();
-    broadcastMwState();
-    updateCopyBtnText();
-}
-
-function renderMultiWidgetTabs() {
-    var container = document.getElementById('mwTabContainer');
-    if (!container) return;
-    container.innerHTML = '';
-
-    for (var i = 0; i < _multiWidgetSlots.length; i++) {
-        var btn = document.createElement('button');
-        btn.className = 'mw-tab' + (i === _multiWidgetActiveSlot ? ' active' : '');
-        btn.textContent = (i + 1).toString();
-        btn.dataset.slot = i;
-        btn.addEventListener('click', onMwTabClick);
-
-        var removeBtn = document.createElement('span');
-        removeBtn.className = 'mw-tab-remove';
-        removeBtn.textContent = '\u00d7';
-        removeBtn.addEventListener('click', function(idx) {
-            return function(e) {
-                e.stopPropagation();
-                removeMultiWidgetSlotAt(idx);
-            };
-        }(i));
-        btn.appendChild(removeBtn);
-
-        container.appendChild(btn);
-    }
-}
-
-function onMwTabClick(e) {
-    var slot = parseInt(e.currentTarget.dataset.slot, 10);
-    if (isNaN(slot) || slot === _multiWidgetActiveSlot) return;
-
-    _multiWidgetSlots[_multiWidgetActiveSlot] = overlayToSlot();
-    _multiWidgetActiveSlot = slot;
-    applySlotToOverlay(slot);
-    renderMultiWidgetTabs();
-    updateCopyBtnText();
-    sendMultiWidgetState();
-    broadcastMwState();
-}
-
-function addMultiWidgetSlot() {
-    if (_multiWidgetSlots.length >= 6) return;
-
-    _multiWidgetSlots.push({
-        Wheel: true, Throttle: true, Brake: true, Clutch: true,
-        Handbrake: true, Gear: true, Gmeter: true, Graphs: true, Background: true
-    });
-    _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
-    applySlotToOverlay(_multiWidgetActiveSlot);
-    renderMultiWidgetTabs();
-    updateCopyBtnText();
-    sendMultiWidgetState();
-    broadcastMwState();
-}
-
-function removeMultiWidgetSlot() {
-    if (_multiWidgetSlots.length <= 1) return;
-
-    _multiWidgetSlots.splice(_multiWidgetActiveSlot, 1);
-    if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
-        _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
-
-    applySlotToOverlay(_multiWidgetActiveSlot);
-    renderMultiWidgetTabs();
-    updateCopyBtnText();
-    sendMultiWidgetState();
-    broadcastMwState();
-}
-
-function removeMultiWidgetSlotAt(index) {
-    if (_multiWidgetSlots.length <= 1) return;
-
-    _multiWidgetSlots.splice(index, 1);
-    if (index < _multiWidgetActiveSlot) {
-        _multiWidgetActiveSlot--;
-    } else if (index === _multiWidgetActiveSlot) {
-        if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
-            _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
-    }
-
-    applySlotToOverlay(_multiWidgetActiveSlot);
-    renderMultiWidgetTabs();
-    updateCopyBtnText();
-    sendMultiWidgetState();
-    broadcastMwState();
-}
-
-function slotToHideArray(slot) {
-    if (!slot) return null;
-    var hidden = [];
-    if (!slot.Wheel) hidden.push('wh');
-    if (!slot.Throttle) hidden.push('th');
-    if (!slot.Brake) hidden.push('br');
-    if (!slot.Clutch) hidden.push('cl');
-    if (!slot.Handbrake) hidden.push('hb');
-    if (!slot.Gear) hidden.push('gb');
-    if (!slot.Gmeter) hidden.push('gm');
-    if (!slot.Graphs) hidden.push('gr');
-    if (!slot.Background) hidden.push('bg');
-    return hidden.length > 0 ? hidden : null;
-}
-
-function overlayToSlot() {
-    var overlay = window._hideOverlay || [];
-    return {
-        Wheel: !overlay.includes('wh'),
-        Throttle: !overlay.includes('th'),
-        Brake: !overlay.includes('br'),
-        Clutch: !overlay.includes('cl'),
-        Handbrake: !overlay.includes('hb'),
-        Gear: !overlay.includes('gb'),
-        Gmeter: !overlay.includes('gm'),
-        Graphs: !overlay.includes('gr'),
-        Background: !overlay.includes('bg')
-    };
-}
-
-function applySlotToOverlay(index) {
-    if (index < 0 || index >= _multiWidgetSlots.length) {
-        window._hideOverlay = null;
-        applyConfig();
-        return;
-    }
-    var hideArray = slotToHideArray(_multiWidgetSlots[index]);
-    applyVisibilityOverlay(hideArray);
-}
-
-function sendMultiWidgetState() {
-    currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
-    currentConfig.multiWidgetActiveSlot = _multiWidgetActiveSlot;
-}
-
-// ==========================================
-// 4. ВИДИМОСТЬ
-// ==========================================
-
-function isVisible(name) {
-    if (name === 'gb' && typeof URL_HIDE_GEAR !== 'undefined' && URL_HIDE_GEAR) return false;
-    if (!window._urlOverlayExplicit && typeof URL_HIDE_PARAM !== 'undefined' && URL_HIDE_PARAM !== null) {
-        var h = URL_HIDE_PARAM === '' ? [] : URL_HIDE_PARAM.split(',');
-        if (h.includes(name)) return false;
-    }
-    if (window._urlOverlayExplicit) {
-        if (window._hideOverlay === null) return true;
-        return !window._hideOverlay.includes(name);
-    }
-    var configKey = HIDE_CONFIG_MAP[name];
-    if (configKey && currentConfig[configKey]) return false;
-    return true;
-}
-
-
-
-function syncOverlayToSlot() {
-    if (_multiWidgetSlots.length > 0 && _multiWidgetActiveSlot < _multiWidgetSlots.length) {
-        _multiWidgetSlots[_multiWidgetActiveSlot] = overlayToSlot();
-        currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
-    }
-}
-
-function applyVisibilityOverlay(hideArray) {
-    window._urlOverlayExplicit = true;
-    if (hideArray === null) {
-        window._hideOverlay = null;
-        syncOverlayToSlot();
-        applyConfig();
-        syncPanelCheckboxes();
-        return;
-    }
-
-    var keys = hideArray.length > 0 ? hideArray.map(function(s) { return String(s).toLowerCase().trim(); }) : null;
-    window._hideOverlay = keys;
-
-    syncOverlayToSlot();
-    applyConfig();
-    syncPanelCheckboxes();
-}
-
-function applyVisibilityPreset(hideMap) {
-    window._hideOverlay = null;
-    window._urlOverlayExplicit = false;
-    for (var key in HIDE_CONFIG_MAP) {
-        currentConfig[HIDE_CONFIG_MAP[key]] = false;
-    }
-    if (hideMap) {
-        for (var key in hideMap) {
-            var configKey = HIDE_CONFIG_MAP[key];
-            if (configKey) currentConfig[configKey] = true;
-        }
-    }
-    applyConfig();
-    syncPanelCheckboxes();
-}
-
-// ==========================================
-// 5. ИНИЦИАЛИЗАЦИЯ
+// 6. ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 
 function initMultiWidget() {
@@ -556,7 +659,7 @@ function initMultiWidget() {
 }
 
 // ==========================================
-// 6. ЭКСПОРТ
+// 7. ЭКСПОРТ
 // ==========================================
 
 window.MultiWidget = {
@@ -564,7 +667,7 @@ window.MultiWidget = {
     enableMultiWidget: enableMultiWidget,
     disableMultiWidget: disableMultiWidget,
     isVisible: isVisible,
-    applyVisibilityOverlay: applyVisibilityOverlay,
-    applyVisibilityPreset: applyVisibilityPreset,
     syncPanelCheckboxes: syncPanelCheckboxes
 };
+
+function applyConfig() { if (typeof window.applyConfig === 'function') window.applyConfig(); }
