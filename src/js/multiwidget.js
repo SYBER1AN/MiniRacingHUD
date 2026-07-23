@@ -1,6 +1,6 @@
 // ==========================================
 // MultiWidget — управление видимостью элементов HUD
-// Чекбоксы НЕ через isVisible(), а напрямую null'ят/восстанавливают бинды.
+// _hideBindingMask — временная маска для рендера (не трогает бинды).
 // Элементы без биндов (gm/gr/bg) — через isVisible() / hideXxx.
 // ==========================================
 'use strict';
@@ -8,33 +8,24 @@
 // --- Состояние ---
 var _multiWidgetSlots = [];
 var _multiWidgetActiveSlot = 0;
-var _savedFullBindings = null;   // deep clone конфига при включении MW
-var _savedCheckboxBindings = {}; // per-key save для OFF-режима
-var _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
+var _hideBindingMask = {};
+window._hideBindingMask = _hideBindingMask;
 
-// --- Маппинг: shortcode → ключи биндов / hide-ключ / UDP-флаг ---
+// --- Маппинг ---
 var MW_ENTRIES = [
-    { key: 'wh', label: 'Руль', loc: 'wheel',
-      bindKeys: ['wheelAxis', 'wheelDeviceId', 'showWheelUdp'] },
-    { key: 'gb', label: 'КПП', loc: 'gearbox',
-      bindKeys: ['gearButtons', 'gearButtonsDeviceIds', 'showGearUdp'] },
-    { key: 'hb', label: 'Ручник', loc: 'handbrake',
-      bindKeys: ['handbrakeAxis', 'handbrakeAxisDeviceId', 'handbrakeButtons', 'handbrakeButtonsDeviceIds', 'showHandbrakeUdp'] },
-    { key: 'th', label: 'Газ', loc: 'throttle',
-      bindKeys: ['throttleAxis', 'throttleDeviceId'] },
-    { key: 'br', label: 'Тормоз', loc: 'brake',
-      bindKeys: ['brakeAxis', 'brakeDeviceId'] },
-    { key: 'cl', label: 'Сцепление', loc: 'clutch',
-      bindKeys: ['clutchAxis', 'clutchDeviceId'] },
-    { key: 'gm', label: 'G-meter', loc: 'gmeter',
-      bindKeys: null, hideKey: 'hideGmeter' },
-    { key: 'gr', label: 'Графики', loc: 'graphs',
-      bindKeys: null, hideKey: 'hideGraphs' },
-    { key: 'bg', label: 'Фон', loc: 'bg',
-      bindKeys: null, hideKey: 'hideBg' }
+    { key: 'wh', label: 'Руль', loc: 'wheel' },
+    { key: 'gb', label: 'КПП', loc: 'gearbox' },
+    { key: 'hb', label: 'Ручник', loc: 'handbrake' },
+    { key: 'th', label: 'Газ', loc: 'throttle' },
+    { key: 'br', label: 'Тормоз', loc: 'brake' },
+    { key: 'cl', label: 'Сцепление', loc: 'clutch' },
+    { key: 'gm', label: 'G-meter', loc: 'gmeter', hideKey: 'hideGmeter' },
+    { key: 'gr', label: 'Графики', loc: 'graphs', hideKey: 'hideGraphs' },
+    { key: 'bg', label: 'Фон', loc: 'bg', hideKey: 'hideBg' }
 ];
 
-var CHECKED_KEY = 'Wh'; // для совместимости с old slot objects
+var SLOT_PROPS = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
+    hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' };
 
 // ==========================================
 // 1. ПАНЕЛЬ
@@ -62,10 +53,6 @@ function buildMwPanel() {
         cb.type = 'checkbox';
         cb.dataset.mw = entry.key;
         cb.checked = true;
-        cb.addEventListener('click', function(e) {
-            e.preventDefault();
-            onMwCheckboxClick(entry.key);
-        });
         label.appendChild(cb);
         var span = document.createElement('span');
         span.setAttribute('data-i18n', 'mw.' + entry.loc);
@@ -92,33 +79,29 @@ function buildMwPanel() {
 }
 
 // ==========================================
-// 2. ЧЕКБОКСЫ — null'ят/восстанавливают бинды
+// 2. ЧЕКБОКСЫ — пишут маску
 // ==========================================
 
-function onMwCheckboxClick(key) {
+function onMwCheckboxClick(key, forceChecked) {
     var entry = getMwEntry(key);
     if (!entry) return;
     var cb = getMwCheckbox(key);
     if (!cb) return;
 
-    var newChecked = !cb.checked;
+    var newChecked = forceChecked !== undefined ? forceChecked : !cb.checked;
     cb.checked = newChecked;
 
-    if (entry.bindKeys) {
-        // Элемент с биндами — null'им или восстанавливаем
-        if (newChecked) {
-            restoreBinding(key);
-        } else {
-            saveAndNullBinding(key);
-        }
-    } else {
-        // Элемент без биндов — hideXxx (gm/gr/bg)
+    if (entry.hideKey) {
+        // gm/gr/bg
         currentConfig[entry.hideKey] = !newChecked;
+    } else {
+        // Элемент с биндами — маска
+        _hideBindingMask[key] = !newChecked;
     }
 
-    // Обновить hide-флаг в текущем слоте (MW mode)
     if (currentConfig.multiWidgetMode && _multiWidgetSlots.length > 0) {
-        hideInCurrentSlot(key, !newChecked);
+        var prop = SLOT_PROPS[key];
+        if (prop) _multiWidgetSlots[_multiWidgetActiveSlot][prop] = newChecked;
     }
 
     applyConfig();
@@ -137,177 +120,6 @@ function getMwCheckbox(key) {
     return document.querySelector('#mwCheckboxes input[data-mw="' + key + '"]');
 }
 
-// --- Null/restore binding helpers ---
-
-function saveAndNullBinding(key) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys) return;
-    // Всегда сохраняем в _savedCheckboxBindings (на случай если _savedFullBindings нет/isNaN)
-    if (!_savedCheckboxBindings[key]) {
-        _savedCheckboxBindings[key] = {};
-        entry.bindKeys.forEach(function(k) {
-            _savedCheckboxBindings[key][k] = JSON.parse(JSON.stringify(currentConfig[k]));
-        });
-    }
-    nullBindingInConfig(key);
-}
-
-function restoreBinding(key) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys) return;
-    var source = null;
-    if (currentConfig.multiWidgetMode && _savedFullBindings) {
-        source = _savedFullBindings;
-    } else if (_savedCheckboxBindings[key]) {
-        source = _savedCheckboxBindings[key];
-    }
-    if (source) {
-        restoreBindingFromSource(key, source);
-        delete _savedCheckboxBindings[key];
-    }
-}
-
-function nullBindingInConfig(key) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys) return;
-    entry.bindKeys.forEach(function(k) {
-        if (k === 'gearButtons' || k === 'handbrakeButtons' || k === 'gearButtonsDeviceIds' || k === 'handbrakeButtonsDeviceIds') {
-            currentConfig[k] = Array.isArray(currentConfig[k]) ? currentConfig[k].map(function() { return -1; }) : currentConfig[k];
-        } else if (k === 'showWheelUdp' || k === 'showGearUdp' || k === 'showHandbrakeUdp' || k === 'showPedalsInUdp') {
-            currentConfig[k] = false;
-        } else {
-            currentConfig[k] = null;
-        }
-    });
-    // Для педалей с общим UDP
-    if (key === 'th' || key === 'br' || key === 'cl') {
-        _pedalUdpBlock[key] = true;
-    }
-}
-
-function restoreBindingFromSource(key, source) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys || !source) return;
-    entry.bindKeys.forEach(function(k) {
-        currentConfig[k] = JSON.parse(JSON.stringify(source[k]));
-    });
-    if (key === 'th' || key === 'br' || key === 'cl') {
-        _pedalUdpBlock[key] = false;
-    }
-}
-
-function copyBindingFromConfigToSource(key, source) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys) return;
-    entry.bindKeys.forEach(function(k) {
-        source[k] = JSON.parse(JSON.stringify(currentConfig[k]));
-    });
-}
-
-// --- Slot mask helpers ---
-
-function slotToHideKeys(slot) {
-    if (!slot) return [];
-    var hidden = [];
-    // slot — объект вида { Wheel: bool, Throttle: bool, ... }
-    var mapping = { Wheel: 'wh', Throttle: 'th', Brake: 'br', Clutch: 'cl',
-        Handbrake: 'hb', Gear: 'gb', Gmeter: 'gm', Graphs: 'gr', Background: 'bg' };
-    for (var prop in mapping) {
-        if (slot[prop] === false) hidden.push(mapping[prop]);
-    }
-    return hidden;
-}
-
-function applySlotToConfig(slotIndex) {
-    if (!_savedFullBindings) return;
-    if (slotIndex < 0 || slotIndex >= _multiWidgetSlots.length) return;
-
-    // Сначала восстанавливаем все бинды из сейва
-    restoreAllBindingsFromSave();
-
-    // Затем null'им то, что скрыто в слоте
-    var hidden = slotToHideKeys(_multiWidgetSlots[slotIndex]);
-    hidden.forEach(function(key) {
-        nullBindingInConfig(key);
-        var entry = getMwEntry(key);
-        if (!entry || entry.bindKeys !== null) {
-            // hideXxx для элементов без биндов
-            if (entry && entry.hideKey) currentConfig[entry.hideKey] = true;
-        }
-    });
-    // Для элементов, КОТОРЫЕ НЕ в hidden, сбрасываем hideXxx
-    MW_ENTRIES.forEach(function(entry) {
-        if (entry.hideKey && hidden.indexOf(entry.key) === -1) {
-            currentConfig[entry.hideKey] = false;
-        }
-    });
-}
-
-function restoreAllBindingsFromSave() {
-    if (!_savedFullBindings) return;
-    MW_ENTRIES.forEach(function(entry) {
-        if (entry.bindKeys) {
-            entry.bindKeys.forEach(function(k) {
-                currentConfig[k] = JSON.parse(JSON.stringify(_savedFullBindings[k]));
-            });
-        }
-    });
-    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
-}
-
-// --- Slot save ---
-
-function currentConfigToSlot() {
-    var slot = {};
-    MW_ENTRIES.forEach(function(entry) {
-        var checked = true;
-        if (entry.bindKeys) {
-            // Элемент с биндами — проверяем, не null'нуты ли бинды
-            var keyName = entry.key.charAt(0).toUpperCase() + entry.key.slice(1);
-            // Маппим shortcode → slot property name
-            var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
-                hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key] || entry.key;
-            if (propName === 'Gmeter' || propName === 'Graphs' || propName === 'Background') {
-                checked = !currentConfig[entry.hideKey];
-            } else {
-                // По умолчанию visible если не null'нуты
-                checked = !isBindingNulled(entry.key);
-            }
-        } else {
-            checked = !currentConfig[entry.hideKey];
-        }
-        var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
-            hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key] || entry.key;
-        slot[propName] = checked;
-    });
-    return slot;
-}
-
-function isBindingNulled(key) {
-    var entry = getMwEntry(key);
-    if (!entry || !entry.bindKeys) return false;
-    for (var i = 0; i < entry.bindKeys.length; i++) {
-        var k = entry.bindKeys[i];
-        var val = currentConfig[k];
-        if (k === 'gearButtons' || k === 'handbrakeButtons' || k === 'gearButtonsDeviceIds' || k === 'handbrakeButtonsDeviceIds') {
-            if (Array.isArray(val) && val.some(function(v) { return v !== -1 && v !== null; })) return false;
-        } else if (k === 'showWheelUdp' || k === 'showGearUdp' || k === 'showHandbrakeUdp') {
-            if (val) return false;
-        } else {
-            if (val !== null && val !== undefined) return false;
-        }
-    }
-    return true;
-}
-
-function hideInCurrentSlot(key, hide) {
-    if (_multiWidgetSlots.length === 0) return;
-    var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
-        hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[key];
-    if (!propName) return;
-    _multiWidgetSlots[_multiWidgetActiveSlot][propName] = !hide;
-}
-
 // ==========================================
 // 3. ВКЛАДКИ (слоты)
 // ==========================================
@@ -317,11 +129,18 @@ function makeDefaultSlot() {
         Handbrake:true, Gear:true, Gmeter:true, Graphs:true, Background:true };
 }
 
-function enableMultiWidget(slots, activeSlot) {
-    // Снапшот конфига для восстановления
-    _savedFullBindings = JSON.parse(JSON.stringify(currentConfig));
-    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
+function applySlotMask(slotIndex) {
+    _hideBindingMask = {};
+    if (slotIndex < 0 || slotIndex >= _multiWidgetSlots.length) return;
+    var slot = _multiWidgetSlots[slotIndex];
+    for (var key in SLOT_PROPS) {
+        var prop = SLOT_PROPS[key];
+        if (slot[prop] === false) _hideBindingMask[key] = true;
+    }
+    window._hideBindingMask = _hideBindingMask;
+}
 
+function enableMultiWidget(slots, activeSlot) {
     if (typeof URL_MW_PARAM !== 'undefined' && URL_MW_PARAM !== null) {
         if (currentConfig.multiWidgetSlots && currentConfig.multiWidgetSlots.length > 0) {
             _multiWidgetSlots = JSON.parse(JSON.stringify(currentConfig.multiWidgetSlots));
@@ -350,6 +169,8 @@ function enableMultiWidget(slots, activeSlot) {
     }
     if (_multiWidgetActiveSlot >= _multiWidgetSlots.length) _multiWidgetActiveSlot = 0;
 
+    applySlotMask(_multiWidgetActiveSlot);
+
     currentConfig.multiWidgetMode = true;
     currentConfig.multiWidgetSlots = JSON.parse(JSON.stringify(_multiWidgetSlots));
     currentConfig.multiWidgetActiveSlot = _multiWidgetActiveSlot;
@@ -362,7 +183,7 @@ function enableMultiWidget(slots, activeSlot) {
         tabs.classList.add('visible');
     }
 
-    applySlotToConfig(_multiWidgetActiveSlot);
+    applyConfig();
     renderMultiWidgetTabs();
     updateCopyBtnText();
     syncPanelCheckboxes();
@@ -370,18 +191,14 @@ function enableMultiWidget(slots, activeSlot) {
 }
 
 function disableMultiWidget() {
-    if (_savedFullBindings) {
-        restoreAllBindingsFromSave();
-        // hideXxx — сброс
-        MW_ENTRIES.forEach(function(entry) {
-            if (entry.hideKey) currentConfig[entry.hideKey] = false;
-        });
-    }
+    _hideBindingMask = {};
+    window._hideBindingMask = _hideBindingMask;
+    MW_ENTRIES.forEach(function(entry) {
+        if (entry.hideKey) currentConfig[entry.hideKey] = false;
+    });
 
     _multiWidgetSlots = [];
     _multiWidgetActiveSlot = 0;
-    _savedFullBindings = null;
-    _pedalUdpBlock = { throttle: false, brake: false, clutch: false };
 
     var tabs = document.getElementById('multiWidgetTabs');
     if (tabs) tabs.classList.remove('visible');
@@ -421,21 +238,26 @@ function onMwTabClick(e) {
     var slot = parseInt(e.currentTarget.dataset.slot, 10);
     if (isNaN(slot) || slot === _multiWidgetActiveSlot) return;
 
-    // Сохранить текущий слот
-    _multiWidgetSlots[_multiWidgetActiveSlot] = currentConfigToSlot();
+    _multiWidgetSlots[_multiWidgetActiveSlot] = slotToObject();
     _multiWidgetActiveSlot = slot;
-
-    applySlotToConfig(slot);
+    applySlotMask(slot);
     renderMultiWidgetTabs();
     updateCopyBtnText();
     sendMultiWidgetState();
     broadcastMwState();
 }
 
+function slotToObject() {
+    var obj = {};
+    for (var key in SLOT_PROPS) {
+        var prop = SLOT_PROPS[key];
+        obj[prop] = !(_hideBindingMask[key] || false);
+    }
+    return obj;
+}
+
 function addMultiWidgetSlot() {
     if (_multiWidgetSlots.length >= 6) return;
-
-    // Новый слот — инвертируем hide-флаги предыдущего
     var prev = _multiWidgetSlots[_multiWidgetSlots.length - 1] || makeDefaultSlot();
     var newSlot = {};
     for (var prop in prev) {
@@ -443,8 +265,7 @@ function addMultiWidgetSlot() {
     }
     _multiWidgetSlots.push(newSlot);
     _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
-
-    applySlotToConfig(_multiWidgetActiveSlot);
+    applySlotMask(_multiWidgetActiveSlot);
     renderMultiWidgetTabs();
     updateCopyBtnText();
     sendMultiWidgetState();
@@ -456,7 +277,7 @@ function removeMultiWidgetSlot() {
     _multiWidgetSlots.splice(_multiWidgetActiveSlot, 1);
     if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
         _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
-    applySlotToConfig(_multiWidgetActiveSlot);
+    applySlotMask(_multiWidgetActiveSlot);
     renderMultiWidgetTabs();
     updateCopyBtnText();
     sendMultiWidgetState();
@@ -472,7 +293,7 @@ function removeMultiWidgetSlotAt(index) {
         if (_multiWidgetActiveSlot >= _multiWidgetSlots.length)
             _multiWidgetActiveSlot = _multiWidgetSlots.length - 1;
     }
-    applySlotToConfig(_multiWidgetActiveSlot);
+    applySlotMask(_multiWidgetActiveSlot);
     renderMultiWidgetTabs();
     updateCopyBtnText();
     sendMultiWidgetState();
@@ -485,16 +306,20 @@ function sendMultiWidgetState() {
 }
 
 // ==========================================
-// 4. ВИДИМОСТЬ — только для gm/gr/bg
+// 4. ВИДИМОСТЬ — фильтр для рендера
 // ==========================================
 
 function isVisible(name) {
+    // URL-параметр ?nogears
     if (name === 'gb' && typeof URL_HIDE_GEAR !== 'undefined' && URL_HIDE_GEAR) return false;
-    var configKey = null;
-    MW_ENTRIES.forEach(function(e) {
-        if (e.key === name && e.hideKey) configKey = e.hideKey;
-    });
-    if (configKey) return !currentConfig[configKey];
+    // Маска (чекбоксы / MW)
+    if (_hideBindingMask && _hideBindingMask[name]) return false;
+    // hideXxx для gm/gr/bg
+    var entry = getMwEntry(name);
+    if (entry && entry.hideKey && currentConfig[entry.hideKey]) return false;
+    // HIDE_CONFIG_MAP для остальных (OFF-режим)
+    var configKey = HIDE_CONFIG_MAP[name];
+    if (configKey && currentConfig[configKey]) return false;
     return true;
 }
 
@@ -520,14 +345,10 @@ function syncPanelCheckboxes() {
             label.style.display = sources[entry.key] ? '' : 'none';
         }
         if (currentConfig.multiWidgetMode && _multiWidgetSlots.length > 0) {
-            var slot = _multiWidgetSlots[_multiWidgetActiveSlot];
-            if (slot) {
-                var propName = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
-                    hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' }[entry.key];
-                cb.checked = propName ? !!slot[propName] : true;
-            }
+            var prop = SLOT_PROPS[entry.key];
+            cb.checked = prop ? !!_multiWidgetSlots[_multiWidgetActiveSlot][prop] : true;
         } else {
-            cb.checked = !currentConfig[entry.hideKey || 'hideNone'];
+            cb.checked = isVisible(entry.key);
         }
     });
     var toggleBtn = document.getElementById('mwToggle');
@@ -606,7 +427,7 @@ function onMwMouseDown(e) {
     _mwLastDragCb = null;
     cb.checked = _mwDragTarget;
     var key = cb.dataset.mw;
-    if (key) onMwCheckboxClick(key);
+    if (key) onMwCheckboxClick(key, _mwDragTarget);
     e.preventDefault();
 }
 
@@ -618,7 +439,7 @@ function onMwMouseMove(e) {
         _mwLastDragCb = cb;
         cb.checked = _mwDragTarget;
         var key = cb.dataset.mw;
-        if (key) onMwCheckboxClick(key);
+        if (key) onMwCheckboxClick(key, _mwDragTarget);
     }
 }
 
@@ -642,7 +463,7 @@ function findMwCheckbox(el) {
 }
 
 // ==========================================
-// 6. ИНИЦИАЛИЗАЦИЯ
+// 7. ИНИЦИАЛИЗАЦИЯ
 // ==========================================
 
 function initMultiWidget() {
@@ -666,7 +487,7 @@ function initMultiWidget() {
 }
 
 // ==========================================
-// 7. ЭКСПОРТ
+// 8. ЭКСПОРТ + backwards compat
 // ==========================================
 
 window.MultiWidget = {
@@ -675,29 +496,18 @@ window.MultiWidget = {
     disableMultiWidget: disableMultiWidget,
     isVisible: isVisible,
     syncPanelCheckboxes: syncPanelCheckboxes,
-    applyVisibilityOverlay: applyVisibilityOverlay,
-    applyVisibilityPreset: applyVisibilityPreset
+    applyVisibilityOverlay: function(hideArray) {
+        _hideBindingMask = {};
+        if (hideArray) hideArray.forEach(function(k) { _hideBindingMask[k] = true; });
+        window._hideBindingMask = _hideBindingMask;
+        applyConfig();
+    },
+    applyVisibilityPreset: function(hideMap) {
+        _hideBindingMask = {};
+        if (hideMap) for (var k in hideMap) { if (hideMap[k]) _hideBindingMask[k] = true; }
+        window._hideBindingMask = _hideBindingMask;
+        applyConfig();
+    }
 };
-
-function applyVisibilityOverlay(hideArray) {
-    // Совместимость: напрямую null'им бинды
-    if (hideArray === null) {
-        MW_ENTRIES.forEach(function(entry) { if (entry.bindKeys) restoreBindingFromSource(entry.key, _savedFullBindings || currentConfig); });
-        return;
-    }
-    hideArray.forEach(function(key) {
-        nullBindingInConfig(key);
-    });
-    applyConfig();
-}
-
-function applyVisibilityPreset(hideMap) {
-    if (!hideMap) return;
-    for (var key in hideMap) {
-        if (hideMap[key]) nullBindingInConfig(key);
-        else restoreBindingFromSource(key, _savedFullBindings || currentConfig);
-    }
-    applyConfig();
-}
 
 function applyConfig() { if (typeof window.applyConfig === 'function') window.applyConfig(); }

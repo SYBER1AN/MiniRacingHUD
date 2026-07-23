@@ -27,24 +27,24 @@ function calculateWidgetSizes() {
     // === 2. ПРОВЕРКИ ВИДИМОСТИ КОМПОНЕНТОВ ===
     const hasWheelGamepad = currentConfig.wheelAxis !== null;
     const hasWheelUdp = hasUdpWheel();
-    let showWheel = (hasWheelUdp || hasWheelGamepad);
+    let showWheel = isVisible('wh') && (hasWheelUdp || hasWheelGamepad);
 
     const hasGearButtons = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
-    let showGear = (hasUdpGear() || hasGearButtons);
+    let showGear = isVisible('gb') && (hasUdpGear() || hasGearButtons);
 
     const wheelHasSource = hasWheelUdp || hasWheelGamepad;
-    let showAssembly = showWheel || (showGear && !currentConfig.gearIndependent);
-    let isGearIndependent = currentConfig.gearIndependent && showGear;
+    let showAssembly = (isVisible('wh') && wheelHasSource) || (isVisible('gb') && (hasUdpGear() || hasGearButtons) && !currentConfig.gearIndependent);
+    let isGearIndependent = isVisible('gb') && currentConfig.gearIndependent && (hasGearButtons || hasUdpGear());
     let showGmeterIndependent = currentConfig.useUdpTelemetry && currentConfig.showGmeter && udpState.connected && window.MultiWidget.isVisible('gm');
 
     // === 3. ПОДСЧЁТ ВИДИМЫХ ПЕДАЛЕЙ ===
     var pedalVisName = { throttle:'th', brake:'br', clutch:'cl', handbrake:'hb' };
     let visiblePedals = PEDAL_TYPES.filter(type => {
         if (type === 'handbrake') {
-            return currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1);
+            return isVisible('hb') && (currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1));
         }
-        if (hasUdpPedals() && !_pedalUdpBlock[type]) return true;
-        return currentConfig[`${type}Axis`] !== null;
+        if (hasUdpPedals()) return isVisible(pedalVisName[type]);
+        return isVisible(pedalVisName[type]) && currentConfig[`${type}Axis`] !== null;
     }).length;
 
     // === GRAPHS-ONLY MODE: принудительно скрываем весь виджет ===

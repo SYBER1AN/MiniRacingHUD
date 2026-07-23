@@ -2060,18 +2060,18 @@ function start() {
         const wheelDev = deviceMap[currentConfig.wheelDeviceId];
         const hasWheelGamepad = currentConfig.wheelAxis !== null;
         const hasWheelUdp = wheelFromUdp;
-        const showWheel = (hasWheelUdp || hasWheelGamepad);
+        const showWheel = window.MultiWidget.isVisible('wh') && (hasWheelUdp || hasWheelGamepad);
 
-        const showThrottle = (pedalsFromUdp && !_pedalUdpBlock.throttle) || currentConfig.throttleAxis !== null;
-        const showBrake = (pedalsFromUdp && !_pedalUdpBlock.brake) || currentConfig.brakeAxis !== null;
-        const showClutch = (pedalsFromUdp && !_pedalUdpBlock.clutch) || currentConfig.clutchAxis !== null;
+        const showThrottle = window.MultiWidget.isVisible('th') && (pedalsFromUdp || currentConfig.throttleAxis !== null);
+        const showBrake = window.MultiWidget.isVisible('br') && (pedalsFromUdp || currentConfig.brakeAxis !== null);
+        const showClutch = window.MultiWidget.isVisible('cl') && (pedalsFromUdp || currentConfig.clutchAxis !== null);
         const hasHandbrakeAxisGamepad = currentConfig.handbrakeAxis !== null;
         const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1);
-        const showHandbrake = (hasHandbrakeAxisGamepad || hasHandbrakeButtons || (handbrakeFromUdp && udpState.data && 'handbrake' in udpState.data));
+        const showHandbrake = window.MultiWidget.isVisible('hb') && (hasHandbrakeAxisGamepad || hasHandbrakeButtons || (handbrakeFromUdp && udpState.data && 'handbrake' in udpState.data));
 
 const hasGearButtonsGamepad = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
-const showGear = (gearFromUdp || hasGearButtonsGamepad);
-const hasGearDataSource = (gearFromUdp || hasGearButtonsGamepad);
+const showGear = window.MultiWidget.isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
+const hasGearDataSource = window.MultiWidget.isVisible('gb') && (gearFromUdp || hasGearButtonsGamepad);
 const wheelHasSource = hasWheelGamepad || hasWheelUdp;
 const showAssembly = showWheel || (showGear && !currentConfig.gearIndependent);
 
