@@ -629,6 +629,26 @@ function clearBindings() {
     if (typeof applyConfig === 'function') applyConfig();
 }
 
+// --- Копировать/Вставить бинды ---
+var _bindingsClipboard = null;
+
+function copyBindingsToClipboard() {
+    _bindingsClipboard = {
+        diBindings: JSON.parse(JSON.stringify(_diBindings)),
+        gpBindings: JSON.parse(JSON.stringify(_gpBindings))
+    };
+    showStatusMessage(t('bindings.copied'));
+}
+
+function pasteBindingsFromClipboard() {
+    if (!_bindingsClipboard) { showStatusMessage(t('bindings.nothing')); return; }
+    var target = _useDiMode ? _diBindings : _gpBindings;
+    var source = _useDiMode ? _bindingsClipboard.diBindings : _bindingsClipboard.gpBindings;
+    Object.assign(target, source);
+    loadBindings(target);
+    showStatusMessage(t('bindings.pasted'));
+}
+
 function clearWsReconnectTimer() {
     if (_wsReconnectTimer) {
         clearTimeout(_wsReconnectTimer);
@@ -874,6 +894,9 @@ function closeUdpWebSocket() {
 
 DOM.resetConfigBtn?.addEventListener('click', resetConfig);
 DOM.saveConfigBtn?.addEventListener('click', savePreset);
+
+document.getElementById('copyBindingsBtn')?.addEventListener('click', copyBindingsToClipboard);
+document.getElementById('pasteBindingsBtn')?.addEventListener('click', pasteBindingsFromClipboard);
 
 DOM.scaleSlider?.addEventListener('input', () => {
     const scale = parseFloat(DOM.scaleSlider.value);
