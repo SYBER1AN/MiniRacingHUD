@@ -3,9 +3,6 @@
 Минималистичный HUD для стримеров гоночных симуляторов.
 Minimalistic HUD for simracing streamers.
 
-# Скачать последнюю версию: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
-# Download latest version: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
-
 ## Системные требования / System Requirements
 
 - Windows 10/11
@@ -70,6 +67,9 @@ p.s.: If you don't see the settings panel, increase the window height and it wil
 Open `Documents\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`,
 add this line inside the `motion_platform` block if port 20777 is already in use:
 <udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+
+# Скачать последнюю версию: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+# Download latest version: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
 # Автор: SYBER1AN
 
