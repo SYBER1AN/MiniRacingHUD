@@ -1,7 +1,7 @@
-# Mini Racing HUD v1.0.0.212
+# Mini Racing HUD v1.0.0.213
 
-Минималистичный HUD для стримов гоночных симуляторов.
-Minimalistic HUD for racing simulator streams.
+Минималистичный HUD для стримеров гоночных симуляторов.
+Minimalistic HUD for simracing streamers.
 
 # Скачать последнюю версию: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
 # Download latest version: https://drive.google.com/file/d/1b38Ncf3VnG_XqpikvLePWmhChHqw_fBf/view
