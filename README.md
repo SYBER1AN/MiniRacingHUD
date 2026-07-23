@@ -62,11 +62,11 @@ p.s.: If you don't see the settings panel, increase the window height and it wil
 
 В `Документы\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`
 в блоке `motion_platform` добавить строку, если порт 20777 уже используется:
-<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+`<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />`
 
 Open `Documents\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`,
 add this line inside the `motion_platform` block if port 20777 is already in use:
-<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+`<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />`
 
 ## Скачать последнюю версию: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 ## Download latest version: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
