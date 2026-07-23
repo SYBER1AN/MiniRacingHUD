@@ -1028,7 +1028,7 @@ public partial class MainWindow : Window
 
             Log("[Window_Loaded] initialization complete");
 
-            if (!_appConfig.DonationReminderShown)
+            if (!_appConfig.DonationReminderShown && _appConfig.Language == "ru")
             {
                 _appConfig.DonationReminderShown = true;
                 SaveConfig();

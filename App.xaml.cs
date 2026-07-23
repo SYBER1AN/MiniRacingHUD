@@ -55,7 +55,13 @@ public partial class App : Application
         catch { }
 
         if (LocalizationManager.CurrentCulture == CultureInfo.InvariantCulture)
-            LocalizationManager.Initialize(new CultureInfo("ru-RU"));
+        {
+            var systemLang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var culture = systemLang == "ru"
+                ? new CultureInfo("ru-RU")
+                : new CultureInfo("en-US");
+            LocalizationManager.Initialize(culture);
+        }
 
         new MainWindow().Show();
     }
