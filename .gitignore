@@ -35,6 +35,9 @@ GIT.md
 # Личные пресеты (не для GitHub)
 src/presets/
 
+# Standalone config (личный, не для GitHub)
+src/NoApp.js
+
 # Dev-утилиты (не для GitHub)
 backup.ps1
 unpackHTML.ps1

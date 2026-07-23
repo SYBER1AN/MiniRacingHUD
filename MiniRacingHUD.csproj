@@ -71,14 +71,12 @@
   <Target Name="CopyWidgetFiles" AfterTargets="Build">
     <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(OutDir)Widget" />
     <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(OutDir)Widget" />
-    <Copy SourceFiles="$(ProjectDir)build\NoApp.js" DestinationFolder="$(OutDir)Widget" />
   </Target>
 
   <!-- ����������� Widget/ � ����� publish -->
   <Target Name="CopyWidgetToPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
     <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(PublishDir)Widget" />
     <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(PublishDir)Widget" />
-    <Copy SourceFiles="$(ProjectDir)build\NoApp.js" DestinationFolder="$(PublishDir)Widget" />
   </Target>
 
   <Target Name="CopyReadme" AfterTargets="Build">
