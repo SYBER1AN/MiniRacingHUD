@@ -7,7 +7,7 @@
 ### Системные требования
 
 - Windows 10/11
-- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Включено в self-contained)
 - Edge WebView2 (обычно уже установлен)
 
 ### Возможности
@@ -52,6 +52,14 @@ p.s.: Если вы не видите панель настройки, увел�
 
 https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
+---
+
+### Автор: SYBER1AN
+
+- https://t.me/SYBER1AN
+- https://www.youtube.com/c/SYBER1AN
+- https://live.vkvideo.ru/SYBER1AN
+
 ## EN
 
 Minimalistic HUD for simracing streamers.
@@ -59,7 +67,7 @@ Minimalistic HUD for simracing streamers.
 ### System Requirements
 
 - Windows 10/11
-- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Included in self-contained)
 - Edge WebView2 (usually pre-installed)
 
 ### Features
@@ -106,7 +114,8 @@ https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
 ---
 
-### Автор: SYBER1AN
+### Author: SYBER1AN
 
-https://t.me/SYBER1AN
-https://live.vkvideo.ru/SYBER1AN
+- https://t.me/SYBER1AN
+- https://www.youtube.com/c/SYBER1AN
+- https://live.vkvideo.ru/SYBER1AN
