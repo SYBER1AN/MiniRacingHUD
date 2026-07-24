@@ -1,15 +1,16 @@
 # Mini Racing HUD v1.0.0.214
 
-Минималистичный HUD для стримеров гоночных симуляторов.
-Minimalistic HUD for simracing streamers.
+## RU
 
-## Системные требования / System Requirements
+Минималистичный HUD для стримеров гоночных симуляторов.
+
+### Системные требования
 
 - Windows 10/11
 - [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
-- Edge WebView2 (обычно уже установлен / usually pre-installed)
+- Edge WebView2 (обычно уже установлен)
 
-## Возможности / Features
+### Возможности
 
 - Отображение руля, педалей, КПП, перегрузок (G-meter), графиков
 - Настройка через обычный браузер (минимальная версия с Gamepad API) или приложение
@@ -21,7 +22,47 @@ Minimalistic HUD for simracing streamers.
 - Поддержка тем, в том числе кастомных + встроенный редактор тем
 - Система пресетов и мультипресетов (несколько отдельных виджетов в одном пресете)
 - Русский и английский язык интерфейса
-- Русский, английский и китайский язык виджета ☝️☺️
+- Русский, английский и китайский язык виджета
+
+### Поддерживаемые игры
+
+- Dirt Rally 2.0 — Port: 20777
+- Automobilista 2 — Port: 5606
+- BeamNG.drive — Port: 4444
+- Assetto Corsa Rally — Shared Memory
+
+### Быстрый старт
+
+1. Распакуйте архив, запустите `MiniRacingHUD.exe` и выберите игру
+2. Настройте оси/кнопки через интерфейс виджета и сохраните пресет
+3. Откройте `file:///путь_к_файлу/MiniRacingHUD.html` в источнике "Браузер" в OBS (в C#-режиме нажмите «Копировать URL» в приложении)
+4. Если нужно, измените порт для телеметрии
+
+p.s.: Если вы не видите панель настройки, увеличьте высоту окна и она появится ☝️😉
+
+### Настройка телеметрии DR2
+
+В `Документы\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`
+в блоке `motion_platform` добавить строку, если порт 20777 уже используется:
+```
+<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+```
+
+### Скачать последнюю версию
+
+https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+
+## EN
+
+Minimalistic HUD for simracing streamers.
+
+### System Requirements
+
+- Windows 10/11
+- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- Edge WebView2 (usually pre-installed)
+
+### Features
 
 - Displays steering wheel, pedals, gearbox, G-meter, graphs
 - Customizable via browser (lite version with Gamepad API) or the app
@@ -33,23 +74,16 @@ Minimalistic HUD for simracing streamers.
 - Theme system with custom themes + built-in theme editor
 - Presets and multi-presets (multiple widget layouts in one preset)
 - Interface language: Russian, English
-- Widget language: Russian, English, Chinese ☝️☺️
+- Widget language: Russian, English, Chinese
 
-## Поддерживаемые игры / Supported Games
+### Supported Games
 
-- Dirt Rally 2.0            Port: 20777
-- Automobilista 2           Port: 5606
-- BeamNG.drive              Port: 4444
-- Assetto Corsa Rally       Shared Memory (нет порта / no port)
+- Dirt Rally 2.0 — Port: 20777
+- Automobilista 2 — Port: 5606
+- BeamNG.drive — Port: 4444
+- Assetto Corsa Rally — Shared Memory
 
-## Быстрый старт / Quick Start
-
-1. Распакуйте архив, запустите `MiniRacingHUD.exe` и выберите игру
-2. Настройте оси/кнопки через интерфейс виджета и сохраните пресет
-3. Откройте `file:///путь_к_файлу/MiniRacingHUD.html` в источнике "Браузер" в OBS (в C#-режиме нажмите «Копировать URL» в приложении)
-4. Если нужно, измените порт для телеметрии
-
-p.s.: Если вы не видите панель настройки, увеличьте высоту окна и она появится ☝️😉
+### Quick Start
 
 1. Extract the archive, run `MiniRacingHUD.exe` and select your game
 2. Bind axes/buttons via the widget UI and save the preset
@@ -58,20 +92,21 @@ p.s.: Если вы не видите панель настройки, увел�
 
 p.s.: If you don't see the settings panel, increase the window height and it will appear ☝️😉
 
-## Настройка телеметрии DR2 / DR2 Telemetry Setup
-
-В `Документы\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`
-в блоке `motion_platform` добавить строку, если порт 20777 уже используется:
-`<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />`
+### DR2 Telemetry Setup
 
 Open `Documents\My Games\DiRT Rally 2.0\hardwaresettings\hardware_settings_config.xml`,
 add this line inside the `motion_platform` block if port 20777 is already in use:
-`<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />`
+```
+<udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
+```
 
-## Скачать последнюю версию: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
-## Download latest version: https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+### Download latest version
+
+https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
+
+---
 
 ### Автор: SYBER1AN
 
-### https://t.me/SYBER1AN
-### https://live.vkvideo.ru/SYBER1AN
+https://t.me/SYBER1AN
+https://live.vkvideo.ru/SYBER1AN
