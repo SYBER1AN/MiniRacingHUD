@@ -2,7 +2,7 @@
 
 ## RU
 
-Минималистичный HUD для стримеров гоночных симуляторов.
+Минималистичный HUD для стримов гоночных симуляторов.
 
 ### Системные требования
 
@@ -52,17 +52,17 @@ p.s.: Если вы не видите панель настройки, увел�
 
 https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
----
-
 ### Автор: SYBER1AN
 
 - https://t.me/SYBER1AN
 - https://www.youtube.com/c/SYBER1AN
 - https://live.vkvideo.ru/SYBER1AN
 
+---
+
 ## EN
 
-Minimalistic HUD for simracing streamers.
+Minimalistic HUD for simracing streams.
 
 ### System Requirements
 
@@ -111,8 +111,6 @@ add this line inside the `motion_platform` block if port 20777 is already in use
 ### Download latest version
 
 https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
-
----
 
 ### Author: SYBER1AN
 
