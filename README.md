@@ -1,8 +1,10 @@
+<img width="785" height="279" alt="MiniRacingHUD-scr" src="https://github.com/user-attachments/assets/a82351b0-6997-440f-a345-828680681da8" />
+
 # Mini Racing HUD v1.0.0.214
 
 ## RU
 
-Минималистичный HUD для стримов гоночных симуляторов.
+Минималистичный, полностью настраиваемый HUD для стримов гоночных симуляторов.
 
 ### Системные требования
 
@@ -62,7 +64,7 @@ https://github.com/SYBER1AN/MiniRacingHUD/releases/latest
 
 ## EN
 
-Minimalistic HUD for simracing streams.
+Minimalistic fully customizable HUD for simracing streams.
 
 ### System Requirements
 
