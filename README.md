@@ -9,7 +9,7 @@
 ### Системные требования
 
 - Windows 10/11
-- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Включено в self-contained)
+- [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Включено в self-contained, потому и такой размер сборки)
 ### Возможности
 
 - Отображение руля, педалей, КПП, перегрузок (G-meter), графиков
@@ -100,7 +100,7 @@ Minimalistic fully customizable HUD for simracing streams.
 - Interface language: Russian, English
 - Widget language: Russian, English, Chinese
 
-### Supported Games
+### Supported Games and Default Ports
 
 - Dirt Rally 2.0 — Port: 20777
 - Automobilista 2 — Port: 5606
