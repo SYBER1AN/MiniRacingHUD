@@ -520,7 +520,14 @@
         <div class="hud-container-wrapper">
             <div class="hud-container">
                 <!-- Индикатор передачи (отдельный) -->
-                <div class="gear-display-independent hidden-gear-independent" id="gearDisplayIndependent">N</div>
+                <div class="gear-display-independent hidden-gear-independent" id="gearDisplayIndependent">
+                    <span class="gear-number">N</span>
+                    <span class="gear-range" style="display:none">
+                        <span class="indicator">H</span>
+                        <span class="indicator">L</span>
+                        <span class="indicator">3</span>
+                    </span>
+                </div>
                 <!-- Руль -->
                 <div class="wheel-assembly roundable">
                     <div class="wheel" id="wheel">
@@ -531,7 +538,14 @@
                         <div class="spoke-ver"></div>
                     </div>
                     <!-- Индикатор передачи -->
-                    <div class="gear-display" id="gearDisplay">N</div>
+                    <div class="gear-display" id="gearDisplay">
+                        <span class="gear-number">N</span>
+                        <span class="gear-range" style="display:none">
+                            <span class="indicator">H</span>
+                            <span class="indicator">L</span>
+                            <span class="indicator">3</span>
+                        </span>
+                    </div>
                 </div>
                 <!-- G-meter -->
                 <div class="gmeter-display roundable hidden-independent" id="gmeterDisplay">

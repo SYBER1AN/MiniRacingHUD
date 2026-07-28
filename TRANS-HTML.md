@@ -117,6 +117,10 @@ tooltip.handbrakeButtons
 ru - Кнопки ручника
 en - Handbrake buttons
 
+tooltip.handbrakeKeyboardUnavailable
+ru - Требуется запуск через приложение
+en - Requires app mode
+
 tooltip.handbrakeRight
 ru - Расположить ручник справа от педалей
 en - Place handbrake to the right of pedals

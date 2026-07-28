@@ -41,7 +41,9 @@ function calculateWidgetSizes() {
     var pedalVisName = { throttle:'th', brake:'br', clutch:'cl', handbrake:'hb' };
     let visiblePedals = PEDAL_TYPES.filter(type => {
         if (type === 'handbrake') {
-            return isVisible('hb') && (currentConfig.handbrakeAxis !== null || currentConfig.handbrakeButtons.some(btn => btn !== -1));
+            return isVisible('hb') && (currentConfig.handbrakeAxis !== null
+                || currentConfig.handbrakeButtons.some(btn => btn !== -1)
+                || (currentConfig.useUdpTelemetry && currentConfig.showHandbrakeUdp && udpState.connected));
         }
         if (hasUdpPedals()) return isVisible(pedalVisName[type]);
         return isVisible(pedalVisName[type]) && currentConfig[`${type}Axis`] !== null;
@@ -254,10 +256,12 @@ function updateGearDisplaySize(sizes) {
 
     if ((!hasGearButtons && !hasUdpGear() && !wheelAssigned) || (!wheelAssigned && !isVisible('gb'))) {
         DOM.gearDisplay.style.width = '0';
+        DOM.gearDisplay.style.minWidth = '0';
         DOM.gearDisplay.style.height = '0';
         DOM.gearDisplay.style.borderWidth = '0';
         if (DOM.gearDisplayIndependent) {
             DOM.gearDisplayIndependent.style.width = '0';
+            DOM.gearDisplayIndependent.style.minWidth = '0';
             DOM.gearDisplayIndependent.style.height = '0';
             DOM.gearDisplayIndependent.style.borderWidth = '0';
         }
@@ -1102,15 +1106,19 @@ function updateGearPosition() {
     // Скрываем только если нет НИЧЕГО: ни КПП, ни руля
     const hideGear = (!hasGear && !wheelAssigned) || (!isVisible('gb') && !wheelAssigned);
 
-    // На-рульный gear: виден всегда (не зависит от independent)
-    if (DOM.gearDisplay) {
-        DOM.gearDisplay.classList.toggle('hidden-gear-independent', hideGear);
-    }
+	// На-рульный gear: виден всегда (не зависит от independent)
+	if (DOM.gearDisplay) {
+		DOM.gearDisplay.classList.toggle('hidden-gear-independent', hideGear);
+		DOM.gearDisplay.classList.toggle('on-wheel-active', hasGear && !isIndependent && !hideGear);
+	}
 
-    // Отдельный gear: виден когда есть gear И independent
-    if (DOM.gearDisplayIndependent) {
-        DOM.gearDisplayIndependent.classList.toggle('hidden-gear-independent', hideGear || !isIndependent);
-    }
+	// Отдельный gear: виден когда есть gear И independent
+	if (DOM.gearDisplayIndependent) {
+		DOM.gearDisplayIndependent.classList.toggle('hidden-gear-independent', hideGear || !isIndependent);
+	}
+
+	// Сброс кэша рендера — при переключении режима КПП перерендерить актуальной передачей
+	_lastRenderedGear = null;
 
     // G-meter: виден только когда showGmeter
     if (DOM.gmeterDisplay) {
@@ -1392,12 +1400,28 @@ function updateBindingsUI() {
 
     // 2. Кнопки ручника
     const hbButtons = currentConfig.handbrakeButtons || [-1, -1, -1, -1, -1];
+    const hbKeyboardKeys = currentConfig.handbrakeKeyboardKeys || [null, null, null, null, null];
     DOM.handbrakeBtnSlots.forEach((slot, idx) => {
         const btnIndex = hbButtons[idx];
+        const kbKey = hbKeyboardKeys[idx];
         if (btnIndex !== -1) {
             slot.textContent = '';
             var lbl = document.createElement('span');
             lbl.textContent = btnIndex;
+            slot.appendChild(lbl);
+            var btn = document.createElement('button');
+            btn.className = 'clear-axis';
+            btn.dataset.mode = 'handbrake-button-' + idx;
+            btn.textContent = '\u00d7';
+            slot.appendChild(btn);
+        } else if (kbKey) {
+            slot.textContent = '';
+            var lbl = document.createElement('span');
+            lbl.textContent = getKeyDisplayName(kbKey);
+            if (!udpState.connected && !window._wsConnected) {
+                lbl.style.opacity = '0.5';
+                slot.title = t('tooltip.handbrakeKeyboardUnavailable');
+            }
             slot.appendChild(lbl);
             var btn = document.createElement('button');
             btn.className = 'clear-axis';
@@ -1443,7 +1467,9 @@ function updateDeviceInfo() {
         const cleanName = deviceName.replace(/\s*\(Vendor:\s*[0-9a-f]+\s+Product:\s*[0-9a-f]+\)\s*$/i, '').trim();
         if (scannerState.lastActiveElement) {
             const element = scannerState.lastActiveElement;
-            const suffix = element.type === 'axis' ? ` • ${t('status.axis', element.index)}` : ` • ${t('status.button', element.index)}`;
+            const suffix = element.type === 'axis' ? ` • ${t('status.axis', element.index)}` :
+                element.type === 'keyboard' ? ` • ${getKeyDisplayName(element.key)}` :
+                ` • ${t('status.button', element.index)}`;
             const fullText = t('status.lastDevice', cleanName + suffix);
             deviceInfoEl.textContent = fullText;
             deviceInfoEl.title = fullText;
@@ -1649,7 +1675,8 @@ function updateAllToggleStates() {
     const hasAnyPedal = currentConfig.throttleAxis !== null || currentConfig.brakeAxis !== null || currentConfig.clutchAxis !== null
         || currentConfig.handbrakeAxis !== null
         || (currentConfig.handbrakeButtons && currentConfig.handbrakeButtons.some(b => b !== -1))
-        || (currentConfig.useUdpTelemetry && udpState.connected && udpState.cSharpEnabled && currentConfig.showPedalsInUdp);
+        || (currentConfig.useUdpTelemetry && udpState.connected && udpState.cSharpEnabled && currentConfig.showPedalsInUdp)
+        || (currentConfig.useUdpTelemetry && udpState.connected && udpState.cSharpEnabled && currentConfig.showHandbrakeUdp);
     updateToggleState(DOM.togglePedalLabelsBtn, !hasAnyPedal, 'showPedalLabels');
 
     // Графики (без disabled, только inactive в GraphManager)
@@ -1718,9 +1745,11 @@ function updateAllToggleStates() {
         }
     });
 
-    // 4. G-meter: disabled если UDP/WS/C# неактивны или включён «Только графики»
+    // 4. G-meter: disabled если UDP/WS/C# неактивны, включён «Только графики» или выбрана грузовая игра
     const udpInactive = !currentConfig.useUdpTelemetry || !udpState.connected || !udpState.cSharpEnabled;
-    const gmeterDisabled = udpInactive || currentConfig.graphsOnly;
+    const isTruck = window._selectedGame === 'Euro Truck Simulator 2' || window._selectedGame === 'American Truck Simulator';
+    const gmeterDisabled = udpInactive || currentConfig.graphsOnly || isTruck;
+    if (gmeterDisabled) currentConfig.showGmeter = false;
     updateToggleState(DOM.toggleGmeter, gmeterDisabled, 'showGmeter', {
         onDisable: updateWidgetLayout, onEnable: updateWidgetLayout
     });

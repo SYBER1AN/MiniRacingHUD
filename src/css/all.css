@@ -1,3 +1,9 @@
+        @font-face {
+            font-family: 'Lilex';
+            font-weight: 550;
+            src: url('../fonts/Lilex-Medium.woff2') format('woff2');
+        }
+
         :root {
             /* Базовые размеры (при scale=1) */
             --scale-factor: 1;
@@ -53,7 +59,7 @@
             /* Плавное скрытие текста передачи (КПП) */
             --gear-transition: var(--anim);
             /* Базовые цвета и стили */
-            --gear-font-family: 'Roboto Mono', monospace;
+            --gear-font-family: 'Lilex', monospace;
             --page-bg: #1a1a1a;
             --panel-bg: #363636;
             --section-bg: #484848;
@@ -962,15 +968,15 @@
 
         .binding-row {
             justify-content: flex-end;
-            gap: 6px;
+            gap: 3px;
             padding-top: 8px;
             margin-top: auto;
         }
 
         .bind-copy-btn,
         .bind-paste-btn {
-            height: 30px;
-            width: 30px;
+            height: 24px;
+            width: 24px;
             background: var(--element-bg);
             color: var(--element-cont);
             padding: 0;
@@ -987,8 +993,8 @@
         .bind-copy-btn svg,
         .bind-paste-btn svg {
             fill: currentColor;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
         }
 
         .axis-label {
@@ -1581,7 +1587,6 @@
             transform: translate(-50%, -50%);
             transform-origin: center center !important;
             font-family: var(--gear-font-family);
-            font-weight: bold;
             color: var(--gear-n-text);
             opacity: 1;
             border: solid;
@@ -1590,8 +1595,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            line-height: 0;
-            padding-bottom: 0.06em;
             background: var(--gear-n-bg);
             border-radius: 50%;
             width: var(--gear-display-size);
@@ -1604,6 +1607,58 @@
             transition: width var(--anim), height var(--anim), font-size var(--anim), background-color var(--anim), color var(--gear-transition);
         }
 
+        .gear-display.has-range {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            place-items: center;
+            justify-content: center;
+            padding: 0 0.25em;
+            line-height: 0;
+        }
+
+        .gear-display .gear-number {
+            line-height: 0;
+        }
+
+        .gear-display.has-range .gear-number {
+            grid-row: 1 / -1;
+            grid-column: 1;
+            align-self: center;
+            justify-self: center;
+            line-height: 0;
+        }
+
+        .gear-display.has-range .gear-range {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 0.8;
+            font-size: 0.35em;
+            gap: 0.05em;
+        }
+
+        .gear-display.has-range .gear-range .indicator {
+            transition: color var(--anim), opacity var(--anim);
+        }
+
+        .gear-display.has-range .gear-range .indicator.inactive {
+            opacity: 0.3;
+        }
+
+        .gear-display.has-range.left {
+            grid-template-columns: auto 1fr;
+        }
+
+        .gear-display.has-range.left .gear-number {
+            grid-column: 2;
+        }
+
+        .gear-display.has-range.left .gear-range {
+            grid-column: 1;
+        }
+
+
         .gear-display.forward {
             background: var(--gear-bg);
             color: var(--gear-text);
@@ -1612,6 +1667,10 @@
         .gear-display.reverse {
             background: var(--gear-r-bg);
             color: var(--gear-r-text);
+        }
+
+        body.game-truck .gear-display.on-wheel-active {
+            border-radius: 20%;
         }
 
         /* G-meter */
@@ -1887,13 +1946,65 @@
             background: var(--gear-n-bg);
             color: var(--gear-n-text);
             font-family: var(--gear-font-family);
-            font-weight: bold;
             font-size: var(--gear-font-size);
-            line-height: 0;
-            padding-bottom: 0.05em;
             flex-shrink: 0;
             transition: width var(--anim), height var(--anim), font-size var(--anim), background-color var(--anim), color var(--gear-transition);
         }
+
+        .gear-display-independent.has-range {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            place-items: center;
+            justify-content: center;
+            padding: 0 0.25em;
+            line-height: 0;
+        }
+
+        .gear-display-independent .gear-number {
+            line-height: 0;
+        }
+
+        .gear-display-independent.has-range .gear-number {
+            grid-row: 1 / -1;
+            grid-column: 1;
+            align-self: center;
+            justify-self: center;
+            line-height: 0;
+        }
+
+        .gear-display-independent.has-range .gear-range {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 0.8;
+            font-size: 0.35em;
+            gap: 0.05em;
+            padding-right: 4px;
+        }
+
+        .gear-display-independent.has-range .gear-range .indicator {
+            transition: color var(--anim), opacity var(--anim);
+        }
+
+        .gear-display-independent.has-range .gear-range .indicator.inactive {
+            opacity: 0.3;
+        }
+
+        .gear-display-independent.has-range.left {
+            grid-template-columns: auto 1fr;
+        }
+
+        .gear-display-independent.has-range.left .gear-number {
+            grid-column: 2;
+        }
+
+        .gear-display-independent.has-range.left .gear-range {
+            grid-column: 1;
+            padding-right: 0;
+            padding-left: 4px;
+        }
+
 
         /* Скрытие отдельного индикатора */
         .gear-display-independent.hidden-gear-independent {

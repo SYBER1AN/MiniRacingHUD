@@ -338,6 +338,7 @@ const DEFAULT_CONFIG = {
     clutchAxis: null, clutchDeviceId: null, invertClutch: false, clutchRange: 'full', showClutchGraph: false,
     handbrakeAxis: null, handbrakeAxisDeviceId: null, invertHandbrake: false, handbrakeRange: 'full', showHandbrakeGraph: false,
     handbrakeButtons: [-1, -1, -1, -1, -1], handbrakeButtonsDeviceIds: [null, null, null, null, null],
+    handbrakeKeyboardKeys: [null, null, null, null, null],
     gearButtons: [-1, -1, -1, -1, -1, -1, -1, -1], gearButtonsDeviceIds: [null, null, null, null, null, null, null, null],
     theme: 'Default', selectedCar: '', gearScale: 1.0, useUdpTelemetry: false,
     showPedalsInUdp: false, showGearUdp: true, showWheelUdp: false, showHandbrakeUdp: false, udpSmoothing: false, noCornerRounding: false,
@@ -356,7 +357,7 @@ const udpState = {
     cSharpEnabled: false,
     handbrakeInTelemetry: false,
     steeringInTelemetry: false,
-    data: { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, gear: 'N', speed: 0, engineRate: 0 },
+    data: { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, handbrake: false, gear: 'N', speed: 0, engineRate: 0 },
     lastDataTime: 0
 };
 
@@ -398,6 +399,34 @@ function hasUdpWheel() {
 /** Есть ли активный UDP-источник данных для педалей */
 function hasUdpPedals() {
     return currentConfig.useUdpTelemetry && currentConfig.showPedalsInUdp && udpState.connected;
+}
+
+// --- Клавиатурные бинды ---
+const keyboardState = {};
+
+function getKeyDisplayName(code) {
+    if (!code) return '';
+    if (/^Key[A-Z]$/.test(code)) return code[3];
+    if (/^Digit[0-9]$/.test(code)) return code[5];
+    if (/^Numpad[0-9]$/.test(code)) return 'N' + code[6];
+    if (/^F(1[0-2]|[1-9])$/.test(code)) return code;
+    var map = {
+        'ArrowUp': '\u2191', 'ArrowDown': '\u2193', 'ArrowLeft': '\u2190', 'ArrowRight': '\u2192',
+        'Space': 'Spc', 'Enter': 'Ent', 'Escape': 'Esc',
+        'ShiftLeft': 'ShL', 'ShiftRight': 'ShR',
+        'ControlLeft': 'CtL', 'ControlRight': 'CtR',
+        'AltLeft': 'AlL', 'AltRight': 'AlR',
+        'MetaLeft': 'Win', 'MetaRight': 'Win',
+        'Backquote': '~', 'Backslash': '\\',
+        'Backspace': 'BSp', 'CapsLock': 'CpL',
+        'BracketLeft': '[', 'BracketRight': ']',
+        'PageUp': 'PgU', 'PageDown': 'PgD',
+        'Home': 'Hm', 'End': 'End',
+        'Delete': 'Del', 'Insert': 'Ins', 'Tab': 'Tab',
+        'Minus': '-', 'Equal': '=', 'Comma': ',', 'Period': '.',
+        'Slash': '/', 'Semicolon': ';', 'Quote': '\'', 'NumpadEnter': 'NEnt'
+    };
+    return map[code] || code.substring(0, 3);
 }
 
 /** Нормализует значение оси в диапазон [-1, 1] в зависимости от выбранного режима */

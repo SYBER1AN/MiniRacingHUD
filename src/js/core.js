@@ -208,6 +208,7 @@ if (window.chrome?.webview) {
                 WS_PORT = data.wsPort;
                 updatePageUrlDisplay();
                 window._selectedGame = data.selectedGame || 'Dirt Rally 2.0';
+                updateGameClass();
                 udpState.handbrakeInTelemetry = data.handbrakeInTelemetry === true;
                 if (data.steeringInTelemetry !== undefined) udpState.steeringInTelemetry = data.steeringInTelemetry === true;
                 if (data.diMode !== undefined) {
@@ -229,6 +230,7 @@ if (window.chrome?.webview) {
                 updateAllToggleStates();
             } else if (data.action === 'gameChange') {
                 window._selectedGame = data.selectedGame || 'Dirt Rally 2.0';
+                updateGameClass();
                 udpState.handbrakeInTelemetry = data.handbrakeInTelemetry === true;
                 if (data.steeringInTelemetry !== undefined) udpState.steeringInTelemetry = data.steeringInTelemetry === true;
                 updateAllToggleStates();
@@ -366,6 +368,14 @@ if (window.chrome?.webview) {
                 });
                 return;
             }
+            if (data.action === 'keyboardKeyCaptured') {
+                assignKeyboardKey(data.key);
+                return;
+            }
+            if (data.action === 'pasteBindingsResult') {
+                parseAndApplyBindings(data.data);
+                return;
+            }
         } catch (e) {
             console.warn('[UDP] Ошибка обработки сообщения от C#:', e);
         }
@@ -386,6 +396,17 @@ if (toggleHelpBtn && hudInfoBlock) {
 
 function applyUiTheme(name) {
     document.documentElement.setAttribute('data-theme-ui', name);
+}
+
+/** Переключает классы на body по выбранной игре */
+function updateGameClass() {
+    document.body.classList.toggle('game-truck',
+        window._selectedGame === 'Euro Truck Simulator 2' ||
+        window._selectedGame === 'American Truck Simulator'
+    );
+    document.body.classList.toggle('game-beamng',
+        window._selectedGame === 'BeamNG.drive'
+    );
 }
 
 function setThemeIcon(theme) {
@@ -556,6 +577,13 @@ DOM.toggleWheelUdpBtn?.addEventListener('click', () => {
 DOM.toggleHandbrakeUdpBtn?.addEventListener('click', () => {
     if (DOM.toggleHandbrakeUdpBtn.disabled) return;
     currentConfig.showHandbrakeUdp = !currentConfig.showHandbrakeUdp;
+    if (window.chrome?.webview) {
+        if (currentConfig.showHandbrakeUdp) {
+            window.chrome.webview.postMessage(JSON.stringify({ action: "stopKeyboardHook" }));
+        } else if (currentConfig.handbrakeKeyboardKeys?.some(k => k !== null)) {
+            window.chrome.webview.postMessage(JSON.stringify({ action: "startKeyboardCapture" }));
+        }
+    }
     updateAllToggleStates();
     updateWidgetLayout();
     sendConfigUpdate();
@@ -602,6 +630,7 @@ var BINDING_KEYS = [
     'clutchAxis', 'clutchDeviceId', 'invertClutch', 'clutchRange', 'showClutchGraph',
     'handbrakeAxis', 'handbrakeAxisDeviceId', 'invertHandbrake', 'handbrakeRange', 'showHandbrakeGraph',
     'handbrakeButtons', 'handbrakeButtonsDeviceIds',
+    'handbrakeKeyboardKeys',
     'gearButtons', 'gearButtonsDeviceIds'
 ];
 
@@ -612,6 +641,7 @@ var BINDING_DEFAULTS = {
     clutchAxis: null, clutchDeviceId: null, invertClutch: false, clutchRange: 'full', showClutchGraph: false,
     handbrakeAxis: null, handbrakeAxisDeviceId: null, invertHandbrake: false, handbrakeRange: 'full', showHandbrakeGraph: false,
     handbrakeButtons: [-1, -1, -1, -1, -1], handbrakeButtonsDeviceIds: [null, null, null, null, null],
+    handbrakeKeyboardKeys: [null, null, null, null, null],
     gearButtons: [-1, -1, -1, -1, -1, -1, -1, -1], gearButtonsDeviceIds: [null, null, null, null, null, null, null, null]
 };
 
@@ -620,7 +650,9 @@ function saveBindings(target) {
 }
 
 function loadBindings(source) {
-    BINDING_KEYS.forEach(function(k) { currentConfig[k] = source[k]; });
+    BINDING_KEYS.forEach(function(k) {
+        if (source[k] !== undefined) currentConfig[k] = source[k];
+    });
     if (typeof applyConfig === 'function') applyConfig();
 }
 
@@ -630,23 +662,59 @@ function clearBindings() {
 }
 
 // --- Копировать/Вставить бинды ---
-var _bindingsClipboard = null;
 
 function copyBindingsToClipboard() {
-    _bindingsClipboard = {
-        diBindings: JSON.parse(JSON.stringify(_diBindings)),
-        gpBindings: JSON.parse(JSON.stringify(_gpBindings))
-    };
+    saveBindings(_useDiMode ? _diBindings : _gpBindings);
+    navigator.clipboard.writeText(JSON.stringify({
+        type: 'minihud-bindings',
+        v: 1,
+        di: JSON.parse(JSON.stringify(_diBindings)),
+        gp: JSON.parse(JSON.stringify(_gpBindings))
+    }));
     showStatusMessage(t('bindings.copied'));
 }
 
 function pasteBindingsFromClipboard() {
-    if (!_bindingsClipboard) { showStatusMessage(t('bindings.nothing')); return; }
-    Object.assign(_diBindings, _bindingsClipboard.diBindings);
-    Object.assign(_gpBindings, _bindingsClipboard.gpBindings);
-    var target = _useDiMode ? _diBindings : _gpBindings;
-    loadBindings(target);
-    showStatusMessage(t('bindings.pasted'));
+    if (window.chrome?.webview) {
+        window.chrome.webview.postMessage(JSON.stringify({ action: "pasteBindings" }));
+    } else {
+        navigator.clipboard.readText().then(parseAndApplyBindings).catch(function() {
+            showStatusMessage(t('bindings.nothing'));
+        });
+    }
+}
+
+function parseAndApplyBindings(text) {
+    try {
+        var parsed = JSON.parse(text);
+        if (parsed && parsed.type === 'minihud-bindings' && parsed.v === 1) {
+            Object.assign(_diBindings, parsed.di);
+            Object.assign(_gpBindings, parsed.gp);
+            loadBindings(_useDiMode ? _diBindings : _gpBindings);
+            showStatusMessage(t('bindings.pasted'));
+            return;
+        }
+    } catch (e) {}
+    showStatusMessage(t('bindings.nothing'));
+}
+
+function assignKeyboardKey(key) {
+    if (captureMode && captureMode.startsWith('handbrake-button')) {
+        var slotIndex = parseInt(captureMode.split('-')[2]);
+        if (!currentConfig.handbrakeKeyboardKeys) {
+            currentConfig.handbrakeKeyboardKeys = [null, null, null, null, null];
+        }
+        currentConfig.handbrakeKeyboardKeys[slotIndex] = key;
+        currentConfig.handbrakeButtons[slotIndex] = -1;
+        currentConfig.handbrakeButtonsDeviceIds[slotIndex] = null;
+    }
+    deviceName = 'Keyboard';
+    scannerState.lastActiveElement = { type: 'keyboard', key: key, captureMode: captureMode || '' };
+    updateDeviceInfo();
+    updateUIFromConfig();
+    updateWidgetLayout();
+    GraphManager.updateButtonsState();
+    captureMode = null;
 }
 
 function clearWsReconnectTimer() {
@@ -670,6 +738,7 @@ function initUdpWebSocket() {
             udpSmooth.steering = 0; udpSmooth.throttle = 0; udpSmooth.brake = 0; udpSmooth.clutch = 0;
             updateAllToggleStates();
             updateWidgetLayout();
+            updateBindingsUI();
             udpState.socket.send(JSON.stringify({ action: 'requestPreset' }));
             // Синхронизировать изменения, сделанные до соединения WS
             sendConfigUpdate();
@@ -785,7 +854,7 @@ function initUdpWebSocket() {
                             }
                             return;
 
-                        case 'colorUpdate':
+                            case 'colorUpdate':
                             if (!PRESET_NAME && typeof ColorManager !== 'undefined') {
                                 ColorManager.apply(data.colors || {});
                                 if (data.name) {
@@ -794,6 +863,10 @@ function initUdpWebSocket() {
                                     window._customThemes[data.name].colors = data.colors;
                                 }
                             }
+                            return;
+
+                        case 'keyState':
+                            keyboardState[data.key] = data.pressed;
                             return;
                     }
                     return;
@@ -832,7 +905,7 @@ function initUdpWebSocket() {
             udpState.connected = false;
             window._wsConnected = false;
             udpState.socket = null;
-            udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, gear: 'N', speed: 0, engineRate: 0 };
+            udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, handbrake: false, gear: 'N', speed: 0, engineRate: 0 };
             gmeterTrail.lat.fill(0);
             gmeterTrail.lon.fill(0);
             gmeterTrail.idx = 0;
@@ -855,6 +928,7 @@ function initUdpWebSocket() {
 
             updateAllToggleStates();
             updateWidgetLayout();
+            updateBindingsUI();
             _wsReconnectTimer = setTimeout(() => {
                 _wsReconnectDelay = Math.min(_wsReconnectDelay * 2, 30000);
                 initUdpWebSocket();
@@ -880,7 +954,7 @@ function closeUdpWebSocket() {
         udpState.socket = null;
     }
     udpState.connected = false;
-    udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, gear: 'N', speed: 0, engineRate: 0 };
+    udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, handbrake: false, gear: 'N', speed: 0, engineRate: 0 };
     gmeterTrail.lat.fill(0);
     gmeterTrail.lon.fill(0);
     gmeterTrail.idx = 0;
@@ -1353,6 +1427,15 @@ function onBeforeUnload(e) {
 function onGamepadConnected(e) { }
 
 function onKeyDown(e) {
+    if (scannerState.isScanning && captureMode?.startsWith('handbrake-button')) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.repeat) return;
+        var key = e.code;
+        stopScanning();
+        assignKeyboardKey(key);
+        return;
+    }
     if (e.key === 'Escape') {
         if (scannerState.isScanning) {
             stopScanning();
@@ -1511,7 +1594,8 @@ function hasAnyBindings() {
         currentConfig.brakeAxis === null &&
         currentConfig.clutchAxis === null &&
         currentConfig.handbrakeAxis === null &&
-        currentConfig.handbrakeButtons.every(btn => btn === -1)
+        currentConfig.handbrakeButtons.every(btn => btn === -1) &&
+        !currentConfig.handbrakeKeyboardKeys?.some(k => k !== null)
     );
 }
 
@@ -1650,6 +1734,7 @@ function _doLoadPreset(name) {
             } else {
                 window._hideOverlay = null;
                 window._urlOverlayExplicit = false;
+                window.MultiWidget.applyVisibilityOverlay([]);
                 var mwTabs = document.getElementById('multiWidgetTabs');
                 if (mwTabs) {
                     mwTabs.classList.remove('visible');
@@ -1718,6 +1803,7 @@ function applyPreset(name, content) {
             } else {
                 window._hideOverlay = null;
                 window._urlOverlayExplicit = false;
+                window.MultiWidget.applyVisibilityOverlay([]);
                 var mwTabs = document.getElementById('multiWidgetTabs');
                 if (mwTabs) {
                     mwTabs.classList.remove('visible');
@@ -1730,7 +1816,7 @@ function applyPreset(name, content) {
         } else {
             console.warn('[Config] Не удалось разобрать содержимое пресета');
         }
-    } catch (e) {
+        } catch (e) {
         console.warn('[Config] Ошибка загрузки пресета:', e);
     }
 }
@@ -1763,6 +1849,10 @@ function parseExternalConfig(config) {
             currentConfig.handbrakeButtonsDeviceIds = [...config.handbrakeButtonsDeviceIds];
             while (currentConfig.handbrakeButtonsDeviceIds.length < 5) currentConfig.handbrakeButtonsDeviceIds.push(null);
         } else { currentConfig.handbrakeButtonsDeviceIds = [null, null, null, null, null]; }
+    }
+
+    if (config.handbrakeKeyboardKeys && Array.isArray(config.handbrakeKeyboardKeys)) {
+        currentConfig.handbrakeKeyboardKeys = [...config.handbrakeKeyboardKeys].concat([null, null, null, null, null]).slice(0, 5);
     }
 
     if (config.gearButtons && Array.isArray(config.gearButtons)) {
@@ -1841,6 +1931,19 @@ function parseExternalConfig(config) {
         saveBindings(_useDiMode ? _diBindings : _gpBindings);
         if (_useDiMode) _diPopulated = true;
         else _gpPopulated = true;
+    }
+
+    // handbrakeKeyboardKeys может быть внутри diBindings/gpBindings
+    if (!config.handbrakeKeyboardKeys) {
+        var nestedKeys = config.diBindings?.handbrakeKeyboardKeys || config.gpBindings?.handbrakeKeyboardKeys;
+        if (nestedKeys) {
+            currentConfig.handbrakeKeyboardKeys = [...nestedKeys].concat([null, null, null, null, null]).slice(0, 5);
+        }
+    }
+
+    // Автостарт клавиатурного хука (C#-режим)
+    if (window.chrome?.webview && currentConfig.handbrakeKeyboardKeys?.some(k => k !== null) && !currentConfig.showHandbrakeUdp) {
+        window.chrome.webview.postMessage(JSON.stringify({ action: "startKeyboardCapture" }));
     }
 }
 
@@ -1950,6 +2053,7 @@ function resetConfig() {
     updateGearScaleFactor();
     DOM.widgetBgOpacityValue.value = '100%';
     DOM.widgetBgOpacitySlider.value = 1.0;
+    currentConfig.widgetBgOpacity = 1.0;
     setVisualScale(currentConfig.scale || 1.0);
 
     // Сохраняем желаемые значения до updateUIFromConfig,
@@ -2060,7 +2164,7 @@ function start() {
         // Тайм-аут телеметрии: если данные не приходили >2 секунд — сброс на нейтральные
         if (udpState.connected && udpState.lastDataTime > 0 && performance.now() - udpState.lastDataTime > 2000) {
             if (udpState.data.speed !== 0 || udpState.data.engineRate !== 0 || udpState.data.gear !== 0) {
-                udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, gear: 0, speed: 0, engineRate: 0 };
+                udpState.data = { throttleInput: 0, steeringInput: 0, brakeInput: 0, clutchInput: 0, handbrake: false, gear: 0, speed: 0, engineRate: 0 };
                 udpSmooth.steering = 0; udpSmooth.throttle = 0; udpSmooth.brake = 0; udpSmooth.clutch = 0;
                 gmeterSmooth.lat = 0; gmeterSmooth.lon = 0;
                 gmeterTrail.lat.fill(0);
@@ -2093,7 +2197,8 @@ function start() {
         const showBrake = window.MultiWidget.isVisible('br') && (pedalsFromUdp || currentConfig.brakeAxis !== null);
         const showClutch = window.MultiWidget.isVisible('cl') && (pedalsFromUdp || currentConfig.clutchAxis !== null);
         const hasHandbrakeAxisGamepad = currentConfig.handbrakeAxis !== null;
-        const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1);
+        const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1) ||
+            currentConfig.handbrakeKeyboardKeys?.some(k => k !== null);
         const showHandbrake = window.MultiWidget.isVisible('hb') && (hasHandbrakeAxisGamepad || hasHandbrakeButtons || (handbrakeFromUdp && udpState.data && 'handbrake' in udpState.data));
 
 const hasGearButtonsGamepad = currentConfig.gearButtons && currentConfig.gearButtons.some(b => b !== -1);
@@ -2159,18 +2264,32 @@ if (DOM.gearDisplayIndependent) {
         // Ручник — ВСЕГДА из геймпада
         handbrakeAxisRaw = readAxisRaw('handbrakeAxis', 'handbrakeAxisDeviceId', deviceMap);
 
-        // Кнопки ручника (геймпад)
+        // Кнопки ручника (геймпад + клавиатура)
         let handbrakeButtonsPressed = false;
         currentConfig.handbrakeButtons.forEach((btnIndex, slotIdx) => {
             if (btnIndex === -1) return;
             const dev = deviceMap[currentConfig.handbrakeButtonsDeviceIds[slotIdx]];
             if (dev?.buttons?.[btnIndex]?.pressed) handbrakeButtonsPressed = true;
         });
+        if (currentConfig.handbrakeKeyboardKeys) {
+            currentConfig.handbrakeKeyboardKeys.forEach(function(k) {
+                if (k && keyboardState[k]) handbrakeButtonsPressed = true;
+            });
+        }
 
         // Передача
         if (gearFromUdp) {
             const g = udpState.data.gear;
-            if (udpState.data.gameId === 3) {
+            if (udpState.data.gameId === 4) {
+                var gearName = udpState.data.gearName;
+                if (gearName && gearName !== '') {
+                    gear = gearName;
+                } else {
+                    if (g === 0 || g === undefined) gear = 'N';
+                    else if (g === -1) gear = 'R';
+                    else gear = String(g);
+                }
+            } else if (udpState.data.gameId === 3) {
                 // BeamNG: если есть gearName (через Lua-мод OutGauge display1) — используем строку режима
                 var gearName = udpState.data.gearName;
                 if (gearName && gearName !== '') {
@@ -2285,6 +2404,79 @@ function renderSteeringWheel(rawAxis) {
     if (DOM.wheel.style.transform !== newTransform) DOM.wheel.style.transform = newTransform;
 }
 
+function getGearIndicators() {
+    if (window._selectedGame === 'Euro Truck Simulator 2' || window._selectedGame === 'American Truck Simulator') {
+        return { labels: ['H', 'L'], position: 'right' };
+    }
+    if (window._selectedGame === 'BeamNG.drive') {
+        return { labels: ['M', 'S'], position: 'left' };
+    }
+    return { labels: [], position: 'right' };
+}
+
+/** Парсит gearName: "5H" → { number: "5", label: "H" }, "M1" → { number: "1", label: "M" } */
+function parseGearSuffix(gear, cfg) {
+    if (!gear) return { number: 'N', label: null };
+    var labels = (cfg && cfg.labels) || [];
+    var position = (cfg && cfg.position) || 'right';
+    for (var i = 0; i < labels.length; i++) {
+        var suffix = labels[i];
+        if (position === 'left') {
+            if (gear.startsWith(suffix) && gear.length > suffix.length) {
+                var num = gear.slice(suffix.length);
+                if (/^R/.test(num)) num = 'R';
+                return { number: num, label: suffix };
+            }
+        } else {
+            if (gear.endsWith(suffix) && gear.length > suffix.length) {
+                var num = gear.slice(0, -suffix.length);
+                if (/^R/.test(num)) num = 'R';
+                return { number: num, label: suffix };
+            }
+        }
+    }
+    if (/^R/.test(gear)) return { number: 'R', label: null };
+    return { number: gear, label: null };
+}
+
+/** Обновляет один элемент индикатора КПП (на-рульный или отдельный) */
+function renderSingleGear(el, baseClass, gear, parsed, cfg) {
+    if (!el || el.classList.contains('no-data')) return;
+    var labels = (cfg && cfg.labels) || [];
+    var position = (cfg && cfg.position) || 'right';
+
+    el.classList.remove('forward', 'reverse');
+    el.classList.add(baseClass);
+    if (parsed.number === 'R') el.classList.add('reverse');
+    else if (parsed.number !== 'N' && parsed.number !== 'P') el.classList.add('forward');
+
+    var numEl = el.querySelector('.gear-number');
+    if (numEl) numEl.textContent = parsed.number || gear;
+
+    var rangeEl = el.querySelector('.gear-range');
+    if (rangeEl) {
+        if (parsed.label && labels.length > 0) {
+            el.classList.add('has-range');
+            el.classList.toggle('left', position === 'left');
+            rangeEl.style.display = 'flex';
+            var indicators = rangeEl.children;
+            for (var i = 0; i < indicators.length; i++) {
+                if (i < labels.length) {
+                    indicators[i].style.display = '';
+                    indicators[i].textContent = labels[i];
+                    indicators[i].classList.toggle('inactive', labels[i] !== parsed.label);
+                } else {
+                    indicators[i].style.display = 'none';
+                }
+            }
+        } else {
+            el.classList.remove('has-range');
+            el.classList.remove('left');
+            rangeEl.style.display = 'none';
+        }
+    }
+}
+
 let _lastRenderedGear = null;
 
 /** Рендер индикатора передачи (текст + классы) */
@@ -2292,20 +2484,11 @@ function renderGearDisplay(gear) {
     if (!gear || _lastRenderedGear === gear) return;
     _lastRenderedGear = gear;
 
-    if (DOM.gearDisplay && !DOM.gearDisplay.classList.contains('no-data')) {
-        DOM.gearDisplay.textContent = gear;
-        DOM.gearDisplay.classList.remove('forward', 'reverse');
-        DOM.gearDisplay.classList.add('gear-display');
-        if (gear === 'R') DOM.gearDisplay.classList.add('reverse');
-        else if (gear !== 'N' && gear !== 'P') DOM.gearDisplay.classList.add('forward');
-    }
-    if (DOM.gearDisplayIndependent && !DOM.gearDisplayIndependent.classList.contains('no-data')) {
-        DOM.gearDisplayIndependent.textContent = gear;
-        DOM.gearDisplayIndependent.classList.remove('forward', 'reverse');
-        DOM.gearDisplayIndependent.classList.add('gear-display-independent');
-        if (gear === 'R') DOM.gearDisplayIndependent.classList.add('reverse');
-        else if (gear !== 'N' && gear !== 'P') DOM.gearDisplayIndependent.classList.add('forward');
-    }
+    var cfg = getGearIndicators();
+    var parsed = parseGearSuffix(gear, cfg);
+
+    renderSingleGear(DOM.gearDisplay, 'gear-display', gear, parsed, cfg);
+    renderSingleGear(DOM.gearDisplayIndependent, 'gear-display-independent', gear, parsed, cfg);
 }
 
 let _lastGearTransformOnWheel = null;
@@ -2626,7 +2809,15 @@ function clearInputAssignment(mode) {
             currentConfig.handbrakeButtons[slotIndex] = -1;
             currentConfig.handbrakeButtonsDeviceIds[slotIndex] = null;
         }
+        if (currentConfig.handbrakeKeyboardKeys) {
+            const oldKey = currentConfig.handbrakeKeyboardKeys[slotIndex];
+            currentConfig.handbrakeKeyboardKeys[slotIndex] = null;
+            if (oldKey) delete keyboardState[oldKey];
+        }
         if (scannerState.lastActiveElement?.type === 'button' && `handbrake-button-${slotIndex}` === mode) {
+            scannerState.lastActiveElement = null;
+        }
+        if (scannerState.lastActiveElement?.type === 'keyboard' && `handbrake-button-${slotIndex}` === (scannerState.lastActiveElement.captureMode || '')) {
             scannerState.lastActiveElement = null;
         }
     } else {
@@ -2644,12 +2835,14 @@ function clearInputAssignment(mode) {
     // Обновление имени устройства
     deviceName = currentConfig.wheelDeviceId || currentConfig.throttleDeviceId || currentConfig.brakeDeviceId ||
         currentConfig.clutchDeviceId || currentConfig.handbrakeAxisDeviceId ||
-        (currentConfig.handbrakeButtonsDeviceIds?.find(id => id !== null)) || '';
+        (currentConfig.handbrakeButtonsDeviceIds?.find(id => id !== null)) ||
+        (currentConfig.handbrakeKeyboardKeys?.find(k => k !== null) ? 'Keyboard' : '') || '';
 
     // Логика графика ручника
     if (mode === 'handbrake' || mode.startsWith('handbrake-button')) {
         const hasHandbrakeAxis = currentConfig.handbrakeAxis !== null;
-        const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1);
+        const hasHandbrakeButtons = currentConfig.handbrakeButtons.some(btn => btn !== -1) ||
+            currentConfig.handbrakeKeyboardKeys?.some(k => k !== null);
         if (!hasHandbrakeAxis && !hasHandbrakeButtons && currentConfig.showHandbrakeGraph) {
             if (DOM.toggleHandbrakeGraphBtn) DOM.toggleHandbrakeGraphBtn.classList.remove('active');
             currentConfig.showHandbrakeGraph = false;

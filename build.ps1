@@ -9,6 +9,11 @@ $enc = [System.Text.UTF8Encoding]::new($false)
 # Читаем части
 $css  = [System.IO.File]::ReadAllText("$srcDir\css\all.css", $enc)
 $cssThemes = [System.IO.File]::ReadAllText("$srcDir\css\themes.css", $enc)
+
+# Base64-инлайн woff2-шрифта
+$fontBytes = [System.IO.File]::ReadAllBytes("$srcDir\fonts\Lilex-Medium.woff2")
+$fontBase64 = [Convert]::ToBase64String($fontBytes)
+$css = $css -replace "url\('\.\./fonts/Lilex-Medium\.woff2'\)", "url('data:font/woff2;base64,$fontBase64')"
 $jsLocales = [System.IO.File]::ReadAllText("$srcDir\js\locales.js", $enc)
 $js1  = [System.IO.File]::ReadAllText("$srcDir\js\constants.js", $enc)
 $jsCars = [System.IO.File]::ReadAllText("$srcDir\js\cars.js", $enc)

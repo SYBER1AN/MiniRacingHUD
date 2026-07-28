@@ -13,7 +13,6 @@ public class AcRallyTelemetryProvider : ITelemetryProvider
 
     private MemoryMappedFile? _mmf;
     private const string PhysicsMmfName = "Local\\acpmf_physics";
-    private readonly Dictionary<string, object> _cache = new(20);
 
     private static readonly List<(string key, string label)> _fields = new()
     {
@@ -37,6 +36,8 @@ public class AcRallyTelemetryProvider : ITelemetryProvider
     public IReadOnlyList<(string key, string label)> Fields => _fields;
 
     private DateTime _lastReconnectAttempt = DateTime.MinValue;
+
+    private readonly Dictionary<string, object> _reducedCache = new(11);
 
     public bool Connect()
     {
@@ -66,15 +67,15 @@ public class AcRallyTelemetryProvider : ITelemetryProvider
 
     public Dictionary<string, object>? ReadTelemetry()
     {
-        return DoRead();
+        return DoRead(false);
     }
 
     public Dictionary<string, object>? ReadReduced()
     {
-        return DoRead();
+        return DoRead(true);
     }
 
-    private Dictionary<string, object>? DoRead()
+    private Dictionary<string, object>? DoRead(bool reduced)
     {
         if (_mmf == null)
         {
@@ -116,28 +117,44 @@ public class AcRallyTelemetryProvider : ITelemetryProvider
 
             float steerNormalized = Math.Clamp(steerAngle, -1f, 1f);
 
-            _cache.Clear();
-            _cache["gameId"] = 2;
-            _cache["throttleInput"] = gas;
-            _cache["brakeInput"] = brake;
-            _cache["steeringInput"] = steerNormalized;
-            _cache["clutchInput"] = clutchInput;
-            _cache["speed"] = speedKmh / 3.6f;
-            _cache["speedMs"] = speedKmh / 3.6f;
-            _cache["engineRate"] = (float)rpms;
-            _cache["gear"] = dr2Gear;
-            _cache["gForceLateral"] = accGLateral;
-            _cache["gForceLongitudinal"] = accGLongitudinal;
-            _cache["packetId"] = packetId;
-            _cache["fuel"] = fuel;
-            _cache["steerAngle"] = steerAngle;
-            _cache["steerNormalized"] = steerNormalized;
-            _cache["gearRaw"] = gear;
-            _cache["speedKmh"] = speedKmh;
-            _cache["accGVertical"] = accGVertical;
-            _cache["clutchRaw"] = clutchRaw;
+            if (reduced)
+            {
+                _reducedCache.Clear();
+                _reducedCache["gameId"] = 2;
+                _reducedCache["gear"] = dr2Gear;
+                _reducedCache["speed"] = speedKmh / 3.6f;
+                _reducedCache["engineRate"] = (float)rpms;
+                _reducedCache["steeringInput"] = steerNormalized;
+                _reducedCache["throttleInput"] = gas;
+                _reducedCache["brakeInput"] = brake;
+                _reducedCache["clutchInput"] = clutchInput;
+                return _reducedCache;
+            }
 
-            return _cache;
+            var result = new Dictionary<string, object>(20)
+            {
+                ["gameId"] = 2,
+                ["throttleInput"] = gas,
+                ["brakeInput"] = brake,
+                ["steeringInput"] = steerNormalized,
+                ["clutchInput"] = clutchInput,
+                ["speed"] = speedKmh / 3.6f,
+                ["speedMs"] = speedKmh / 3.6f,
+                ["engineRate"] = (float)rpms,
+                ["gear"] = dr2Gear,
+                ["gForceLateral"] = accGLateral,
+                ["gForceLongitudinal"] = accGLongitudinal,
+                ["packetId"] = packetId,
+                ["fuel"] = fuel,
+                ["steerAngle"] = steerAngle,
+                ["steerNormalized"] = steerNormalized,
+                ["gearRaw"] = gear,
+                ["speedKmh"] = speedKmh,
+                ["accGVertical"] = accGVertical,
+                ["clutchRaw"] = clutchRaw,
+            };
+
+            return result;
         }
         catch
         {

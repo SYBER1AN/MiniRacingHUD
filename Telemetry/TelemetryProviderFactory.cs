@@ -13,11 +13,18 @@ public static class TelemetryProviderFactory
         Register<Providers.Ams2TelemetryProvider>("Automobilista 2");
         Register<Providers.BeamNgTelemetryProvider>("BeamNG.drive");
         Register<Providers.AcRallyTelemetryProvider>("Assetto Corsa Rally");
+        Register("Euro Truck Simulator 2", () => new Providers.ScsTelemetryProvider("Euro Truck Simulator 2"));
+        Register("American Truck Simulator", () => new Providers.ScsTelemetryProvider("American Truck Simulator"));
     }
 
     public static void Register<T>(string gameName) where T : ITelemetryProvider, new()
     {
         _registry[gameName] = () => new T();
+    }
+
+    public static void Register(string gameName, Func<ITelemetryProvider> factory)
+    {
+        _registry[gameName] = factory;
     }
 
     public static void Unregister(string gameName)

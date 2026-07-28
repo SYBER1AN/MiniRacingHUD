@@ -366,7 +366,9 @@ function mwGetAvailableSources() {
         br: pedalsFromUdp || currentConfig.brakeAxis !== null,
         cl: pedalsFromUdp || currentConfig.clutchAxis !== null,
         hb: currentConfig.handbrakeAxis !== null ||
-            currentConfig.handbrakeButtons.some(function(b) { return b !== -1; }),
+            currentConfig.handbrakeButtons.some(function(b) { return b !== -1; }) ||
+            currentConfig.handbrakeKeyboardKeys?.some(function(k) { return k !== null; }) ||
+            (currentConfig.useUdpTelemetry && currentConfig.showHandbrakeUdp && udpState.connected),
         gb: gearFromUdp || currentConfig.gearButtons.some(function(b) { return b !== -1; }),
         gm: isUdpReady && currentConfig.showGmeter,
         gr: currentConfig.showWheelGraph || currentConfig.showThrottleGraph ||

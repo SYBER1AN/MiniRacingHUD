@@ -1,8 +1,24 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 using Res = MiniRacingHUD.Properties.Resources;
 
 namespace MiniRacingHUD;
+
+public static class BuiltInGames
+{
+    public static readonly List<GameUdpConfig> Configs = new()
+    {
+        new() { Name = Res.Constants_NoTelemetry, ProcessName = "", UdpPort = 0, UdpEnabled = false, HasTelemetrySupport = false, LinkedPreset = "Default" },
+        new() { Name = "Assetto Corsa Rally", ProcessName = "acr", UdpPort = 0, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "ACR" },
+        new() { Name = "Automobilista 2", ProcessName = "ams2", UdpPort = 5606, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "AMS2" },
+        new() { Name = "Dirt Rally 2.0", ProcessName = "dirtrally2", UdpPort = 20777, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "DR2" },
+        new() { Name = "BeamNG.drive", ProcessName = "BeamNG.drive.x64", UdpPort = 4444, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "BeamNG" },
+        new() { Name = "Euro Truck Simulator 2", ProcessName = "eurotrucks2", UdpPort = 0, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "ETS2" },
+        new() { Name = "American Truck Simulator", ProcessName = "amtrucks", UdpPort = 0, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "ATS" },
+    };
+    public static HashSet<string> Names => Configs.Select(c => c.Name).ToHashSet();
+}
 
 public class GameUdpConfig
 {
@@ -16,7 +32,7 @@ public class GameUdpConfig
     [JsonIgnore]
     public bool HandbrakeInTelemetry => Name switch
     {
-        "BeamNG.drive" or "Automobilista 2" => true,
+        "BeamNG.drive" or "Automobilista 2" or "Euro Truck Simulator 2" or "American Truck Simulator" => true,
         _ => false
     };
 
@@ -26,6 +42,10 @@ public class GameUdpConfig
         "BeamNG.drive" => false,
         _ => true
     };
+
+    [JsonIgnore]
+    public bool IsSharedMemory => UdpPort == 0 && HasTelemetrySupport;
+
 }
 
 public class AppConfig
@@ -43,14 +63,16 @@ public class AppConfig
     public bool UseDiMode { get; set; } = false;
     public string Language { get; set; } = "ru";
     public string SelectedGame { get; set; } = NoTelemetryName;
-    public List<GameUdpConfig> GameConfigs { get; set; } = new()
-    {
-        new() { Name = "Assetto Corsa Rally", ProcessName = "acr", UdpPort = 0, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "ACR" },
-        new() { Name = "Automobilista 2", ProcessName = "ams2", UdpPort = 5606, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "AMS2" },
-        new() { Name = "Dirt Rally 2.0", ProcessName = "dirtrally2", UdpPort = 20777, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "DR2" },
-        new() { Name = "BeamNG.drive", ProcessName = "BeamNG.drive.x64", UdpPort = 4444, UdpEnabled = true, HasTelemetrySupport = true, LinkedPreset = "BeamNG" },
-        new() { Name = NoTelemetryName, ProcessName = "", UdpPort = 0, UdpEnabled = false, HasTelemetrySupport = false, LinkedPreset = "Default" }
-    };
+    public bool UdpEnabled { get; set; } = true;
+
+    public List<GameUdpConfig> CustomGameConfigs { get; set; } = new();
+
+    [JsonIgnore]
+    public List<GameUdpConfig> GameConfigs => 
+        BuiltInGames.Configs.Concat(CustomGameConfigs).ToList();
+
+    [JsonIgnore]
+    public List<GameUdpConfig> AllGameConfigs => GameConfigs;
 }
 
 public class WindowSite

@@ -65,6 +65,7 @@ public partial class MainWindow : Window
     private ThemeEditorWindow? _themeEditorWindow;
     private DirectInputReader? _directInputReader;
     private HwndSourceHook? _wndProcHook;
+    private KeyboardHook? _keyboardHook;
     private int _diPollTickBusy;
     private static readonly JsonSerializerOptions _diJsonOptions = new()
     {
@@ -80,7 +81,9 @@ public partial class MainWindow : Window
     private static void Log(string message)
     {
         System.Diagnostics.Debug.WriteLine(message);
+#if DEBUG
         try { System.IO.File.AppendAllText(_logPath, $"[{DateTime.Now:HH:mm:ss.fff}] {message}\n"); } catch { }
+#endif
     }
 
     public MainWindow()
@@ -157,43 +160,33 @@ public partial class MainWindow : Window
         };
     }
 
-    private static HashSet<string> BuiltInGames => new(TelemetryProviderFactory.RegisteredGames)
-    {
-        AppConfig.NoTelemetryName
-    };
-
     private void InitGameSelector()
     {
-        var builtIn = BuiltInGames;
+        var builtInNames = MiniRacingHUD.BuiltInGames.Names;
         var items = new List<GameSelectorItem>();
 
         // No telemetry — отдельный пункт в начале
-        var noTelConfig = _appConfig.GameConfigs.FirstOrDefault(g => g.ProcessName == "");
+        var noTelConfig = MiniRacingHUD.BuiltInGames.Configs[0];
         items.Add(new GameSelectorItem
         {
-            Name = noTelConfig?.Name ?? AppConfig.NoTelemetryName,
-            DisplayName = AppConfig.NoTelemetryName,
-            IsNoTelemetry = true,
-            GameIndex = noTelConfig != null ? _appConfig.GameConfigs.IndexOf(noTelConfig) : -1
+            Name = noTelConfig.Name,
+            DisplayName = noTelConfig.Name,
+            IsNoTelemetry = true
         });
 
-        // Встроенные игры
-        for (int i = 0; i < _appConfig.GameConfigs.Count; i++)
+        // Встроенные игры (без NoTelemetry)
+        for (int i = 1; i < MiniRacingHUD.BuiltInGames.Configs.Count; i++)
         {
-            var g = _appConfig.GameConfigs[i];
-            if (g.ProcessName == "") continue; // NoTelemetry уже добавлен
-            if (builtIn.Contains(g.Name))
-                items.Add(new GameSelectorItem { Name = g.Name, DisplayName = g.Name, GameIndex = i });
+            var g = MiniRacingHUD.BuiltInGames.Configs[i];
+            items.Add(new GameSelectorItem { Name = g.Name, DisplayName = g.Name });
         }
         // Разделитель
         items.Add(new GameSelectorItem { Name = "separator", DisplayName = "separator", IsSeparator = true });
         // Пользовательские игры
-        for (int i = 0; i < _appConfig.GameConfigs.Count; i++)
+        for (int i = 0; i < _appConfig.CustomGameConfigs.Count; i++)
         {
-            var g = _appConfig.GameConfigs[i];
-            if (g.ProcessName == "") continue;
-            if (!builtIn.Contains(g.Name))
-                items.Add(new GameSelectorItem { Name = g.Name, DisplayName = g.Name, GameIndex = i, IsCustom = true });
+            var g = _appConfig.CustomGameConfigs[i];
+            items.Add(new GameSelectorItem { Name = g.Name, DisplayName = g.Name, IsCustom = true });
         }
         // Добавить игру...
         items.Add(new GameSelectorItem { Name = AppConfig.AddGameLabel, DisplayName = AppConfig.AddGameLabel, IsAction = true });
@@ -226,49 +219,17 @@ public partial class MainWindow : Window
                     return;
                 }
 
-                var doc = JsonDocument.Parse(json);
-                var root = doc.RootElement;
-
-                if (root.TryGetProperty("GameConfigs", out _))
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var config = JsonSerializer.Deserialize<AppConfig>(json, options);
+                if (config != null)
                 {
-                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-                    var config = JsonSerializer.Deserialize<AppConfig>(json, options);
-                    if (config != null)
-                    {
-                        _appConfig = config;
+                    _appConfig = config;
+                    _appConfig.CustomGameConfigs ??= new();
 
-                        if (_appConfig.GameConfigs.Count == 0)
-                            _appConfig.GameConfigs = new()
-                            {
-                                new() { Name = "Assetto Corsa Rally", ProcessName = "acr", UdpPort = 0, UdpEnabled = true, HasTelemetrySupport = true },
-                                new() { Name = "Automobilista 2", ProcessName = "ams2", UdpPort = 5606, UdpEnabled = true, HasTelemetrySupport = true },
-                                new() { Name = "Dirt Rally 2.0", ProcessName = "dirtrally2", UdpPort = 20777, UdpEnabled = true, HasTelemetrySupport = true },
-                                new() { Name = "BeamNG.drive", ProcessName = "BeamNG.drive.x64", UdpPort = 4444, UdpEnabled = true, HasTelemetrySupport = true },
-                            };
-
-                        var registeredGames = TelemetryProviderFactory.RegisteredGames.ToHashSet();
-                        foreach (var g in _appConfig.GameConfigs)
-                        {
-                            if (registeredGames.Contains(g.Name))
-                                g.HasTelemetrySupport = true;
-                            if (string.IsNullOrEmpty(g.ProcessName))
-                            {
-                                g.ProcessName = g.Name switch
-                                {
-                                    "Dirt Rally 2.0" => "dirtrally2",
-                                    "Automobilista 2" => "ams2",
-                                    "Assetto Corsa Rally" => "acr",
-                                    "BeamNG.drive" => "BeamNG.drive.x64",
-                                    _ => ""
-                                };
-                            }
-                        }
-
-                        if (!_appConfig.GameConfigs.Any(g => g.Name == _appConfig.SelectedGame))
-                            _appConfig.SelectedGame = _appConfig.GameConfigs[0].Name;
-                        SaveConfig();
-                        return;
-                    }
+                    if (!_appConfig.GameConfigs.Any(g => g.Name == _appConfig.SelectedGame))
+                        _appConfig.SelectedGame = _appConfig.GameConfigs[0].Name;
+                    SaveConfig();
+                    return;
                 }
             }
         }
@@ -616,6 +577,7 @@ public partial class MainWindow : Window
             await Task.Delay(50);
 
             StopWebSocket();
+            StopKeyboardHook();
             _trayIcon?.Dispose();
             _provider?.Dispose();
             if (_diPollTimer != null) { _diPollTimer.Dispose(); _diPollTimer = null; }
@@ -972,6 +934,7 @@ public partial class MainWindow : Window
             Log($"[Window_Loaded] startPreset='{startPreset}', wsClients={_wsClients.Count}");
             BroadcastPresetChange(startPreset);
 
+            CurrentGame.UdpEnabled = _appConfig.UdpEnabled;
             if (CurrentGame.UdpEnabled)
             {
                 await StartUDPAsync();
@@ -1097,6 +1060,19 @@ public partial class MainWindow : Window
                             BroadcastPresetChange(name);
                         }
                         break;
+                    case "pasteBindings":
+                        try
+                        {
+                            var text = System.Windows.Clipboard.GetText();
+                            webView.CoreWebView2.PostWebMessageAsJson(
+                                JsonSerializer.Serialize(new { action = "pasteBindingsResult", data = text }));
+                        }
+                        catch
+                        {
+                            webView.CoreWebView2.PostWebMessageAsJson(
+                                JsonSerializer.Serialize(new { action = "pasteBindingsResult", data = "" }));
+                        }
+                        break;
                     case "pageReady":
                         _pageReadyFallback?.Stop();
                         Dispatcher.Invoke(() =>
@@ -1126,6 +1102,12 @@ public partial class MainWindow : Window
                     case "themeColors":
                         foreach (var kvp in _wsClients)
                             _ = Task.Run(() => { try { kvp.Value.Send(message); } catch { } });
+                        break;
+                    case "startKeyboardCapture":
+                        StartKeyboardHook();
+                        break;
+                    case "stopKeyboardHook":
+                        StopKeyboardHook();
                         break;
                 }
             }
@@ -1270,8 +1252,7 @@ public partial class MainWindow : Window
 
                         if (connected)
                         {
-                            bool isAcr = _appConfig.SelectedGame == "Assetto Corsa Rally";
-                            _udpStatus = isAcr ? UdpStatus.ShmemOn : UdpStatus.On;
+                            _udpStatus = CurrentGame.IsSharedMemory ? UdpStatus.ShmemOn : UdpStatus.On;
                             _udpConnStatus = "disconnected";
                             udpStatusMain.Text = FormatUdpMainText();
                             udpStatusMain.Foreground = ThemeRes<SolidColorBrush>("GreenBrush") ?? Brushes.LimeGreen;
@@ -1280,8 +1261,7 @@ public partial class MainWindow : Window
                         }
                         else
                         {
-                            bool isAcr = _appConfig.SelectedGame == "Assetto Corsa Rally";
-                            _udpStatus = isAcr ? UdpStatus.ShmemOff : UdpStatus.Err;
+                            _udpStatus = CurrentGame.IsSharedMemory ? UdpStatus.ShmemOff : UdpStatus.Err;
                             _udpConnStatus = "notrunning";
                             udpStatusMain.Text = FormatUdpMainText();
                 udpStatusMain.Foreground = ThemeRes<SolidColorBrush>("OrangeBrush") ?? Brushes.Orange;
@@ -1336,7 +1316,7 @@ public partial class MainWindow : Window
                 _udpConnStatus = "";
                 if (CurrentGame.HasTelemetrySupport)
                 {
-                    _udpStatus = IsCurrentGame("Assetto Corsa Rally") ? UdpStatus.ShmemOff : UdpStatus.Off;
+                    _udpStatus = CurrentGame.IsSharedMemory ? UdpStatus.ShmemOff : UdpStatus.Off;
                 }
                 else
                 {
@@ -1806,7 +1786,8 @@ public partial class MainWindow : Window
             udpDataBtn.IsEnabled = false;
             udpDataBtn.Opacity = 0.35;
         }
-        CurrentGame.UdpEnabled = telemetryToggle.IsChecked == true;
+        _appConfig.UdpEnabled = telemetryToggle.IsChecked == true;
+        CurrentGame.UdpEnabled = _appConfig.UdpEnabled;
         SaveConfig();
     }
 
@@ -2043,11 +2024,11 @@ public partial class MainWindow : Window
 
     private void UpdatePortDisplay()
     {
-        var isAcr = IsCurrentGame("Assetto Corsa Rally");
-        udpPortInput.Label = isAcr ? Properties.Resources.Status_UdpPortLabel_SharedMemory : Properties.Resources.Status_UdpPortLabel_Udp;
-        udpPortInput.LabelCursor = isAcr ? Cursors.Arrow : Cursors.Hand;
-        udpPortInput.LabelMargin = isAcr ? new Thickness(0) : new Thickness(0, 0, 4, 0);
-        udpPortInput.InputTextBox.Visibility = isAcr ? Visibility.Collapsed : Visibility.Visible;
+        bool isShmem = CurrentGame.IsSharedMemory;
+        udpPortInput.Label = isShmem ? Properties.Resources.Status_UdpPortLabel_SharedMemory : Properties.Resources.Status_UdpPortLabel_Udp;
+        udpPortInput.LabelCursor = isShmem ? Cursors.Arrow : Cursors.Hand;
+        udpPortInput.LabelMargin = isShmem ? new Thickness(0) : new Thickness(0, 0, 4, 0);
+        udpPortInput.InputTextBox.Visibility = isShmem ? Visibility.Collapsed : Visibility.Visible;
         udpPortInput.Text = CurrentGame.UdpPort > 0 ? CurrentGame.UdpPort.ToString() : "—";
         udpPortInput.InputTextBox.IsEnabled = CurrentGame.UdpPort > 0;
     }
@@ -2221,7 +2202,7 @@ public partial class MainWindow : Window
 
             if (wasRunning) await StopUDPAsync();
 
-            if (CurrentGame.HasTelemetrySupport && CurrentGame.UdpEnabled)
+            if (CurrentGame.HasTelemetrySupport)
             {
                 await StartUDPAsync();
             }
@@ -2320,7 +2301,7 @@ public partial class MainWindow : Window
             LinkedPreset = presetName
         };
 
-        _appConfig.GameConfigs.Add(newGame);
+        _appConfig.CustomGameConfigs.Add(newGame);
         _appConfig.SelectedGame = gameName;
         SaveConfig();
         InitGameSelector();
@@ -2419,28 +2400,19 @@ public partial class MainWindow : Window
 
     private void DeleteGame(GameSelectorItem item)
     {
-        if (item.GameIndex < 0 || item.GameIndex >= _appConfig.GameConfigs.Count) return;
-        var name = _appConfig.GameConfigs[item.GameIndex].Name;
+        var name = item.Name;
+        var idx = _appConfig.CustomGameConfigs.FindIndex(g => g.Name == name);
+        if (idx < 0) return;
         if (!ShowConfirmDialog(string.Format(Properties.Resources.Dialog_ConfirmDeleteGame, name)))
             return;
 
-        int nextIndex = -1;
+        _appConfig.CustomGameConfigs.RemoveAt(idx);
+
         if (_appConfig.SelectedGame == name)
         {
-            nextIndex = item.GameIndex > 0 ? item.GameIndex - 1 : item.GameIndex;
-            if (nextIndex >= _appConfig.GameConfigs.Count - 1)
-                nextIndex = _appConfig.GameConfigs.Count - 2;
-        }
-
-        _appConfig.GameConfigs.RemoveAt(item.GameIndex);
-
-        if (nextIndex >= 0 && nextIndex < _appConfig.GameConfigs.Count)
-        {
-            _appConfig.SelectedGame = _appConfig.GameConfigs[nextIndex].Name;
-        }
-        else if (_appConfig.SelectedGame == name)
-        {
-            _appConfig.SelectedGame = _appConfig.GameConfigs.FirstOrDefault()?.Name ?? AppConfig.NoTelemetryName;
+            var allGames = _appConfig.GameConfigs;
+            _appConfig.SelectedGame = allGames.FirstOrDefault(g => g.Name != name)?.Name
+                ?? AppConfig.NoTelemetryName;
         }
 
         SaveConfig();
@@ -2665,5 +2637,86 @@ public partial class MainWindow : Window
             : Properties.Resources.Status_WsOff;
 
         clientsCount.Text = string.Format(Properties.Resources.Status_Clients, _wsClients.Count);
+    }
+
+    // --- Keyboard hook ---
+
+    private void StartKeyboardHook()
+    {
+        if (_keyboardHook?.IsRunning == true) return;
+        if (_keyboardHook == null)
+        {
+            _keyboardHook = new KeyboardHook();
+            _keyboardHook.KeyStateChanged += OnKeyboardKeyState;
+        }
+        _keyboardHook.Start();
+    }
+
+    private void StopKeyboardHook()
+    {
+        if (_keyboardHook != null)
+        {
+            _keyboardHook.KeyStateChanged -= OnKeyboardKeyState;
+            _keyboardHook.Stop();
+            _keyboardHook.Dispose();
+            _keyboardHook = null;
+        }
+    }
+
+    private void OnKeyboardKeyState(int vkCode, bool pressed)
+    {
+        var key = VkCodeToKey(vkCode);
+        if (key == null) return;
+        var json = System.Text.Json.JsonSerializer.Serialize(new { action = "keyState", key, pressed });
+        foreach (var kvp in _wsClients)
+            _ = Task.Run(() => { try { kvp.Value.Send(json); } catch { } });
+    }
+
+    private static string? VkCodeToKey(int vk)
+    {
+        if (vk >= 0x41 && vk <= 0x5A) return "Key" + (char)('A' + (vk - 0x41));
+        if (vk >= 0x30 && vk <= 0x39) return "Digit" + (char)('0' + (vk - 0x30));
+        if (vk >= 0x60 && vk <= 0x69) return "Numpad" + (vk - 0x60);
+        if (vk >= 0x70 && vk <= 0x7B) return "F" + (vk - 0x6F);
+        return vk switch
+        {
+            0x20 => "Space",
+            0x0D => "Enter",
+            0x1B => "Escape",
+            0xA0 => "ShiftLeft",
+            0xA1 => "ShiftRight",
+            0xA2 => "ControlLeft",
+            0xA3 => "ControlRight",
+            0xA4 => "AltLeft",
+            0xA5 => "AltRight",
+            0x5B => "MetaLeft",
+            0x5C => "MetaRight",
+            0xC0 => "Backquote",
+            0xDC => "Backslash",
+            0x08 => "Backspace",
+            0x14 => "CapsLock",
+            0xDB => "BracketLeft",
+            0xDD => "BracketRight",
+            0x21 => "PageUp",
+            0x22 => "PageDown",
+            0x24 => "Home",
+            0x23 => "End",
+            0x2E => "Delete",
+            0x2D => "Insert",
+            0x09 => "Tab",
+            0xBD => "Minus",
+            0xBB => "Equal",
+            0xBC => "Comma",
+            0xBE => "Period",
+            0xBF => "Slash",
+            0xBA => "Semicolon",
+            0xDE => "Quote",
+            0x6A => "NumpadMultiply",
+            0x6B => "NumpadAdd",
+            0x6D => "NumpadSubtract",
+            0x6E => "NumpadDecimal",
+            0x6F => "NumpadDivide",
+            _ => null
+        };
     }
 }

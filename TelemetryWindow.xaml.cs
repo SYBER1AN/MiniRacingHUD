@@ -74,6 +74,11 @@ public partial class TelemetryWindow : Window
         _secondaryCol.Visibility = _vm.SecondaryColumn.Fields.Count > 0
             ? Visibility.Visible
             : Visibility.Collapsed;
+        Dispatcher.BeginInvoke(RefreshValueBlocks, DispatcherPriority.Background);
+    }
+
+    private void RefreshValueBlocks()
+    {
         _valueBlocks.Clear();
         foreach (var tb in FindVisualChildren<TextBlock>(shell))
         {
@@ -142,6 +147,7 @@ public partial class TelemetryWindow : Window
         {
             BuildColumns();
             ResizeToContent();
+            RefreshValueBlocks();
             return;
         }
 

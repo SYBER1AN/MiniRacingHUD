@@ -1,0 +1,8 @@
+﻿{
+  "name": "MiniRacingHUD-BeamNG-mod",
+  "version": "1.0.0",
+  "description": "Передаёт режим АКПП и дополнительную телеметрию в MiniRacingHUD",
+  "authors": [
+    "SYBER1AN"
+  ]
+}

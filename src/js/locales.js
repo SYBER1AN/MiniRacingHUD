@@ -31,6 +31,7 @@ const LOCALES = {
         'tooltip.invert': 'Инвертировать диапазон',
         'tooltip.showGraph': 'Показать график оси',
         'tooltip.handbrakeButtons': 'Кнопки ручника',
+        'tooltip.handbrakeKeyboardUnavailable': 'Требуется запуск через приложение',
         'tooltip.gearButtons': 'Кнопки передач',
         // ---- Middle column ----
         'widget.scale': 'Масштаб виджета',
@@ -241,6 +242,7 @@ const LOCALES = {
         'tooltip.invert': 'Invert range',
         'tooltip.showGraph': 'Show graph',
         'tooltip.handbrakeButtons': 'Handbrake buttons',
+        'tooltip.handbrakeKeyboardUnavailable': 'Requires app mode',
         'tooltip.gearButtons': 'Gear buttons',
         'widget.scale': 'Widget scale',
         'gear.scale': 'Gear indicator scale',
