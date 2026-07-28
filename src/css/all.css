@@ -64,8 +64,8 @@
             --panel-bg: #363636;
             --section-bg: #484848;
             --element-bg: #191919;
-            --accent: #5bb436;
-            --bind-cont: #5bb436;
+            --accent: #57a636;
+            --bind-cont: #73b956;
             --danger-bg: #ab2626;
             --danger-cont: #e0e0e0;
             --panel-cont: #e0e0e0;
@@ -78,7 +78,7 @@
             --border: #797979;
             --last-active: #797979;
             --scrollbar-track: #191919;
-            --toggle-off: #5aac37;
+            --toggle-off: #57a636;
             --toggle-on: #363636;
             --code-bg: #191919;
             --code-cont: #5bb436;
@@ -89,8 +89,8 @@
             --panel-bg: #363636;
             --section-bg: #484848;
             --element-bg: #191919;
-            --accent: #5bb436;
-            --bind-cont: #5bb436;
+            --accent: #57a636;
+            --bind-cont: #73b956;
             --danger-bg: #ab2626;
             --danger-cont: #e0e0e0;
             --panel-cont: #e0e0e0;
@@ -103,7 +103,7 @@
             --border: #797979;
             --last-active: #797979;
             --scrollbar-track: #191919;
-            --toggle-off: #5aac37;
+            --toggle-off: #57a636;
             --toggle-on: #363636;
             --code-bg: #191919;
             --code-cont: #5bb436;
@@ -120,12 +120,12 @@
             --danger-cont: #ffffff;
             --panel-cont: #000000;
             --element-cont: #ffffff;
-            --help-bg: #d7d7d7;
+            --help-bg: #e6e6e6;
             --help-cont: #000000;
             --help-heading: #2b2b2b;
             --disabled-bg: #c3c3c3;
             --disabled-cont: #686868;
-            --border: #686868;
+            --border: #777777;
             --last-active: #777777;
             --scrollbar-track: #2b2b2b;
             --toggle-off: #59c27a;
