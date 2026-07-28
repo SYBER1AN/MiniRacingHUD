@@ -1,6 +1,6 @@
 <img width="785" height="279" alt="MiniRacingHUD-scr" src="https://github.com/user-attachments/assets/a82351b0-6997-440f-a345-828680681da8" />
 
-# Mini Racing HUD v1.0.0.228
+# Mini Racing HUD v1.0.0.229
 
 ## RU
 
@@ -10,8 +10,6 @@
 
 - Windows 10/11
 - [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Включено в self-contained)
-- Edge WebView2 (обычно уже установлен)
-
 ### Возможности
 
 - Отображение руля, педалей, КПП, перегрузок (G-meter), графиков
@@ -84,8 +82,6 @@ Minimalistic fully customizable HUD for simracing streams.
 
 - Windows 10/11
 - [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) (Included in self-contained)
-- Edge WebView2 (usually pre-installed)
-
 ### Features
 
 - Displays steering wheel, pedals, gearbox, G-meter, graphs

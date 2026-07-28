@@ -128,7 +128,7 @@
   <data name="Tray_Exit" xml:space="preserve"><value>Выйти</value></data>
   <data name="Tray_Tooltip" xml:space="preserve"><value>Mini Racing HUD</value></data>
   <data name="Dialog_DonationTitle" xml:space="preserve"><value>Приветствую!</value></data>
-  <data name="Dialog_DonationBody" xml:space="preserve"><value>В Mini Racing HUD было вложено много сил и времени. Если оно приносит вам пользу — буду благодарен за поддержку на </value></data>
+  <data name="Dialog_DonationBody" xml:space="preserve"><value>В Mini Racing HUD было вложено много сил и времени. Если моё приложение вам полезно, Вы можете поддержать меня на </value></data>
   <data name="Dialog_DonationLink" xml:space="preserve"><value>стримах</value></data>
   <data name="Dialog_DonationPostscript" xml:space="preserve"><value>.&#10;Приятного использования!</value></data>
   <data name="Dialog_DonationClose" xml:space="preserve"><value>Закрыть</value></data>
