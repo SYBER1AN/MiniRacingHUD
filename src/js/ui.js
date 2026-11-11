@@ -1936,8 +1936,13 @@ function applyTvdOffset() {
     if (!baseHeight) return;
     var basePadTop = parseFloat(container.dataset.basePadTop || '0');
     var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
-    container.style.height = (baseHeight + offset) + 'px';
-    container.style.paddingTop = (basePadTop + offset) + 'px';
+    container.style.height = Math.round(baseHeight + offset) + 'px';
+    container.style.paddingTop = Math.round(basePadTop + offset) + 'px';
+}
+
+function updateTvdShift() {
+    var shift = Math.round((window.innerHeight || 0) * 0.25);
+    document.documentElement.style.setProperty('--tvd-shift', shift + 'px');
 }
 
 function setTvdPreview(on) {
@@ -1960,6 +1965,15 @@ function updateTvdResults() {
 
     var active = isTvdActive();
     el.classList.toggle('on', active);
+    if (document.body) {
+        var wasOpen = document.body.classList.contains('tvd-open');
+        document.body.classList.toggle('tvd-open', active);
+        // Зафиксировать стартовое положение, чтобы сдвиг и рост шли одной анимацией
+        if (wasOpen !== active) {
+            var mw = document.querySelector('.main-wrapper');
+            if (mw) void mw.offsetHeight;
+        }
+    }
     if (active) {
         el.classList.toggle('compact', tvdWidgetWidth() < 205);
         renderTvdResult(currentTvdResult());
@@ -2009,5 +2023,9 @@ function renderTvdResult(r) {
 }
 
 setInterval(updateTvdResults, 1000);
-window.addEventListener('resize', updateTvdResults);
+window.addEventListener('resize', function() {
+    updateTvdShift();
+    updateTvdResults();
+});
+updateTvdShift();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateTvdResults);

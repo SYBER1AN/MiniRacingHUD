@@ -594,7 +594,15 @@
             }
             body {
                 padding: 0 !important;
-                justify-content: flex-end;
+                justify-content: center;
+            }
+
+            .main-wrapper {
+                transform: translateY(var(--tvd-shift, 25vh));
+            }
+
+            body.tvd-open .main-wrapper {
+                transform: translateY(0);
             }
 
             .settings-container {
@@ -1464,6 +1472,8 @@
             gap: 0;
             position: relative;
             z-index: 6;
+            transition: transform var(--anim);
+            will-change: transform;
         }
 
         .main-wrapper.graph-independent {
