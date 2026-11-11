@@ -143,6 +143,7 @@ namespace MiniRacingHUD.Properties {
         internal static string ThemeGroup_Gearbox => ResourceManager.GetString("ThemeGroup_Gearbox", Culture) ?? "!ThemeGroup_Gearbox!";
         internal static string ThemeGroup_Gmeter => ResourceManager.GetString("ThemeGroup_Gmeter", Culture) ?? "!ThemeGroup_Gmeter!";
         internal static string ThemeGroup_General => ResourceManager.GetString("ThemeGroup_General", Culture) ?? "!ThemeGroup_General!";
+        internal static string ThemeGroup_TvdResults => ResourceManager.GetString("ThemeGroup_TvdResults", Culture) ?? "!ThemeGroup_TvdResults!";
         internal static string ThemeItem_WheelRim => ResourceManager.GetString("ThemeItem_WheelRim", Culture) ?? "!ThemeItem_WheelRim!";
         internal static string ThemeItem_WheelSpoke => ResourceManager.GetString("ThemeItem_WheelSpoke", Culture) ?? "!ThemeItem_WheelSpoke!";
         internal static string ThemeItem_WheelMarker => ResourceManager.GetString("ThemeItem_WheelMarker", Culture) ?? "!ThemeItem_WheelMarker!";
@@ -169,6 +170,11 @@ namespace MiniRacingHUD.Properties {
         internal static string ThemeItem_WidgetBg => ResourceManager.GetString("ThemeItem_WidgetBg", Culture) ?? "!ThemeItem_WidgetBg!";
         internal static string ThemeItem_GraphGrid => ResourceManager.GetString("ThemeItem_GraphGrid", Culture) ?? "!ThemeItem_GraphGrid!";
         internal static string ThemeItem_GraphText => ResourceManager.GetString("ThemeItem_GraphText", Culture) ?? "!ThemeItem_GraphText!";
+        internal static string ThemeItem_TvdPos => ResourceManager.GetString("ThemeItem_TvdPos", Culture) ?? "!ThemeItem_TvdPos!";
+        internal static string ThemeItem_TvdText => ResourceManager.GetString("ThemeItem_TvdText", Culture) ?? "!ThemeItem_TvdText!";
+        internal static string ThemeItem_TvdDim => ResourceManager.GetString("ThemeItem_TvdDim", Culture) ?? "!ThemeItem_TvdDim!";
+        internal static string ThemeItem_TvdPlus => ResourceManager.GetString("ThemeItem_TvdPlus", Culture) ?? "!ThemeItem_TvdPlus!";
+        internal static string ThemeItem_TvdMinus => ResourceManager.GetString("ThemeItem_TvdMinus", Culture) ?? "!ThemeItem_TvdMinus!";
         internal static string WindowTitle_AddGame => ResourceManager.GetString("WindowTitle_AddGame", Culture) ?? "!WindowTitle_AddGame!";
         internal static string Label_GameName => ResourceManager.GetString("Label_GameName", Culture) ?? "!Label_GameName!";
         internal static string Tooltip_GameName => ResourceManager.GetString("Tooltip_GameName", Culture) ?? "!Tooltip_GameName!";

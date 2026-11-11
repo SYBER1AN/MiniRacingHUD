@@ -547,7 +547,16 @@ DOM.toggleNoCornerRounding?.addEventListener('click', () => {
     sendConfigUpdate();
 });
 
+DOM.toggleTvdPreview?.addEventListener('click', () => {
+    if (DOM.toggleTvdPreview.disabled) return;
+    setTvdPreview(!_tvdPreview);
+    if (udpState.socket && udpState.socket.readyState === WebSocket.OPEN) {
+        udpState.socket.send(JSON.stringify({ action: 'tvdPreview', enabled: _tvdPreview }));
+    }
+});
+
 DOM.toggleTvdResults?.addEventListener('click', () => {
+    if (DOM.toggleTvdResults.disabled || DOM.toggleTvdResults.classList.contains('disabled')) return;
     currentConfig.showTvdResults = !currentConfig.showTvdResults;
     updateAllToggleStates();
     if (typeof window.MultiWidget !== 'undefined') window.MultiWidget.syncPanelCheckboxes();
@@ -900,6 +909,10 @@ function initUdpWebSocket() {
 
                         case 'tvdInfo':
                             onTvdInfo(data.result);
+                            return;
+
+                        case 'tvdPreview':
+                            setTvdPreview(data.enabled === true);
                             return;
                     }
                     return;

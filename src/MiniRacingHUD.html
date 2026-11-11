@@ -317,10 +317,21 @@
                             <!-- РЕЗУЛЬТАТЫ TVD -->
                             <div class="tvd-settings-block">
                                 <div class="setting-title" data-i18n="tvd.section">Результаты TVD</div>
-                                <div class="widget-toggle-row">
-                                    <button class="widget-toggle" id="toggleTvdResults"
-                                        title="Показывать итог СУ из лаунчера TVD Rally" data-i18n-attr="title" data-i18n-title="tooltip.tvdResults"></button>
-                                    <span class="widget-toggle-label" data-i18n="toggle.tvdResults">Итог СУ</span>
+                                <div class="other-settings">
+                                    <div class="other-settings-col">
+                                        <div class="widget-toggle-row">
+                                            <button class="widget-toggle" id="toggleTvdResults"
+                                                title="Показывать итог СУ из лаунчера TVD Rally" data-i18n-attr="title" data-i18n-title="tooltip.tvdResults"></button>
+                                            <span class="widget-toggle-label" data-i18n="toggle.tvdResults">Итог СУ</span>
+                                        </div>
+                                    </div>
+                                    <div class="other-settings-col">
+                                        <div class="widget-toggle-row">
+                                            <button class="widget-toggle" id="toggleTvdPreview"
+                                                title="Показать таблицу с тестовыми данными" data-i18n-attr="title" data-i18n-title="tooltip.tvdPreview"></button>
+                                            <span class="widget-toggle-label" data-i18n="toggle.tvdPreview">Превью</span>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="steering-angle-row" title="Сколько секунд держать результат на экране" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
                                     <input type="range" class="steering-slider" id="tvdResultsSlider" min="10" max="300" value="60" step="5"
@@ -605,13 +616,14 @@
                 <!-- Итог СУ из лаунчера TVD Rally -->
                 <div class="tvd-results" id="tvdResults">
                     <div class="tvd-results-head">
+                        <span class="tvd-results-track" id="tvdResultsTrack"></span>
                         <span class="tvd-results-title" id="tvdResultsTitle"></span>
                         <span class="tvd-results-state" id="tvdResultsState"></span>
                     </div>
                     <div class="tvd-results-me">
                         <span class="tvd-results-pos" id="tvdResultsPos"></span>
                         <span class="tvd-results-time" id="tvdResultsTime"></span>
-                        <span class="tvd-results-of" id="tvdResultsOf"></span>
+                        <span class="tvd-results-gap" id="tvdResultsGap"></span>
                     </div>
                     <div class="tvd-results-rows" id="tvdResultsRows"></div>
                 </div>

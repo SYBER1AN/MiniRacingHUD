@@ -351,6 +351,8 @@ function updateWidgetDimensions() {
     DOM.hudContainer.dataset.baseHeight = `${sizes.widgetHeight}`;
     DOM.hudContainer.dataset.basePadTop = `${scaledPadding}`;
     applyTvdOffset();
+    updateTvdToggleAvailability();
+    updateTvdResults();
 
     // Педали
     if (DOM.pedalsRow) {
@@ -808,6 +810,11 @@ const THEME_COLOR_MAP = {
     pedalText: '--pedal-text',
     graphGrid: '--graph-grid',
     graphText: '--graph-text',
+    tvdPos: '--tvd-pos',
+    tvdText: '--tvd-text',
+    tvdDim: '--tvd-dim',
+    tvdPlus: '--tvd-plus',
+    tvdMinus: '--tvd-minus',
 };
 
 function getCurrentThemeColors() {
@@ -1681,7 +1688,7 @@ function updateAllToggleStates() {
     syncToggleState(DOM.toggleLayoutOrderBtn, currentConfig.layoutReverse);
     syncToggleState(DOM.toggleHandbrakeRightBtn, currentConfig.handbrakeOnRight);
     syncToggleState(DOM.toggleNoCornerRounding, currentConfig.noCornerRounding);
-    syncToggleState(DOM.toggleTvdResults, currentConfig.showTvdResults);
+    updateTvdToggleAvailability();
 
     // 0. Pedal Labels: disabled если нет ни одной педали
     const hasAnyPedal = currentConfig.throttleAxis !== null || currentConfig.brakeAxis !== null || currentConfig.clutchAxis !== null
@@ -1811,6 +1818,7 @@ function updateAllToggleStates() {
 // ==========================================
 var _tvdResult = null;
 var _tvdReceivedAt = 0;
+var _tvdPreview = false;
 var TVD_DEMO = new URLSearchParams(location.search).get('tvddemo') === '1';
 var _tvdDemoResult = null;
 
@@ -1821,7 +1829,7 @@ function tvdDemoResult() {
     var rows = names.map(function(name) {
         return { driver: name, ms: 148000 + Math.floor(Math.random() * 30000), me: false };
     });
-    rows.push({ driver: '', ms: meMs, me: true });
+    rows.push({ driver: 'SYBER1AN', ms: meMs, me: true });
     rows.sort(function(a, b) { return a.ms - b.ms; });
     var pos = 1;
     rows.forEach(function(x, i) {
@@ -1867,38 +1875,56 @@ function tvdFormatDiff(ms) {
     return (ms < 0 ? '−' : '+') + (Math.abs(ms) / 1000).toFixed(2);
 }
 
+function setTvdGap(ms) {
+    var el = DOM.tvdResultsGap;
+    if (!el) return;
+    el.textContent = ms == null ? '' : tvdFormatDiff(ms);
+    el.classList.toggle('fast', ms != null && ms <= 0);
+    el.classList.toggle('slow', ms != null && ms > 0);
+}
+
 function currentTvdResult() {
-    if (TVD_DEMO) return (_tvdResult && _tvdResult.n != null) ? _tvdResult : tvdDemoResult();
+    if (TVD_DEMO || _tvdPreview) return (_tvdResult && _tvdResult.n != null) ? _tvdResult : tvdDemoResult();
     return _tvdResult;
+}
+
+function tvdWidgetWidth() {
+    // Базовая ширина (при масштабе 1): адаптив не должен зависеть от scale
+    if (_lastWidgetSizes && _lastWidgetSizes.widgetWidth && _lastWidgetSizes.scale) {
+        return _lastWidgetSizes.widgetWidth / _lastWidgetSizes.scale;
+    }
+    var el = DOM.hudContainer;
+    var scale = (typeof currentConfig !== 'undefined' && currentConfig && currentConfig.scale) || 1;
+    return el ? el.getBoundingClientRect().width / scale : 0;
+}
+
+function updateTvdToggleAvailability() {
+    var btn = DOM.toggleTvdResults;
+    if (!btn) return;
+    var narrow = tvdWidgetWidth() < 125;
+    btn.disabled = narrow;
+    btn.classList.toggle('disabled', narrow);
+    syncToggleState(btn, !narrow && !!currentConfig.showTvdResults);
+
+    var preview = DOM.toggleTvdPreview;
+    if (preview) {
+        preview.disabled = narrow;
+        preview.classList.toggle('disabled', narrow);
+        preview.classList.toggle('active', !narrow && _tvdPreview);
+    }
 }
 
 function isTvdActive() {
     if (typeof currentConfig === 'undefined' || !currentConfig) return false;
+    if (tvdWidgetWidth() < 125) return false;
     var r = currentTvdResult();
     if (!r || r.n == null) return false;
+    if (_tvdPreview) return true;
     if (TVD_DEMO) return !!currentConfig.showTvdResults;
     if (!currentConfig.showTvdResults) return false;
     if (typeof isVisible === 'function' && !isVisible('tr')) return false;
     var seconds = Number(currentConfig.tvdResultsSeconds) || 60;
     return (performance.now() - _tvdReceivedAt) < seconds * 1000;
-}
-
-function initTvdDemoToggle() {
-    var btn = document.createElement('button');
-    btn.id = 'tvdDemoToggle';
-    btn.className = 'btn' + (currentConfig.showTvdResults ? ' btn-primary' : '');
-    btn.type = 'button';
-    btn.textContent = t('toggle.tvdResults');
-    btn.title = t('tooltip.tvdResults');
-    btn.addEventListener('click', function() {
-        currentConfig.showTvdResults = !currentConfig.showTvdResults;
-        btn.classList.toggle('btn-primary', !!currentConfig.showTvdResults);
-        updateAllToggleStates();
-        if (typeof window.MultiWidget !== 'undefined') window.MultiWidget.syncPanelCheckboxes();
-        updateTvdResults();
-        if (typeof sendConfigUpdate === 'function') sendConfigUpdate();
-    });
-    document.body.appendChild(btn);
 }
 
 /** Высота таблицы уходит вверх: виджет растёт, компоненты остаются внизу */
@@ -1912,6 +1938,12 @@ function applyTvdOffset() {
     var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
     container.style.height = (baseHeight + offset) + 'px';
     container.style.paddingTop = (basePadTop + offset) + 'px';
+}
+
+function setTvdPreview(on) {
+    _tvdPreview = !!on;
+    updateTvdResults();
+    updateTvdToggleAvailability();
 }
 
 function onTvdInfo(result) {
@@ -1928,39 +1960,33 @@ function updateTvdResults() {
 
     var active = isTvdActive();
     el.classList.toggle('on', active);
-    if (active) renderTvdResult(currentTvdResult());
+    if (active) {
+        el.classList.toggle('compact', tvdWidgetWidth() < 205);
+        renderTvdResult(currentTvdResult());
+    }
     applyTvdOffset();
     if (_lastWidgetSizes) calculateBorderRadius(_lastWidgetSizes);
+    updateTvdToggleAvailability();
 }
 
 function renderTvdResult(r) {
-    var title = t('tvd.finish');
-    if (r.n) title += ' · ' + t('tvd.stage') + r.n;
-    if (r.track) title += ' · ' + r.track;
-    DOM.tvdResultsTitle.textContent = title;
+    DOM.tvdResultsTitle.textContent = r.n ? t('tvd.stage') + r.n : '';
+    DOM.tvdResultsTrack.textContent = r.track || '';
     DOM.tvdResultsState.textContent = r.loading ? t('tvd.syncing') : (r.official ? '' : t('tvd.unofficial'));
 
     if (r.dnf) {
         DOM.tvdResultsPos.textContent = '';
         DOM.tvdResultsTime.textContent = t('tvd.dnf');
-        DOM.tvdResultsOf.textContent = '';
+        setTvdGap(null);
         DOM.tvdResultsRows.innerHTML = '<div class="tvd-note">' + _tvdEsc(t('tvd.dnfNote')) + '</div>';
         return;
     }
 
     DOM.tvdResultsPos.textContent = r.pos ? 'P' + r.pos : '';
     DOM.tvdResultsTime.textContent = tvdFormatTime(r.my_ms);
+    setTvdGap(r.pos !== 1 ? r.gap_best_ms : null);
 
     var of = r.of || 1;
-    if (of <= 1) {
-        DOM.tvdResultsOf.textContent = t('tvd.noRivals');
-    } else if (r.pos === 1) {
-        DOM.tvdResultsOf.textContent = t('tvd.bestStage');
-    } else {
-        DOM.tvdResultsOf.textContent = t('tvd.of', of)
-            + (r.gap_best_ms != null ? ' · ' + tvdFormatDiff(r.gap_best_ms) : '');
-    }
-
     var rows = Array.isArray(r.rows) ? r.rows : [];
     if (of <= 1 || !rows.length) {
         DOM.tvdResultsRows.innerHTML = '<div class="tvd-note">' + _tvdEsc(t('tvd.noRivals')) + '</div>';
@@ -1974,7 +2000,7 @@ function renderTvdResult(r) {
         var dcls = x.diff_ms == null ? '' : (x.diff_ms <= 0 ? ' fast' : ' slow');
         html += '<div class="tvd-row' + (x.me ? ' me' : '') + '">'
             + '<span class="tvd-p">' + (x.p || '') + '</span>'
-            + '<span class="tvd-n">' + _tvdEsc(x.me ? t('tvd.you') : (x.driver || '')) + '</span>'
+            + '<span class="tvd-n">' + _tvdEsc(x.me ? (x.driver || t('tvd.you')) : (x.driver || '')) + '</span>'
             + '<span class="tvd-t">' + tvdFormatTime(x.ms) + '</span>'
             + '<span class="tvd-d' + dcls + '">' + diff + '</span>'
             + '</div>';
@@ -1985,4 +2011,3 @@ function renderTvdResult(r) {
 setInterval(updateTvdResults, 1000);
 window.addEventListener('resize', updateTvdResults);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateTvdResults);
-if (TVD_DEMO) initTvdDemoToggle();

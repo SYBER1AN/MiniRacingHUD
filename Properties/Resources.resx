@@ -198,6 +198,7 @@
   <data name="ThemeGroup_Gearbox" xml:space="preserve"><value>КПП</value></data>
   <data name="ThemeGroup_Gmeter" xml:space="preserve"><value>G-meter</value></data>
   <data name="ThemeGroup_General" xml:space="preserve"><value>Общее</value></data>
+  <data name="ThemeGroup_TvdResults" xml:space="preserve"><value>Таблица результатов</value></data>
   <data name="ThemeItem_WheelRim" xml:space="preserve"><value>Обод</value></data>
   <data name="ThemeItem_WheelSpoke" xml:space="preserve"><value>Спицы</value></data>
   <data name="ThemeItem_WheelMarker" xml:space="preserve"><value>Маркер</value></data>
@@ -224,6 +225,11 @@
   <data name="ThemeItem_WidgetBg" xml:space="preserve"><value>Фон</value></data>
   <data name="ThemeItem_GraphGrid" xml:space="preserve"><value>Сетка графиков</value></data>
   <data name="ThemeItem_GraphText" xml:space="preserve"><value>Подписи графиков</value></data>
+  <data name="ThemeItem_TvdPos" xml:space="preserve"><value>Позиция</value></data>
+  <data name="ThemeItem_TvdText" xml:space="preserve"><value>Основной текст</value></data>
+  <data name="ThemeItem_TvdDim" xml:space="preserve"><value>Второстепенный текст</value></data>
+  <data name="ThemeItem_TvdPlus" xml:space="preserve"><value>Дельта +</value></data>
+  <data name="ThemeItem_TvdMinus" xml:space="preserve"><value>Дельта −</value></data>
   <!-- AddGameDialog -->
   <data name="WindowTitle_AddGame" xml:space="preserve"><value>Новая игра</value></data>
   <data name="Label_GameName" xml:space="preserve"><value>Имя</value></data>

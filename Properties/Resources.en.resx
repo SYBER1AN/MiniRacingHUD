@@ -138,6 +138,7 @@
   <data name="ThemeGroup_Gearbox" xml:space="preserve"><value>Gearbox</value></data>
   <data name="ThemeGroup_Gmeter" xml:space="preserve"><value>G-meter</value></data>
   <data name="ThemeGroup_General" xml:space="preserve"><value>General</value></data>
+  <data name="ThemeGroup_TvdResults" xml:space="preserve"><value>Results table</value></data>
   <data name="ThemeItem_WheelRim" xml:space="preserve"><value>Rim</value></data>
   <data name="ThemeItem_WheelSpoke" xml:space="preserve"><value>Spokes</value></data>
   <data name="ThemeItem_WheelMarker" xml:space="preserve"><value>Marker</value></data>
@@ -164,6 +165,11 @@
   <data name="ThemeItem_WidgetBg" xml:space="preserve"><value>Background</value></data>
   <data name="ThemeItem_GraphGrid" xml:space="preserve"><value>Graph grid</value></data>
   <data name="ThemeItem_GraphText" xml:space="preserve"><value>Graph labels</value></data>
+  <data name="ThemeItem_TvdPos" xml:space="preserve"><value>Position</value></data>
+  <data name="ThemeItem_TvdText" xml:space="preserve"><value>Main text</value></data>
+  <data name="ThemeItem_TvdDim" xml:space="preserve"><value>Secondary text</value></data>
+  <data name="ThemeItem_TvdPlus" xml:space="preserve"><value>Delta +</value></data>
+  <data name="ThemeItem_TvdMinus" xml:space="preserve"><value>Delta −</value></data>
   <data name="WindowTitle_AddGame" xml:space="preserve"><value>New Game</value></data>
   <data name="Label_GameName" xml:space="preserve"><value>Name</value></data>
   <data name="Tooltip_GameName" xml:space="preserve"><value>Game name in the list (can be anything)</value></data>

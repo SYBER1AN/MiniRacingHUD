@@ -64,6 +64,7 @@ public partial class MainWindow : Window
     private int _tvdTickBusy;
     private int _tvdPort;
     private string? _lastTvdResult;
+    private bool _tvdPreviewEnabled;
     private DateTime _tvdRetryAfter = DateTime.MinValue;
     private string _baseDir = "";
     private string _currentUiTheme = "light";
@@ -1725,6 +1726,8 @@ public partial class MainWindow : Window
                     if (_lastTvdResult != null)
                         socket.Send("{\"action\":\"tvdInfo\",\"result\":" + _lastTvdResult + "}");
 
+                    socket.Send(JsonSerializer.Serialize(new { action = "tvdPreview", enabled = _tvdPreviewEnabled }));
+
                     // Слать текущий DI-режим новому клиенту
                     if (_appConfig.UseDiMode)
                     {
@@ -1781,6 +1784,24 @@ public partial class MainWindow : Window
                             else if (actionStr == "themeColors")
                             {
                                 // Ретранслировать цвета темы всем остальным WS-клиентам
+                                foreach (var kvp in _wsClients)
+                                {
+                                    if (kvp.Key != socket.ConnectionInfo.Id)
+                                    {
+                                        try { kvp.Value.Send(message); } catch { _wsClients.TryRemove(kvp.Key, out _); }
+                                    }
+                                }
+                            }
+                            else if (actionStr == "tvdPreview")
+                            {
+                                var enabled = false;
+                                try
+                                {
+                                    if (json.TryGetValue("enabled", out var enObj) && enObj is JsonElement en)
+                                        enabled = en.GetBoolean();
+                                }
+                                catch { }
+                                _tvdPreviewEnabled = enabled;
                                 foreach (var kvp in _wsClients)
                                 {
                                     if (kvp.Key != socket.ConnectionInfo.Id)

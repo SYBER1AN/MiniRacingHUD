@@ -112,6 +112,11 @@ public class ThemeColors
     public string? pedalText { get; set; }
     public string? graphGrid { get; set; }
     public string? graphText { get; set; }
+    public string? tvdPos { get; set; }
+    public string? tvdText { get; set; }
+    public string? tvdDim { get; set; }
+    public string? tvdPlus { get; set; }
+    public string? tvdMinus { get; set; }
 }
 
 public class UIColors

@@ -82,6 +82,12 @@
             --toggle-on: #363636;
             --code-bg: #191919;
             --code-cont: #5bb436;
+            /* Таблица результатов */
+            --tvd-pos: var(--wheel-marker);
+            --tvd-text: #e0e0e0;
+            --tvd-dim: #a8a8a8;
+            --tvd-plus: var(--pedal-brake);
+            --tvd-minus: var(--pedal-throttle);
         }
 
         :root[data-theme-ui="dark"] {
@@ -1457,6 +1463,7 @@
             justify-content: center;
             gap: 0;
             position: relative;
+            z-index: 6;
         }
 
         .main-wrapper.graph-independent {
@@ -2289,26 +2296,43 @@ body.cross-visible .mw-tab-remove,
 
 .tvd-results-head {
     display: flex;
-    justify-content: space-between;
     align-items: baseline;
-    gap: calc(10px * var(--scale-factor));
+    gap: calc(8px * var(--scale-factor));
 }
 
 .tvd-results-title {
+    flex-shrink: 0;
     font-weight: 700;
     font-size: calc(11px * var(--scale-factor));
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    opacity: 0.85;
+    color: var(--tvd-dim);
+    white-space: nowrap;
+}
+
+.tvd-results-track {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-weight: 700;
+    font-size: calc(11px * var(--scale-factor));
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--tvd-dim);
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .tvd-results-state {
+    flex-shrink: 0;
     font-size: calc(10px * var(--scale-factor));
-    opacity: 0.65;
+    color: var(--tvd-dim);
     white-space: nowrap;
+}
+
+.tvd-results-state:empty {
+    display: none;
 }
 
 .tvd-results-me {
@@ -2317,21 +2341,36 @@ body.cross-visible .mw-tab-remove,
     gap: calc(8px * var(--scale-factor));
 }
 
+.tvd-results-pos,
+.tvd-results-time {
+    white-space: nowrap;
+}
+
 .tvd-results-pos {
     font-size: calc(20px * var(--scale-factor));
     font-weight: 700;
-    color: var(--wheel-marker);
+    color: var(--tvd-pos);
 }
 
 .tvd-results-time {
+    margin-left: auto;
     font-size: calc(18px * var(--scale-factor));
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
 
-.tvd-results-of {
-    font-size: calc(10px * var(--scale-factor));
-    opacity: 0.7;
+.tvd-results-gap {
+    font-size: calc(11px * var(--scale-factor));
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tvd-results-gap.fast {
+    color: var(--tvd-minus);
+}
+
+.tvd-results-gap.slow {
+    color: var(--tvd-plus);
 }
 
 .tvd-results-rows {
@@ -2350,11 +2389,11 @@ body.cross-visible .mw-tab-remove,
 }
 
 .tvd-row.me {
-    background: color-mix(in oklab, var(--wheel-marker) 18%, transparent);
+    background: color-mix(in oklab, var(--tvd-pos) 18%, transparent);
 }
 
 .tvd-row .tvd-p {
-    opacity: 0.6;
+    color: var(--tvd-dim);
     text-align: right;
 }
 
@@ -2371,28 +2410,27 @@ body.cross-visible .mw-tab-remove,
 }
 
 .tvd-row .tvd-d {
-    opacity: 0.85;
     min-width: calc(46px * var(--scale-factor));
     text-align: right;
 }
 
 .tvd-row .tvd-d.fast {
-    color: var(--pedal-throttle);
+    color: var(--tvd-minus);
 }
 
 .tvd-row .tvd-d.slow {
-    color: var(--pedal-brake);
+    color: var(--tvd-plus);
 }
 
 .tvd-skip {
     text-align: center;
-    opacity: 0.5;
+    color: var(--tvd-dim);
     letter-spacing: 0.2em;
     font-size: calc(10px * var(--scale-factor));
 }
 
 .tvd-note {
-    opacity: 0.6;
+    color: var(--tvd-dim);
     font-size: calc(10px * var(--scale-factor));
 }
 
@@ -2406,9 +2444,58 @@ body.cross-visible .mw-tab-remove,
     margin-bottom: var(--gap-xs);
 }
 
-#tvdDemoToggle {
-    position: fixed;
-    right: 12px;
-    bottom: 12px;
-    z-index: 1000;
+/* Узкий виджет (125–204 px): без имён, только место/время/отставание */
+.tvd-results.compact {
+    gap: calc(2px * var(--scale-factor));
+    padding: calc(6px * var(--scale-factor)) calc(8px * var(--scale-factor)) calc(2px * var(--scale-factor));
+    font-size: calc(10px * var(--scale-factor));
 }
+
+.tvd-results.compact .tvd-results-state {
+    display: none;
+}
+
+.tvd-results.compact .tvd-results-title,
+.tvd-results.compact .tvd-results-track {
+    font-size: calc(10px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-results-me {
+    gap: calc(5px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-results-pos {
+    font-size: calc(15px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-results-time {
+    font-size: calc(14px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-results-gap {
+    font-size: calc(9px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-row {
+    grid-template-columns: calc(16px * var(--scale-factor)) 1fr auto;
+    gap: calc(4px * var(--scale-factor));
+    font-size: calc(10px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-row .tvd-n {
+    display: none;
+}
+
+.tvd-results.compact .tvd-row .tvd-t {
+    text-align: right;
+}
+
+.tvd-results.compact .tvd-row .tvd-d {
+    min-width: calc(36px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-skip,
+.tvd-results.compact .tvd-note {
+    font-size: calc(9px * var(--scale-factor));
+}
+

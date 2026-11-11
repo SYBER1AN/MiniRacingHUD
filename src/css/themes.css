@@ -23,7 +23,11 @@
    ========================================== */
 :root[data-theme="Default"] {
     --widget-bg: #b9b9b9;
-    --tvd-text: #1b1b1b;
+    --tvd-text: #2b2b2b;
+    --tvd-pos: #64df8a;
+    --tvd-dim: #2b2b2b;
+    --tvd-plus: #f65365;
+    --tvd-minus: #64df8a;
     --wheel-rim: #2b2b2b;
     --wheel-spoke: #868686;
     --gmeter-border: #2b2b2b;
@@ -45,15 +49,19 @@
     --pedal-handbrake: #e94646;
     --pedal-clutch: #78b8f0;
     --pedal-brake: #f65365;
-    --pedal-throttle: #3ed66d;
-    --pedal-text: #000000;
+    --pedal-throttle: #3ed66c;
+    --pedal-text: #2b2b2b;
     --graph-grid: #2b2b2b;
     --graph-text: #2b2b2b;
 }
 
 :root[data-theme="Dark"] {
     --widget-bg: #363636;
-    --tvd-text: #f0f0f0;
+    --tvd-text: #707070;
+    --tvd-pos: #5bb436;
+    --tvd-dim: #707070;
+    --tvd-plus: #d52d2d;
+    --tvd-minus: #5bb436;
     --wheel-rim: #121212;
     --wheel-spoke: #484848;
     --gmeter-border: #121212;
@@ -83,7 +91,11 @@
 
 :root[data-theme="White"] {
     --widget-bg: #444444;
-    --tvd-text: #f0f0f0;
+    --tvd-text: #ffffff;
+    --tvd-pos: #ffffff;
+    --tvd-dim: #b9b9b9;
+    --tvd-plus: #fe6060;
+    --tvd-minus: #abe65a;
     --wheel-rim: #ffffff;
     --wheel-spoke: #b9b9b9;
     --gmeter-border: #ffffff;
@@ -93,7 +105,7 @@
     --gmeter-outer: #b1b1b1;
     --gmeter-ball: #eda918;
     --gmeter-crosshair-dashed: #ffffff;
-    --gmeter-rings-dashed: #FFFFFF;
+    --gmeter-rings-dashed: #ffffff;
     --gmeter-trail: #eda918;
     --gear-bg: #5a5a5a;
     --gear-text: #ffffff;
@@ -113,7 +125,11 @@
 
 :root[data-theme="Black"] {
     --widget-bg: #404040;
-    --tvd-text: #f2f2f2;
+    --tvd-text: #9a9a9a;
+    --tvd-pos: #63df47;
+    --tvd-dim: #cebd3a;
+    --tvd-plus: #ea352b;
+    --tvd-minus: #63df47;
     --wheel-rim: #111111;
     --wheel-spoke: #222222;
     --gmeter-border: #222222;
@@ -123,10 +139,10 @@
     --gmeter-outer: #111111;
     --gmeter-ball: #cebd3a;
     --gmeter-crosshair-dashed: #6b6b6b;
-    --gmeter-rings-dashed: #4F4F4F;
+    --gmeter-rings-dashed: #4f4f4f;
     --gmeter-trail: #6b6b6b;
     --gear-bg: #cebd3a;
-    --gear-text: #000000;
+    --gear-text: #111111;
     --gear-n-bg: #111111;
     --gear-n-text: #6b6b6b;
     --gear-r-bg: #ea352b;
@@ -143,7 +159,11 @@
 
 :root[data-theme="Monochrome"] {
     --widget-bg: #444444;
-    --tvd-text: #f0f0f0;
+    --tvd-text: #efefef;
+    --tvd-pos: #efefef;
+    --tvd-dim: #8e8e8e;
+    --tvd-plus: #efefef;
+    --tvd-minus: #d2d2d2;
     --wheel-rim: #000000;
     --wheel-spoke: #8e8e8e;
     --gmeter-border: #202020;
@@ -173,7 +193,11 @@
 
 :root[data-theme="Vintage"] {
     --widget-bg: #bcb8b0;
-    --tvd-text: #2f2a22;
+    --tvd-text: #1b2124;
+    --tvd-pos: #37871f;
+    --tvd-dim: #3b4144;
+    --tvd-plus: #a13623;
+    --tvd-minus: #37871f;
     --wheel-rim: #524434;
     --wheel-spoke: #877f69;
     --gmeter-border: #877f69;
@@ -183,7 +207,7 @@
     --gmeter-outer: #1b2124;
     --gmeter-ball: #d5d0c2;
     --gmeter-crosshair-dashed: #877f69;
-    --gmeter-rings-dashed: #877E65;
+    --gmeter-rings-dashed: #877e65;
     --gmeter-trail: #bcb8b0;
     --gear-bg: #2b3134;
     --gear-text: #d5d0c2;
@@ -203,7 +227,11 @@
 
 :root[data-theme="Pastel"] {
     --widget-bg: #c8cdce;
-    --tvd-text: #233033;
+    --tvd-text: #3a464a;
+    --tvd-pos: #5ca664;
+    --tvd-dim: #4a565a;
+    --tvd-plus: #c6765b;
+    --tvd-minus: #5ca666;
     --wheel-rim: #4a565a;
     --wheel-spoke: #827e6c;
     --gmeter-border: #827e6c;
@@ -234,6 +262,10 @@
 :root[data-theme="DR2"] {
     --widget-bg: #44464a;
     --tvd-text: #ffffff;
+    --tvd-pos: #ff003c;
+    --tvd-dim: #c8c8c8;
+    --tvd-plus: #ff003c;
+    --tvd-minus: #c8c8c8;
     --wheel-rim: #c8c8c8;
     --wheel-spoke: #ffffff;
     --gmeter-border: #ffffff;
@@ -243,7 +275,7 @@
     --gmeter-outer: #34363a;
     --gmeter-ball: #ff003c;
     --gmeter-crosshair-dashed: #ffffff;
-    --gmeter-rings-dashed: #A2A2A2;
+    --gmeter-rings-dashed: #a2a2a2;
     --gmeter-trail: #ffffff;
     --gear-bg: #54565b;
     --gear-text: #ffffff;
@@ -264,6 +296,10 @@
 :root[data-theme="BeamNG"] {
     --widget-bg: #000000;
     --tvd-text: #ffffff;
+    --tvd-pos: #ff6600;
+    --tvd-dim: #91939a;
+    --tvd-plus: #ff6600;
+    --tvd-minus: #009a1a;
     --wheel-rim: #1e1e1e;
     --wheel-spoke: #343434;
     --wheel-marker: #ff6600;

@@ -253,6 +253,11 @@ public partial class ThemeEditorWindow : Window
         ["pedalText"] = c => c.pedalText,
         ["graphGrid"] = c => c.graphGrid,
         ["graphText"] = c => c.graphText,
+        ["tvdPos"] = c => c.tvdPos,
+        ["tvdText"] = c => c.tvdText,
+        ["tvdDim"] = c => c.tvdDim,
+        ["tvdPlus"] = c => c.tvdPlus,
+        ["tvdMinus"] = c => c.tvdMinus,
     };
 
     private static readonly Dictionary<string, Action<ThemeColors, string?>> ThemeSetters = new()
@@ -283,6 +288,11 @@ public partial class ThemeEditorWindow : Window
         ["pedalText"] = (c, v) => c.pedalText = v,
         ["graphGrid"] = (c, v) => c.graphGrid = v,
         ["graphText"] = (c, v) => c.graphText = v,
+        ["tvdPos"] = (c, v) => c.tvdPos = v,
+        ["tvdText"] = (c, v) => c.tvdText = v,
+        ["tvdDim"] = (c, v) => c.tvdDim = v,
+        ["tvdPlus"] = (c, v) => c.tvdPlus = v,
+        ["tvdMinus"] = (c, v) => c.tvdMinus = v,
     };
 
     private string? GetColorValue(string key) =>
@@ -371,6 +381,14 @@ public partial class ThemeEditorWindow : Window
             new ColorItem("widgetBg", Res.ThemeItem_WidgetBg),
             new ColorItem("graphGrid", Res.ThemeItem_GraphGrid),
             new ColorItem("graphText", Res.ThemeItem_GraphText),
+        ]),
+        new(Res.ThemeGroup_TvdResults,
+        [
+            new ColorItem("tvdPos", Res.ThemeItem_TvdPos),
+            new ColorItem("tvdText", Res.ThemeItem_TvdText),
+            new ColorItem("tvdDim", Res.ThemeItem_TvdDim),
+            new ColorItem("tvdPlus", Res.ThemeItem_TvdPlus),
+            new ColorItem("tvdMinus", Res.ThemeItem_TvdMinus),
         ]),
     ];
 
