@@ -1627,6 +1627,12 @@ function updateUIFromConfig() {
         DOM.scaleSlider.value = (currentConfig.scale || 1.0).toFixed(2);
     }
 
+    if (DOM.tvdResultsSlider && DOM.tvdResultsValue) {
+        var tvdSec = currentConfig.tvdResultsSeconds ?? 60;
+        DOM.tvdResultsValue.value = String(tvdSec);
+        DOM.tvdResultsSlider.value = tvdSec;
+    }
+
     updateAllToggleStates();
 }
 
@@ -1670,6 +1676,7 @@ function updateAllToggleStates() {
     syncToggleState(DOM.toggleLayoutOrderBtn, currentConfig.layoutReverse);
     syncToggleState(DOM.toggleHandbrakeRightBtn, currentConfig.handbrakeOnRight);
     syncToggleState(DOM.toggleNoCornerRounding, currentConfig.noCornerRounding);
+    syncToggleState(DOM.toggleTvdResults, currentConfig.showTvdResults);
 
     // 0. Pedal Labels: disabled если нет ни одной педали
     const hasAnyPedal = currentConfig.throttleAxis !== null || currentConfig.brakeAxis !== null || currentConfig.clutchAxis !== null
@@ -1793,3 +1800,151 @@ function updateAllToggleStates() {
     if (typeof window.MultiWidget !== 'undefined') window.MultiWidget.syncPanelCheckboxes();
 }
 
+
+// ==========================================
+// 7. ИТОГ СУ TVD (данные приходят из C# по WS)
+// ==========================================
+var _tvdResult = null;
+var _tvdReceivedAt = 0;
+var TVD_DEMO = new URLSearchParams(location.search).get('tvddemo') === '1';
+var _tvdDemoResult = null;
+
+function tvdDemoResult() {
+    if (_tvdDemoResult) return _tvdDemoResult;
+    var names = ['Gosha382', 'Ural_74', 'seWenöff', 'Sergey_R', 'Kolya', 'RioSsa93', 'Vitaliy', 'MaxDrift', 'Andrey'];
+    var meMs = 150000 + Math.floor(Math.random() * 25000);
+    var rows = names.map(function(name) {
+        return { driver: name, ms: 148000 + Math.floor(Math.random() * 30000), me: false };
+    });
+    rows.push({ driver: '', ms: meMs, me: true });
+    rows.sort(function(a, b) { return a.ms - b.ms; });
+    var pos = 1;
+    rows.forEach(function(x, i) {
+        x.p = i + 1;
+        x.skip = false;
+        if (x.me) pos = i + 1;
+    });
+    rows.forEach(function(x) {
+        x.diff_ms = x.me ? null : meMs - x.ms;
+    });
+    _tvdDemoResult = {
+        n: 2, track: 'Fourkéta Kourva', my_ms: meMs, official: true, loading: false, dnf: false,
+        pos: pos, of: rows.length, gap_best_ms: meMs - rows[0].ms, rows: rows,
+        best: { driver: rows[0].driver, ms: rows[0].ms }
+    };
+    return _tvdDemoResult;
+}
+
+function _tvdEsc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+}
+
+function _tvd2(n) {
+    return String(n).padStart(2, '0');
+}
+
+function tvdFormatTime(ms) {
+    if (ms == null || isNaN(ms)) return '—';
+    if (ms >= 5999000) return t('tvd.dnf');
+    var h = Math.floor(ms / 3600000);
+    var m = Math.floor(ms / 60000) % 60;
+    var s = Math.floor(ms / 1000) % 60;
+    var x = String(ms % 1000).padStart(3, '0');
+    return h
+        ? h + ':' + _tvd2(m) + ':' + _tvd2(s) + '.' + x
+        : m + ':' + _tvd2(s) + '.' + x;
+}
+
+function tvdFormatDiff(ms) {
+    if (ms == null) return '';
+    return (ms < 0 ? '−' : '+') + (Math.abs(ms) / 1000).toFixed(2);
+}
+
+function updateTvdResultsBg() {
+    var el = DOM.tvdResults;
+    if (!el) return;
+    var bgVisible = (typeof isVisible !== 'function') || isVisible('bg');
+    var opacity = currentConfig.widgetBgOpacity ?? 1.0;
+    var bg = getComputedStyle(document.documentElement).getPropertyValue('--widget-bg').trim();
+    el.style.background = (bgVisible && opacity > 0 && bg) ? applyAlpha(bg, opacity) : 'transparent';
+}
+
+function onTvdInfo(result) {
+    if (result && typeof result === 'object') {
+        _tvdResult = result;
+        _tvdReceivedAt = performance.now();
+    }
+    updateTvdResults();
+}
+
+function updateTvdResults() {
+    var el = DOM.tvdResults;
+    if (!el) return;
+
+    var seconds = Number(currentConfig.tvdResultsSeconds) || 60;
+    var r = TVD_DEMO
+        ? ((_tvdResult && _tvdResult.n != null) ? _tvdResult : tvdDemoResult())
+        : _tvdResult;
+    var active = TVD_DEMO
+        ? !!r
+        : (!!currentConfig.showTvdResults
+            && (typeof isVisible !== 'function' || isVisible('tr'))
+            && !!r && r.n != null
+            && (performance.now() - _tvdReceivedAt) < seconds * 1000);
+
+    el.classList.toggle('on', active);
+    if (!active) return;
+
+    updateTvdResultsBg();
+
+    var title = t('tvd.finish');
+    if (r.n) title += ' · ' + t('tvd.stage') + r.n;
+    if (r.track) title += ' · ' + r.track;
+    DOM.tvdResultsTitle.textContent = title;
+    DOM.tvdResultsState.textContent = r.loading ? t('tvd.syncing') : (r.official ? '' : t('tvd.unofficial'));
+
+    if (r.dnf) {
+        DOM.tvdResultsPos.textContent = '';
+        DOM.tvdResultsTime.textContent = t('tvd.dnf');
+        DOM.tvdResultsOf.textContent = '';
+        DOM.tvdResultsRows.innerHTML = '<div class="tvd-note">' + _tvdEsc(t('tvd.dnfNote')) + '</div>';
+        return;
+    }
+
+    DOM.tvdResultsPos.textContent = r.pos ? 'P' + r.pos : '';
+    DOM.tvdResultsTime.textContent = tvdFormatTime(r.my_ms);
+
+    var of = r.of || 1;
+    if (of <= 1) {
+        DOM.tvdResultsOf.textContent = t('tvd.noRivals');
+    } else if (r.pos === 1) {
+        DOM.tvdResultsOf.textContent = t('tvd.bestStage');
+    } else {
+        DOM.tvdResultsOf.textContent = t('tvd.of', of)
+            + (r.gap_best_ms != null ? ' · ' + tvdFormatDiff(r.gap_best_ms) : '');
+    }
+
+    var rows = Array.isArray(r.rows) ? r.rows : [];
+    if (of <= 1 || !rows.length) {
+        DOM.tvdResultsRows.innerHTML = '<div class="tvd-note">' + _tvdEsc(t('tvd.noRivals')) + '</div>';
+        return;
+    }
+
+    var html = '';
+    rows.forEach(function(x) {
+        if (x.skip && x.p > 1) html += '<div class="tvd-skip">···</div>';
+        var diff = x.diff_ms == null ? '' : tvdFormatDiff(x.diff_ms);
+        var dcls = x.diff_ms == null ? '' : (x.diff_ms <= 0 ? ' fast' : ' slow');
+        html += '<div class="tvd-row' + (x.me ? ' me' : '') + '">'
+            + '<span class="tvd-p">' + (x.p || '') + '</span>'
+            + '<span class="tvd-n">' + _tvdEsc(x.me ? t('tvd.you') : (x.driver || '')) + '</span>'
+            + '<span class="tvd-t">' + tvdFormatTime(x.ms) + '</span>'
+            + '<span class="tvd-d' + dcls + '">' + diff + '</span>'
+            + '</div>';
+    });
+    DOM.tvdResultsRows.innerHTML = html;
+}
+
+setInterval(updateTvdResults, 1000);

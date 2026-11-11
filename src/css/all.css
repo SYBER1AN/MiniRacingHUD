@@ -2256,3 +2256,148 @@ body.cross-visible .mw-tab-remove,
     filter: brightness(0.7);
 }
 
+
+/* === 10. ИТОГ СУ TVD === */
+.tvd-results {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: calc(100% + calc(12px * var(--scale-factor)));
+    transform: translateY(-50%);
+    z-index: 5;
+    flex-direction: column;
+    gap: calc(4px * var(--scale-factor));
+    min-width: calc(270px * var(--scale-factor));
+    max-width: calc(460px * var(--scale-factor));
+    padding: calc(8px * var(--scale-factor)) calc(10px * var(--scale-factor));
+    border-radius: var(--widget-radius);
+    background: var(--widget-bg);
+    color: var(--tvd-text, #e0e0e0);
+    font-family: var(--gear-font-family);
+    font-size: calc(12px * var(--scale-factor));
+    line-height: 1.25;
+    transition: opacity var(--anim);
+}
+
+.tvd-results.on {
+    display: flex;
+}
+
+.tvd-results-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: calc(10px * var(--scale-factor));
+}
+
+.tvd-results-title {
+    font-weight: 700;
+    font-size: calc(11px * var(--scale-factor));
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tvd-results-state {
+    font-size: calc(10px * var(--scale-factor));
+    opacity: 0.65;
+    white-space: nowrap;
+}
+
+.tvd-results-me {
+    display: flex;
+    align-items: baseline;
+    gap: calc(8px * var(--scale-factor));
+}
+
+.tvd-results-pos {
+    font-size: calc(20px * var(--scale-factor));
+    font-weight: 700;
+    color: var(--wheel-marker);
+}
+
+.tvd-results-time {
+    font-size: calc(18px * var(--scale-factor));
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.tvd-results-of {
+    font-size: calc(10px * var(--scale-factor));
+    opacity: 0.7;
+}
+
+.tvd-results-rows {
+    display: flex;
+    flex-direction: column;
+    gap: calc(2px * var(--scale-factor));
+}
+
+.tvd-row {
+    display: grid;
+    grid-template-columns: calc(22px * var(--scale-factor)) 1fr auto auto;
+    gap: calc(8px * var(--scale-factor));
+    align-items: baseline;
+    padding: calc(2px * var(--scale-factor)) calc(4px * var(--scale-factor));
+    border-radius: calc(4px * var(--scale-factor));
+}
+
+.tvd-row.me {
+    background: color-mix(in oklab, var(--wheel-marker) 18%, transparent);
+}
+
+.tvd-row .tvd-p {
+    opacity: 0.6;
+    text-align: right;
+}
+
+.tvd-row .tvd-n {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tvd-row .tvd-t,
+.tvd-row .tvd-d {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.tvd-row .tvd-d {
+    opacity: 0.85;
+    min-width: calc(46px * var(--scale-factor));
+    text-align: right;
+}
+
+.tvd-row .tvd-d.fast {
+    color: var(--pedal-throttle);
+}
+
+.tvd-row .tvd-d.slow {
+    color: var(--pedal-brake);
+}
+
+.tvd-skip {
+    text-align: center;
+    opacity: 0.5;
+    letter-spacing: 0.2em;
+    font-size: calc(10px * var(--scale-factor));
+}
+
+.tvd-note {
+    opacity: 0.6;
+    font-size: calc(10px * var(--scale-factor));
+}
+
+.tvd-settings-block {
+    margin-top: var(--gap-sm);
+    padding-top: var(--gap-sm);
+    border-top: 1px dashed var(--border);
+}
+
+.tvd-settings-block .widget-toggle-row {
+    margin-bottom: var(--gap-xs);
+}

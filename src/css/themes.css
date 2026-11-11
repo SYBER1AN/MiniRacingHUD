@@ -23,6 +23,7 @@
    ========================================== */
 :root[data-theme="Default"] {
     --widget-bg: #b9b9b9;
+    --tvd-text: #1b1b1b;
     --wheel-rim: #2b2b2b;
     --wheel-spoke: #868686;
     --gmeter-border: #2b2b2b;
@@ -52,6 +53,7 @@
 
 :root[data-theme="Dark"] {
     --widget-bg: #363636;
+    --tvd-text: #f0f0f0;
     --wheel-rim: #121212;
     --wheel-spoke: #484848;
     --gmeter-border: #121212;
@@ -81,6 +83,7 @@
 
 :root[data-theme="White"] {
     --widget-bg: #444444;
+    --tvd-text: #f0f0f0;
     --wheel-rim: #ffffff;
     --wheel-spoke: #b9b9b9;
     --gmeter-border: #ffffff;
@@ -110,6 +113,7 @@
 
 :root[data-theme="Black"] {
     --widget-bg: #404040;
+    --tvd-text: #f2f2f2;
     --wheel-rim: #111111;
     --wheel-spoke: #222222;
     --gmeter-border: #222222;
@@ -139,6 +143,7 @@
 
 :root[data-theme="Monochrome"] {
     --widget-bg: #444444;
+    --tvd-text: #f0f0f0;
     --wheel-rim: #000000;
     --wheel-spoke: #8e8e8e;
     --gmeter-border: #202020;
@@ -168,6 +173,7 @@
 
 :root[data-theme="Vintage"] {
     --widget-bg: #bcb8b0;
+    --tvd-text: #2f2a22;
     --wheel-rim: #524434;
     --wheel-spoke: #877f69;
     --gmeter-border: #877f69;
@@ -197,6 +203,7 @@
 
 :root[data-theme="Pastel"] {
     --widget-bg: #c8cdce;
+    --tvd-text: #233033;
     --wheel-rim: #4a565a;
     --wheel-spoke: #827e6c;
     --gmeter-border: #827e6c;
@@ -226,6 +233,7 @@
 
 :root[data-theme="DR2"] {
     --widget-bg: #44464a;
+    --tvd-text: #ffffff;
     --wheel-rim: #c8c8c8;
     --wheel-spoke: #ffffff;
     --gmeter-border: #ffffff;
@@ -255,6 +263,7 @@
 
 :root[data-theme="BeamNG"] {
     --widget-bg: #000000;
+    --tvd-text: #ffffff;
     --wheel-rim: #1e1e1e;
     --wheel-spoke: #343434;
     --wheel-marker: #ff6600;

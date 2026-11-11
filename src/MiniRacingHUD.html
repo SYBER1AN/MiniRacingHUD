@@ -314,6 +314,21 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- РЕЗУЛЬТАТЫ TVD -->
+                            <div class="tvd-settings-block">
+                                <div class="setting-title" data-i18n="tvd.section">Результаты TVD</div>
+                                <div class="widget-toggle-row">
+                                    <button class="widget-toggle" id="toggleTvdResults"
+                                        title="Показывать итог СУ из лаунчера TVD Rally" data-i18n-attr="title" data-i18n-title="tooltip.tvdResults"></button>
+                                    <span class="widget-toggle-label" data-i18n="toggle.tvdResults">Итог СУ</span>
+                                </div>
+                                <div class="steering-angle-row" title="Сколько секунд держать результат на экране" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                    <input type="range" class="steering-slider" id="tvdResultsSlider" min="10" max="300" value="60" step="5"
+                                        title="Сколько секунд держать результат" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                    <input type="text" class="steering-input" id="tvdResultsValue" value="60"
+                                        title="Сколько секунд держать результат" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                </div>
+                            </div>
                             <!-- UDP-телеметрия -->
                             <div class="other-settings udp-section">
                                 <div class="other-settings-col">
@@ -592,6 +607,19 @@
         <!-- Отдельный график -->
         <div class="graph-container" id="graphContainer">
             <canvas id="graphBlockIndependent"></canvas>
+        </div>
+        <!-- Итог СУ из лаунчера TVD Rally -->
+        <div class="tvd-results" id="tvdResults">
+            <div class="tvd-results-head">
+                <span class="tvd-results-title" id="tvdResultsTitle"></span>
+                <span class="tvd-results-state" id="tvdResultsState"></span>
+            </div>
+            <div class="tvd-results-me">
+                <span class="tvd-results-pos" id="tvdResultsPos"></span>
+                <span class="tvd-results-time" id="tvdResultsTime"></span>
+                <span class="tvd-results-of" id="tvdResultsOf"></span>
+            </div>
+            <div class="tvd-results-rows" id="tvdResultsRows"></div>
         </div>
     </div>
 

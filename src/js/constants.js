@@ -23,6 +23,16 @@ const DOM = {
     toggleHandbrakeUdpBtn: document.getElementById('toggleHandbrakeUdp'),
     toggleGearUdpBtn: document.getElementById('toggleGearUdp'),
     toggleNoCornerRounding: document.getElementById('toggleNoCornerRounding'),
+    toggleTvdResults: document.getElementById('toggleTvdResults'),
+    tvdResultsSlider: document.getElementById('tvdResultsSlider'),
+    tvdResultsValue: document.getElementById('tvdResultsValue'),
+    tvdResults: document.getElementById('tvdResults'),
+    tvdResultsTitle: document.getElementById('tvdResultsTitle'),
+    tvdResultsState: document.getElementById('tvdResultsState'),
+    tvdResultsPos: document.getElementById('tvdResultsPos'),
+    tvdResultsTime: document.getElementById('tvdResultsTime'),
+    tvdResultsOf: document.getElementById('tvdResultsOf'),
+    tvdResultsRows: document.getElementById('tvdResultsRows'),
     scaleSlider: document.getElementById('scaleSlider'),
     scaleValue: document.getElementById('scaleValue'),
     gearScaleSlider: document.getElementById('gearScaleSlider'),
@@ -138,7 +148,8 @@ const CONFIG_PROXY_MAP = {
     showWheelUdp: DOM.toggleWheelUdpBtn,
     showGearUdp: DOM.toggleGearUdpBtn,
     udpSmoothing: DOM.toggleUdpSmoothingBtn,
-    noCornerRounding: DOM.toggleNoCornerRounding
+    noCornerRounding: DOM.toggleNoCornerRounding,
+    showTvdResults: DOM.toggleTvdResults
 };
 
 // Реальный объект конфига (в обход Proxy, для updateToggleState)
@@ -325,7 +336,7 @@ const scannerState = {
 const HIDE_CONFIG_MAP = {
     wh: 'hideWheel', th: 'hideThrottle', br: 'hideBrake',
     cl: 'hideClutch', hb: 'hideHandbrake', gb: 'hideGear',
-    gm: 'hideGmeter', gr: 'hideGraphs', bg: 'hideBg'
+    gm: 'hideGmeter', gr: 'hideGraphs', bg: 'hideBg', tr: 'hideTvdResults'
 };
 
 // Конфигурация по умолчанию
@@ -344,7 +355,8 @@ const DEFAULT_CONFIG = {
     showPedalsInUdp: false, showGearUdp: true, showWheelUdp: false, showHandbrakeUdp: false, udpSmoothing: false, noCornerRounding: false,
     hideWheel: false, hideThrottle: false, hideBrake: false,
     hideClutch: false, hideHandbrake: false, hideGear: false,
-    hideGmeter: false, hideGraphs: false, hideBg: false,
+    hideGmeter: false, hideGraphs: false, hideBg: false, hideTvdResults: false,
+    showTvdResults: false, tvdResultsSeconds: 60,
     multiWidgetMode: false,
     multiWidgetSlots: [],
     multiWidgetActiveSlot: 0

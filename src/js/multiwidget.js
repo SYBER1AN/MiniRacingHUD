@@ -21,11 +21,12 @@ var MW_ENTRIES = [
     { key: 'cl', label: 'Сцепление', loc: 'clutch' },
     { key: 'gm', label: 'G-meter', loc: 'gmeter', hideKey: 'hideGmeter' },
     { key: 'gr', label: 'Графики', loc: 'graphs', hideKey: 'hideGraphs' },
+    { key: 'tr', label: 'Итог СУ', loc: 'tvdResults', hideKey: 'hideTvdResults' },
     { key: 'bg', label: 'Фон', loc: 'bg', hideKey: 'hideBg' }
 ];
 
 var SLOT_PROPS = { wh:'Wheel', th:'Throttle', br:'Brake', cl:'Clutch',
-    hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', bg:'Background' };
+    hb:'Handbrake', gb:'Gear', gm:'Gmeter', gr:'Graphs', tr:'TvdResults', bg:'Background' };
 
 // ==========================================
 // 1. ПАНЕЛЬ
@@ -126,7 +127,7 @@ function getMwCheckbox(key) {
 
 function makeDefaultSlot() {
     return { Wheel:true, Throttle:true, Brake:true, Clutch:true,
-        Handbrake:true, Gear:true, Gmeter:true, Graphs:true, Background:true };
+        Handbrake:true, Gear:true, Gmeter:true, Graphs:true, TvdResults:true, Background:true };
 }
 
 function applySlotMask(slotIndex) {
@@ -346,7 +347,8 @@ function syncPanelCheckboxes() {
         }
         if (currentConfig.multiWidgetMode && _multiWidgetSlots.length > 0) {
             var prop = SLOT_PROPS[entry.key];
-            cb.checked = prop ? !!_multiWidgetSlots[_multiWidgetActiveSlot][prop] : true;
+            // undefined — старый слот без этого свойства, считаем видимым (как applySlotMask)
+            cb.checked = prop ? _multiWidgetSlots[_multiWidgetActiveSlot][prop] !== false : true;
         } else {
             cb.checked = isVisible(entry.key);
         }
@@ -374,6 +376,7 @@ function mwGetAvailableSources() {
         gr: currentConfig.showWheelGraph || currentConfig.showThrottleGraph ||
             currentConfig.showBrakeGraph || currentConfig.showClutchGraph ||
             currentConfig.showHandbrakeGraph,
+        tr: !!currentConfig.showTvdResults,
         bg: true
     };
 }

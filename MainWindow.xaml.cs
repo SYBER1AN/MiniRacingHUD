@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -58,6 +59,12 @@ public partial class MainWindow : Window
     private bool _isAutoDetecting;
     private int _autoDetectBusy;
     private int _broadcastTickBusy;
+    private static readonly HttpClient _tvdHttp = new() { Timeout = TimeSpan.FromMilliseconds(800) };
+    private System.Threading.Timer? _tvdTimer;
+    private int _tvdTickBusy;
+    private int _tvdPort;
+    private string? _lastTvdResult;
+    private DateTime _tvdRetryAfter = DateTime.MinValue;
     private string _baseDir = "";
     private string _currentUiTheme = "light";
     private UIColors _colorOverrides = new();
@@ -912,6 +919,7 @@ public partial class MainWindow : Window
 
                 ReloadHtml();
                 StartWebSocket();
+                StartTvdPoll();
                 SendDiModeToJs(_appConfig.UseDiMode);
                 Log($"[Window_Loaded] SelectedGame='{_appConfig.SelectedGame}', LinkedPreset='{CurrentGame.LinkedPreset}'");
             }
@@ -1381,6 +1389,7 @@ public partial class MainWindow : Window
 
     private void StopWebSocket()
     {
+        StopTvdPoll();
         if (_wsServer == null) return;
         foreach (var kvp in _wsClients)
             kvp.Value.Close();
@@ -1480,6 +1489,96 @@ public partial class MainWindow : Window
         Log($"[BroadcastPresetChange] content={(content != null ? content.Length + " chars" : "null")}");
         if (content == null) return;
         var msg = JsonSerializer.Serialize(new { action = "presetContent", presetName, content });
+        foreach (var kvp in _wsClients)
+        {
+            var c = kvp.Value;
+            var id = kvp.Key;
+            _ = Task.Run(() => { try { c.Send(msg); } catch { _wsClients.TryRemove(id, out _); } });
+        }
+    }
+
+    private void StartTvdPoll()
+    {
+        if (_tvdTimer != null || _wsServer == null) return;
+        _tvdTimer = new System.Threading.Timer(_ => TvdPollTick(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(1));
+    }
+
+    private void StopTvdPoll()
+    {
+        var timer = _tvdTimer;
+        _tvdTimer = null;
+        timer?.Dispose();
+    }
+
+    private void TvdPollTick()
+    {
+        if (Interlocked.Exchange(ref _tvdTickBusy, 1) == 1) return;
+        try { TvdPollCore(); }
+        catch { }
+        finally { Interlocked.Exchange(ref _tvdTickBusy, 0); }
+    }
+
+    private void TvdPollCore()
+    {
+        if (DateTime.UtcNow < _tvdRetryAfter) return;
+
+        var ports = _tvdPort != 0
+            ? new[] { _tvdPort, 20995, 20996, 20997 }
+            : new[] { 20995, 20996, 20997 };
+
+        foreach (var port in ports.Distinct())
+        {
+            string body;
+            try
+            {
+                using var resp = _tvdHttp.GetAsync($"http://127.0.0.1:{port}/obs/info").GetAwaiter().GetResult();
+                if (!resp.IsSuccessStatusCode) continue;
+                body = resp.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+            }
+            catch
+            {
+                continue;
+            }
+
+            _tvdPort = port;
+            _tvdRetryAfter = DateTime.MinValue;
+
+            string? result = null;
+            try
+            {
+                using var doc = JsonDocument.Parse(body);
+                if (doc.RootElement.TryGetProperty("result", out var r) && r.ValueKind == JsonValueKind.Object
+                    && r.TryGetProperty("n", out var n) && n.ValueKind == JsonValueKind.Number)
+                {
+                    // n пуст в свободной игре — результат TVD-этапа там не нужен
+                    result = r.GetRawText();
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            if (result != _lastTvdResult)
+            {
+                _lastTvdResult = result;
+                BroadcastTvdInfo(result);
+            }
+            return;
+        }
+
+        _tvdPort = 0;
+        _tvdRetryAfter = DateTime.UtcNow.AddSeconds(5);
+        if (_lastTvdResult != null)
+        {
+            _lastTvdResult = null;
+            BroadcastTvdInfo(null);
+        }
+    }
+
+    private void BroadcastTvdInfo(string? resultJson)
+    {
+        var msg = "{\"action\":\"tvdInfo\",\"result\":" + (resultJson ?? "null") + "}";
         foreach (var kvp in _wsClients)
         {
             var c = kvp.Value;
@@ -1622,6 +1721,9 @@ public partial class MainWindow : Window
 
                     var statusMsg = JsonSerializer.Serialize(new { action = "status", udp = _isRunning ? "on" : "off", ws = "on", clients = _wsClients.Count, handbrakeInTelemetry = CurrentGame.HandbrakeInTelemetry, steeringInTelemetry = CurrentGame.SteeringInTelemetry });
                     socket.Send(statusMsg);
+
+                    if (_lastTvdResult != null)
+                        socket.Send("{\"action\":\"tvdInfo\",\"result\":" + _lastTvdResult + "}");
 
                     // Слать текущий DI-режим новому клиенту
                     if (_appConfig.UseDiMode)

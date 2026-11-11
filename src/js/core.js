@@ -309,6 +309,8 @@ if (window.chrome?.webview) {
                 if (typeof ThemeManager !== 'undefined') {
                     ThemeManager.apply(data.theme);
                 }
+            } else if (data.action === 'tvdInfo') {
+                onTvdInfo(data.result);
             } else if (data.action === 'customThemeList') {
                 window._customThemes = {};
                 (data.themes || []).forEach(function(t) { window._customThemes[t.name] = t; });
@@ -542,6 +544,33 @@ DOM.toggleNoCornerRounding?.addEventListener('click', () => {
     currentConfig.noCornerRounding = !currentConfig.noCornerRounding;
     updateAllToggleStates();
     updateWidgetLayout();
+    sendConfigUpdate();
+});
+
+DOM.toggleTvdResults?.addEventListener('click', () => {
+    currentConfig.showTvdResults = !currentConfig.showTvdResults;
+    updateAllToggleStates();
+    if (typeof window.MultiWidget !== 'undefined') window.MultiWidget.syncPanelCheckboxes();
+    updateTvdResults();
+    sendConfigUpdate();
+});
+
+DOM.tvdResultsSlider?.addEventListener('input', () => {
+    var sec = parseInt(DOM.tvdResultsSlider.value, 10) || 60;
+    sec = Math.max(10, Math.min(300, sec));
+    DOM.tvdResultsValue.value = String(sec);
+    currentConfig.tvdResultsSeconds = sec;
+    updateTvdResults();
+    sendConfigUpdateDebounced();
+});
+
+DOM.tvdResultsValue?.addEventListener('change', () => {
+    var sec = parseInt(DOM.tvdResultsValue.value, 10) || 60;
+    sec = Math.max(10, Math.min(300, sec));
+    DOM.tvdResultsValue.value = String(sec);
+    DOM.tvdResultsSlider.value = sec;
+    currentConfig.tvdResultsSeconds = sec;
+    updateTvdResults();
     sendConfigUpdate();
 });
 
@@ -867,6 +896,10 @@ function initUdpWebSocket() {
 
                         case 'keyState':
                             keyboardState[data.key] = data.pressed;
+                            return;
+
+                        case 'tvdInfo':
+                            onTvdInfo(data.result);
                             return;
                     }
                     return;
@@ -1896,6 +1929,11 @@ function parseExternalConfig(config) {
     if (config.showHandbrakeUdp !== undefined) currentConfig.showHandbrakeUdp = config.showHandbrakeUdp;
     if (config.udpSmoothing !== undefined) currentConfig.udpSmoothing = config.udpSmoothing;
     if (config.noCornerRounding !== undefined) currentConfig.noCornerRounding = config.noCornerRounding;
+    if (config.showTvdResults !== undefined) currentConfig.showTvdResults = config.showTvdResults === true;
+    if (config.tvdResultsSeconds !== undefined) {
+        var tvdSec = parseInt(config.tvdResultsSeconds, 10);
+        currentConfig.tvdResultsSeconds = isNaN(tvdSec) ? 60 : Math.max(10, Math.min(300, tvdSec));
+    }
 
     // hideXxx — глобальное скрытие элементов (OFF-режим мультивиджета)
     Object.keys(HIDE_CONFIG_MAP).forEach(function(key) {
@@ -1994,6 +2032,8 @@ function applyConfig() {
 
     ThemeManager.apply(currentConfig.theme || 'Default');
     updatePedalOrder();
+
+    if (typeof updateTvdResults === 'function') updateTvdResults();
 
     if (currentConfig.useUdpTelemetry) {
         initUdpWebSocket();
