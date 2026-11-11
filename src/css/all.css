@@ -588,6 +588,7 @@
             }
             body {
                 padding: 0 !important;
+                justify-content: flex-end;
             }
 
             .settings-container {
@@ -1427,7 +1428,7 @@
             background: var(--widget-bg);
             padding: var(--widget-padding);
             position: relative;
-            transition: width var(--anim), height var(--anim);
+            transition: width var(--anim), height var(--anim), padding-top var(--anim);
             will-change: width;
         }
 
@@ -1905,7 +1906,7 @@
         }
 
         .hud-container {
-            transition: width var(--anim), height var(--anim);
+            transition: width var(--anim), height var(--anim), padding-top var(--anim);
         }
 
         .wheel,
@@ -2259,28 +2260,31 @@ body.cross-visible .mw-tab-remove,
 
 /* === 10. ИТОГ СУ TVD === */
 .tvd-results {
-    display: none;
     position: absolute;
-    top: 50%;
-    left: calc(100% + calc(12px * var(--scale-factor)));
-    transform: translateY(-50%);
-    z-index: 5;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
     flex-direction: column;
     gap: calc(4px * var(--scale-factor));
-    min-width: calc(270px * var(--scale-factor));
-    max-width: calc(460px * var(--scale-factor));
-    padding: calc(8px * var(--scale-factor)) calc(10px * var(--scale-factor));
-    border-radius: var(--widget-radius);
-    background: var(--widget-bg);
+    padding: calc(6px * var(--scale-factor)) var(--widget-padding) calc(2px * var(--scale-factor));
     color: var(--tvd-text, #e0e0e0);
     font-family: var(--gear-font-family);
     font-size: calc(12px * var(--scale-factor));
     line-height: 1.25;
-    transition: opacity var(--anim);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(calc(6px * var(--scale-factor)));
+    pointer-events: none;
+    transition: opacity var(--anim), transform var(--anim), visibility 0s linear var(--anim-duration);
 }
 
 .tvd-results.on {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity var(--anim), transform var(--anim);
 }
 
 .tvd-results-head {
@@ -2400,4 +2404,11 @@ body.cross-visible .mw-tab-remove,
 
 .tvd-settings-block .widget-toggle-row {
     margin-bottom: var(--gap-xs);
+}
+
+#tvdDemoToggle {
+    position: fixed;
+    right: 12px;
+    bottom: 12px;
+    z-index: 1000;
 }

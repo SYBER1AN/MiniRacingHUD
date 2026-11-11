@@ -202,6 +202,8 @@ function updateGraphLayout(sizes) {
     }
 }
 
+var _lastWidgetSizes = null;
+
 /** Рассчитывает border-radius по видимым круглым элементам */
 function calculateBorderRadius(sizes) {
     if (currentConfig.noCornerRounding) {
@@ -232,18 +234,15 @@ function calculateBorderRadius(sizes) {
         rightRound = !hasGraph && visible[visible.length - 1].round;
     }
 
-    let borderRadius;
-    if (leftRound && rightRound) {
-        borderRadius = `${widgetWheelRadius}px`;
-    } else if (leftRound) {
-        borderRadius = `${widgetWheelRadius}px var(--widget-radius) var(--widget-radius) ${widgetWheelRadius}px`;
-    } else if (rightRound) {
-        borderRadius = `var(--widget-radius) ${widgetWheelRadius}px ${widgetWheelRadius}px var(--widget-radius)`;
-    } else {
-        borderRadius = `var(--widget-radius)`;
-    }
+    const round = `${widgetWheelRadius}px`;
+    const small = 'var(--widget-radius)';
+    let tl = small, tr = small, br = small, bl = small;
+    if (leftRound) { tl = round; bl = round; }
+    if (rightRound) { tr = round; br = round; }
+    // С открытой таблицей верхние углы не «пилюльные» — иначе она режется
+    if (typeof isTvdActive === 'function' && isTvdActive()) { tl = small; tr = small; }
 
-    DOM.hudContainerWrapper.style.borderRadius = borderRadius;
+    DOM.hudContainerWrapper.style.borderRadius = `${tl} ${tr} ${br} ${bl}`;
     return widgetWheelRadius;
 }
 
@@ -320,6 +319,7 @@ function updateGearDisplaySize(sizes) {
 function updateWidgetDimensions() {
     updateCssBaseValuesCache();
     const sizes = calculateWidgetSizes();
+    _lastWidgetSizes = sizes;
 
     // Кэшируем размер для отображения и копирования
     cachedWidgetSize = `${Math.round(sizes.totalWidthPhysical)}×${Math.round(sizes.widgetHeightPhysical)}`;
@@ -346,6 +346,11 @@ function updateWidgetDimensions() {
         // Когда графика нет, он отдельный или порядок обратный: обычный padding со всех сторон
         DOM.hudContainer.style.padding = `${scaledPadding}px`;
     }
+
+    // База для выезжающей таблицы TVD: высота и верхний отступ без неё
+    DOM.hudContainer.dataset.baseHeight = `${sizes.widgetHeight}`;
+    DOM.hudContainer.dataset.basePadTop = `${scaledPadding}`;
+    applyTvdOffset();
 
     // Педали
     if (DOM.pedalsRow) {
@@ -1862,13 +1867,51 @@ function tvdFormatDiff(ms) {
     return (ms < 0 ? '−' : '+') + (Math.abs(ms) / 1000).toFixed(2);
 }
 
-function updateTvdResultsBg() {
+function currentTvdResult() {
+    if (TVD_DEMO) return (_tvdResult && _tvdResult.n != null) ? _tvdResult : tvdDemoResult();
+    return _tvdResult;
+}
+
+function isTvdActive() {
+    if (typeof currentConfig === 'undefined' || !currentConfig) return false;
+    var r = currentTvdResult();
+    if (!r || r.n == null) return false;
+    if (TVD_DEMO) return !!currentConfig.showTvdResults;
+    if (!currentConfig.showTvdResults) return false;
+    if (typeof isVisible === 'function' && !isVisible('tr')) return false;
+    var seconds = Number(currentConfig.tvdResultsSeconds) || 60;
+    return (performance.now() - _tvdReceivedAt) < seconds * 1000;
+}
+
+function initTvdDemoToggle() {
+    var btn = document.createElement('button');
+    btn.id = 'tvdDemoToggle';
+    btn.className = 'btn' + (currentConfig.showTvdResults ? ' btn-primary' : '');
+    btn.type = 'button';
+    btn.textContent = t('toggle.tvdResults');
+    btn.title = t('tooltip.tvdResults');
+    btn.addEventListener('click', function() {
+        currentConfig.showTvdResults = !currentConfig.showTvdResults;
+        btn.classList.toggle('btn-primary', !!currentConfig.showTvdResults);
+        updateAllToggleStates();
+        if (typeof window.MultiWidget !== 'undefined') window.MultiWidget.syncPanelCheckboxes();
+        updateTvdResults();
+        if (typeof sendConfigUpdate === 'function') sendConfigUpdate();
+    });
+    document.body.appendChild(btn);
+}
+
+/** Высота таблицы уходит вверх: виджет растёт, компоненты остаются внизу */
+function applyTvdOffset() {
     var el = DOM.tvdResults;
-    if (!el) return;
-    var bgVisible = (typeof isVisible !== 'function') || isVisible('bg');
-    var opacity = currentConfig.widgetBgOpacity ?? 1.0;
-    var bg = getComputedStyle(document.documentElement).getPropertyValue('--widget-bg').trim();
-    el.style.background = (bgVisible && opacity > 0 && bg) ? applyAlpha(bg, opacity) : 'transparent';
+    var container = DOM.hudContainer;
+    if (!el || !container) return;
+    var baseHeight = parseFloat(container.dataset.baseHeight || '0');
+    if (!baseHeight) return;
+    var basePadTop = parseFloat(container.dataset.basePadTop || '0');
+    var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
+    container.style.height = (baseHeight + offset) + 'px';
+    container.style.paddingTop = (basePadTop + offset) + 'px';
 }
 
 function onTvdInfo(result) {
@@ -1883,22 +1926,14 @@ function updateTvdResults() {
     var el = DOM.tvdResults;
     if (!el) return;
 
-    var seconds = Number(currentConfig.tvdResultsSeconds) || 60;
-    var r = TVD_DEMO
-        ? ((_tvdResult && _tvdResult.n != null) ? _tvdResult : tvdDemoResult())
-        : _tvdResult;
-    var active = TVD_DEMO
-        ? !!r
-        : (!!currentConfig.showTvdResults
-            && (typeof isVisible !== 'function' || isVisible('tr'))
-            && !!r && r.n != null
-            && (performance.now() - _tvdReceivedAt) < seconds * 1000);
-
+    var active = isTvdActive();
     el.classList.toggle('on', active);
-    if (!active) return;
+    if (active) renderTvdResult(currentTvdResult());
+    applyTvdOffset();
+    if (_lastWidgetSizes) calculateBorderRadius(_lastWidgetSizes);
+}
 
-    updateTvdResultsBg();
-
+function renderTvdResult(r) {
     var title = t('tvd.finish');
     if (r.n) title += ' · ' + t('tvd.stage') + r.n;
     if (r.track) title += ' · ' + r.track;
@@ -1948,3 +1983,6 @@ function updateTvdResults() {
 }
 
 setInterval(updateTvdResults, 1000);
+window.addEventListener('resize', updateTvdResults);
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateTvdResults);
+if (TVD_DEMO) initTvdDemoToggle();
