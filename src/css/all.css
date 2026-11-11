@@ -2285,7 +2285,7 @@ body.cross-visible .mw-tab-remove,
     display: flex;
     flex-direction: column;
     gap: calc(4px * var(--scale-factor));
-    padding: calc(6px * var(--scale-factor)) var(--widget-padding) calc(2px * var(--scale-factor));
+    padding: calc(10px * var(--scale-factor)) var(--widget-padding) calc(6px * var(--scale-factor));
     color: var(--tvd-text, #e0e0e0);
     font-family: var(--gear-font-family);
     font-size: calc(12px * var(--scale-factor));
@@ -2308,6 +2308,7 @@ body.cross-visible .mw-tab-remove,
     display: flex;
     align-items: baseline;
     gap: calc(8px * var(--scale-factor));
+    padding: 0 calc(4px * var(--scale-factor));
 }
 
 .tvd-results-title {
@@ -2349,6 +2350,7 @@ body.cross-visible .mw-tab-remove,
     display: flex;
     align-items: baseline;
     gap: calc(8px * var(--scale-factor));
+    padding: 0 calc(4px * var(--scale-factor));
 }
 
 .tvd-results-pos,
@@ -2392,7 +2394,7 @@ body.cross-visible .mw-tab-remove,
 .tvd-row {
     display: grid;
     grid-template-columns: calc(22px * var(--scale-factor)) 1fr auto auto;
-    gap: calc(8px * var(--scale-factor));
+    gap: calc(6px * var(--scale-factor));
     align-items: baseline;
     padding: calc(2px * var(--scale-factor)) calc(4px * var(--scale-factor));
     border-radius: calc(4px * var(--scale-factor));
@@ -2457,8 +2459,13 @@ body.cross-visible .mw-tab-remove,
 /* Узкий виджет (125–204 px): без имён, только место/время/отставание */
 .tvd-results.compact {
     gap: calc(2px * var(--scale-factor));
-    padding: calc(6px * var(--scale-factor)) calc(8px * var(--scale-factor)) calc(2px * var(--scale-factor));
+    padding: calc(8px * var(--scale-factor)) calc(6px * var(--scale-factor)) calc(4px * var(--scale-factor));
     font-size: calc(10px * var(--scale-factor));
+}
+
+.tvd-results.compact .tvd-results-head,
+.tvd-results.compact .tvd-results-me {
+    padding: 0 calc(2px * var(--scale-factor));
 }
 
 .tvd-results.compact .tvd-results-state {
@@ -2489,6 +2496,7 @@ body.cross-visible .mw-tab-remove,
 .tvd-results.compact .tvd-row {
     grid-template-columns: calc(16px * var(--scale-factor)) 1fr auto;
     gap: calc(4px * var(--scale-factor));
+    padding: calc(2px * var(--scale-factor)) calc(2px * var(--scale-factor));
     font-size: calc(10px * var(--scale-factor));
 }
 
