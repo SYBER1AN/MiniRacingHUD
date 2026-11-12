@@ -317,6 +317,7 @@ function updateGearDisplaySize(sizes) {
 
 /** Главная функция обновления геометрии виджета */
 function updateWidgetDimensions() {
+    invalidateGraphLayout();
     updateCssBaseValuesCache();
     const sizes = calculateWidgetSizes();
     _lastWidgetSizes = sizes;
@@ -500,9 +501,16 @@ function renderGmeterTrail() {
 // ==========================================
 // 3. МЕНЕДЖЕР ГРАФИКОВ
 // ==========================================
+// Версия макета для кэша размера графика: растёт при любой смене геометрии
+let _graphLayoutVersion = 0;
+function invalidateGraphLayout() { _graphLayoutVersion++; }
+
 const GraphManager = {
     renderTimeout: null,
     needsRender: false,
+    _geomVersion: -1,
+    _geomW: 0,
+    _geomH: 0,
 
     /** Рендер графика на указанный канвас */
     renderToCanvas(canvas, targetWidth, targetHeight, timeWindow = 0, dataWindow = HISTORY_SIZE) {
@@ -592,35 +600,38 @@ const GraphManager = {
         if (!canvas) return;
 
         const scale = currentConfig.scale || 1.0;
+        const dpr = window.devicePixelRatio;
+
+        let targetWidth, targetHeight;
 
         if (isIndependent) {
-            const container = DOM.graphContainer;
-            const rect = container?.getBoundingClientRect();
-            const targetWidth = rect?.width || DOM.cssBaseValues.graphWidthIndependent;
-            const targetHeight = rect?.height || DOM.cssBaseValues.widgetHeight;
-            canvas.style.width = `${targetWidth}px`;
-            canvas.style.height = `${targetHeight}px`;
-            const dpr = window.devicePixelRatio;
-            if (Math.abs(canvas.width - targetWidth * dpr) > 1 || Math.abs(canvas.height - targetHeight * dpr) > 1) {
-                canvas.width = targetWidth * dpr;
-                canvas.height = targetHeight * dpr;
+            // Размер контейнера читаем только при смене макета, а не каждый кадр
+            if (this._geomVersion !== _graphLayoutVersion) {
+                const rect = DOM.graphContainer?.getBoundingClientRect();
+                this._geomW = rect?.width || DOM.cssBaseValues.graphWidthIndependent;
+                this._geomH = rect?.height || DOM.cssBaseValues.widgetHeight;
+                this._geomVersion = _graphLayoutVersion;
             }
-            this.renderToCanvas(canvas, targetWidth, targetHeight, 3, HISTORY_SIZE);
+            targetWidth = this._geomW;
+            targetHeight = this._geomH;
         } else {
-            const baseGraphWidth = DOM.cssBaseValues.graphWidth / window.devicePixelRatio;
-            const targetWidth = baseGraphWidth * scale;
-            const targetHeight = parseFloat(DOM.hudContainer.style.height) || canvas.offsetHeight;
-
-            canvas.style.width = `${targetWidth}px`;
-            canvas.style.height = `${targetHeight}px`;
-
-            const dpr = window.devicePixelRatio;
-            if (Math.abs(canvas.width - targetWidth * dpr) > 1 || Math.abs(canvas.height - targetHeight * dpr) > 1) {
-                canvas.width = targetWidth * dpr;
-                canvas.height = targetHeight * dpr;
-            }
-            this.renderToCanvas(canvas, targetWidth, targetHeight, false, 180);
+            const baseGraphWidth = DOM.cssBaseValues.graphWidth / dpr;
+            targetWidth = baseGraphWidth * scale;
+            targetHeight = parseFloat(DOM.hudContainer.style.height) || canvas.offsetHeight;
         }
+
+        const cssW = `${targetWidth}px`;
+        const cssH = `${targetHeight}px`;
+        if (canvas.style.width !== cssW) canvas.style.width = cssW;
+        if (canvas.style.height !== cssH) canvas.style.height = cssH;
+        if (Math.abs(canvas.width - targetWidth * dpr) > 1 || Math.abs(canvas.height - targetHeight * dpr) > 1) {
+            canvas.width = targetWidth * dpr;
+            canvas.height = targetHeight * dpr;
+        }
+
+        this.renderToCanvas(canvas, targetWidth, targetHeight,
+            isIndependent ? 3 : false,
+            isIndependent ? HISTORY_SIZE : 180);
     },
 
     /** Запрос на перерисовку с debounce */
@@ -1940,6 +1951,7 @@ function applyTvdOffset() {
     var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
     container.style.height = Math.round(baseHeight + offset) + 'px';
     container.style.paddingTop = Math.round(basePadTop + offset) + 'px';
+    invalidateGraphLayout();
 }
 
 function updateTvdShift() {

@@ -60,6 +60,7 @@ public partial class MainWindow : Window
     private int _autoDetectBusy;
     private int _broadcastTickBusy;
     private int _lastBroadcastSeq;
+    private readonly Dictionary<string, object> _broadcastData = new(16);
     private static readonly System.Text.Json.JsonSerializerOptions _telemetryJsonOptions = new();
     private static readonly HttpClient _tvdHttp = new() { Timeout = TimeSpan.FromMilliseconds(800) };
     private System.Threading.Timer? _tvdTimer;
@@ -1467,7 +1468,20 @@ public partial class MainWindow : Window
     private void SendToClients(Dictionary<string, object> data)
     {
         if (_wsClients.IsEmpty) return;
-        var json = JsonSerializer.Serialize(data, _telemetryJsonOptions);
+
+        // 3 знака после запятой: JSON короче, на экране разницы нет
+        _broadcastData.Clear();
+        foreach (var kvp in data)
+        {
+            _broadcastData[kvp.Key] = kvp.Value switch
+            {
+                float f => MathF.Round(f, 3),
+                double d => Math.Round(d, 3),
+                _ => kvp.Value
+            };
+        }
+
+        var json = JsonSerializer.Serialize(_broadcastData, _telemetryJsonOptions);
         foreach (var (id, client) in _wsClients)
         {
             _ = client.Send(json).ContinueWith(t =>
