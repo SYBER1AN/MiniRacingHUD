@@ -617,7 +617,10 @@ const GraphManager = {
         } else {
             const baseGraphWidth = DOM.cssBaseValues.graphWidth / dpr;
             targetWidth = baseGraphWidth * scale;
-            targetHeight = parseFloat(DOM.hudContainer.style.height) || canvas.offsetHeight;
+            // Высота без выехавшей таблицы TVD, иначе график растягивается на её высоту
+            const baseHeight = parseFloat(DOM.hudContainer.dataset.baseHeight) ||
+                DOM.cssBaseValues.widgetHeight * scale;
+            targetHeight = baseHeight || canvas.offsetHeight;
         }
 
         const cssW = `${targetWidth}px`;
@@ -837,13 +840,27 @@ function getCurrentThemeColors() {
     return result;
 }
 
+// Верх выехавшей таблицы плотнее фона: не прозрачнее 90%
+const TVD_BG_TOP_MIN_OPACITY = 0.9;
+
+function widgetBackgroundCss() {
+    const bgOpacity = currentConfig.widgetBgOpacity ?? 1.0;
+    if (!(isVisible('bg') && bgOpacity > 0)) return 'transparent';
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--widget-bg').trim();
+    const solid = applyAlpha(bg, bgOpacity);
+    if (typeof isTvdActive !== 'function' || !isTvdActive()) return solid;
+    const topOpacity = Math.max(bgOpacity, TVD_BG_TOP_MIN_OPACITY);
+    if (topOpacity <= bgOpacity) return solid;
+    const tableHeight = DOM.tvdResults ? DOM.tvdResults.getBoundingClientRect().height : 0;
+    if (!tableHeight) return solid;
+    // Фейд тянется по всей таблице и заканчивается ровно над виджетом
+    const band = Math.round(tableHeight);
+    return `linear-gradient(to bottom, ${applyAlpha(bg, topOpacity)}, ${solid} ${band}px)`;
+}
+
 function updateWidgetBg() {
     if (!DOM.hudContainer) return;
-    const bgOpacity = currentConfig.widgetBgOpacity ?? 1.0;
-    const bgVisible = isVisible('bg') && bgOpacity > 0;
-    DOM.hudContainer.style.background = bgVisible
-        ? applyAlpha(getComputedStyle(document.documentElement).getPropertyValue('--widget-bg').trim(), bgOpacity)
-        : 'transparent';
+    DOM.hudContainer.style.background = widgetBackgroundCss();
 }
 
 const ColorManager = {
@@ -947,11 +964,7 @@ const ThemeManager = {
 
         // Виджет
         if (DOM.hudContainer) {
-            const bgOpacity = currentConfig.widgetBgOpacity ?? 1.0;
-            const bgVisible = isVisible('bg') && bgOpacity > 0;
-            DOM.hudContainer.style.background = bgVisible
-                ? applyAlpha(getComputedStyle(document.documentElement).getPropertyValue('--widget-bg').trim(), bgOpacity)
-                : 'transparent';
+            DOM.hudContainer.style.background = widgetBackgroundCss();
             DOM.hudContainer.classList.toggle('labels-hidden', !currentConfig.showPedalLabels);
         }
 
@@ -961,7 +974,9 @@ const ThemeManager = {
         });
 
         // Скругления при отключённом фоне
-        const noBg = (currentConfig.widgetBgOpacity ?? 1.0) === 0 || !isVisible('bg');
+        const bgOpacity = currentConfig.widgetBgOpacity ?? 1.0;
+        const bgVisible = isVisible('bg') && bgOpacity > 0;
+        const noBg = !bgVisible;
         if (DOM.hudContainerWrapper) {
             DOM.hudContainerWrapper.classList.toggle('no-bg', noBg);
         }
@@ -1838,8 +1853,10 @@ function tvdDemoResult() {
     var names = ['Gosha382', 'Ural_74', 'seWenöff', 'Sergey_R', 'Kolya', 'RioSsa93', 'Vitaliy', 'MaxDrift', 'Andrey',
         'Kostya_86', 'NikitaR', 'Denis_A', 'SashaPro', 'Ivan_G', 'Oleg_T', 'Pavel_K', 'Ruslan77', 'Misha_S',
         'Anton_04', 'Vadim_N', 'Dima_B', 'Yura_M', 'Artem_Z', 'Kirill_V'];
+    // Всего участников от 1 до 20, вместе со мной
+    var total = 1 + Math.floor(Math.random() * 20);
     var meMs = 150000 + Math.floor(Math.random() * 25000);
-    var rows = names.map(function(name) {
+    var rows = names.slice(0, total - 1).map(function(name) {
         return { driver: name, ms: 148000 + Math.floor(Math.random() * 30000), me: false };
     });
     rows.push({ driver: 'SYBER1AN', ms: meMs, me: true });
@@ -1951,6 +1968,11 @@ function applyTvdOffset() {
     var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
     container.style.height = Math.round(baseHeight + offset) + 'px';
     container.style.paddingTop = Math.round(basePadTop + offset) + 'px';
+    // Отдельный график центрируется флексом: сдвиг на весь offset опускает его
+    // на половину высоты таблицы и оставляет вровень с нижней полосой виджета
+    if (DOM.graphContainer) {
+        DOM.graphContainer.style.transform = offset ? `translateY(${Math.round(offset / 2)}px)` : '';
+    }
     invalidateGraphLayout();
 }
 
@@ -1993,6 +2015,7 @@ function updateTvdResults() {
         renderTvdResult(currentTvdResult());
     }
     applyTvdOffset();
+    updateWidgetBg();
     if (_lastWidgetSizes) calculateBorderRadius(_lastWidgetSizes);
     updateTvdToggleAvailability();
 }
