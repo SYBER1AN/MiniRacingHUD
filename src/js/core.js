@@ -936,11 +936,17 @@ function initUdpWebSocket() {
                     lat = gmeterSmooth.lat;
                     lon = gmeterSmooth.lon;
                     renderGmeter(lat, lon);
-                    gmeterTrail.lat[gmeterTrail.idx] = lat;
-                    gmeterTrail.lon[gmeterTrail.idx] = lon;
-                    gmeterTrail.idx = (gmeterTrail.idx + 1) % GMETER_TRAIL_SIZE;
-                    if (gmeterTrail.count < GMETER_TRAIL_SIZE) gmeterTrail.count++;
-                    _trailDirty = true;
+                    // Точку шлейфа пишем по времени, а не по каждому пакету:
+                    // при 100 Гц 60 точек через 30 мс дают те же ~1.8 с шлейфа
+                    const trailNow = performance.now();
+                    if (trailNow - _trailLastAppendMs >= GMETER_TRAIL_INTERVAL_MS) {
+                        _trailLastAppendMs = trailNow;
+                        gmeterTrail.lat[gmeterTrail.idx] = lat;
+                        gmeterTrail.lon[gmeterTrail.idx] = lon;
+                        gmeterTrail.idx = (gmeterTrail.idx + 1) % GMETER_TRAIL_SIZE;
+                        if (gmeterTrail.count < GMETER_TRAIL_SIZE) gmeterTrail.count++;
+                        _trailDirty = true;
+                    }
                 }
             } catch (e) {
                 console.warn('[UDP] Ошибка парсинга:', e);
@@ -1450,7 +1456,7 @@ if (optionsContainer && typeof CARS_DATA !== 'undefined') {
 
 function onBeforeUnload(e) {
     closeUdpWebSocket();
-    if (gameLoopInterval) { clearInterval(gameLoopInterval); gameLoopInterval = null; }
+    if (gameLoopInterval) { cancelAnimationFrame(gameLoopInterval); gameLoopInterval = null; }
     if (scannerState.scanAnimationFrameId) {
         cancelAnimationFrame(scannerState.scanAnimationFrameId);
         scannerState.scanAnimationFrameId = null;
@@ -2182,6 +2188,7 @@ function start() {
     isInitialized = true;
     active = true;
     let lastLayoutHash = '';
+    let lastHistoryPushMs = 0;
 
     _gameLoopUpdate = () => {
         try {
@@ -2383,13 +2390,19 @@ if (DOM.gearDisplayIndependent) {
             currentConfig.showHandbrakeGraph;
 
         if (anyGraphActive) {
-            const idx = pedalHistory.index;
-            pedalHistory.wheel[idx] = wheelRaw !== null ? getPedalPercent(wheelRaw, !currentConfig.invertWheel, currentConfig.wheelRange) : 0;
-            pedalHistory.throttle[idx] = throttlePct;
-            pedalHistory.brake[idx] = brakePct;
-            pedalHistory.clutch[idx] = clutchPct;
-            pedalHistory.handbrake[idx] = handbrakePct;
-            pedalHistory.index = (pedalHistory.index + 1) % HISTORY_SIZE;
+            // Шаг истории фиксирован по времени (60 Гц), иначе на высоких герцовках
+            // окно графика сжимается с 3 с до ~1 с
+            const historyNow = performance.now();
+            if (historyNow - lastHistoryPushMs >= 1000 / 60) {
+                lastHistoryPushMs = historyNow;
+                const idx = pedalHistory.index;
+                pedalHistory.wheel[idx] = wheelRaw !== null ? getPedalPercent(wheelRaw, !currentConfig.invertWheel, currentConfig.wheelRange) : 0;
+                pedalHistory.throttle[idx] = throttlePct;
+                pedalHistory.brake[idx] = brakePct;
+                pedalHistory.clutch[idx] = clutchPct;
+                pedalHistory.handbrake[idx] = handbrakePct;
+                pedalHistory.index = (pedalHistory.index + 1) % HISTORY_SIZE;
+            }
         }
 
         // === 6. Рендер ===
@@ -2401,10 +2414,14 @@ if (DOM.gearDisplayIndependent) {
         if (showClutch) renderPedals('clutch', clutchPct);
         if (showHandbrake) renderPedals('handbrake', handbrakePct);
 
-        // G-meter trail render — только по флагу новых данных
+        // G-meter trail render — только по флагу новых данных, не чаще ~30 Гц
         if (currentConfig.showGmeter && udpState.connected && window.MultiWidget.isVisible('gm') && _trailDirty) {
-            renderGmeterTrail();
-            _trailDirty = false;
+            const trailDrawNow = performance.now();
+            if (trailDrawNow - _trailLastDrawMs >= GMETER_TRAIL_DRAW_MS) {
+                _trailLastDrawMs = trailDrawNow;
+                renderGmeterTrail();
+                _trailDirty = false;
+            }
         }
 
         // === 7. Проверка изменения макета ===
@@ -2424,7 +2441,14 @@ if (DOM.gearDisplayIndependent) {
         }
     };
 
-    gameLoopInterval = setInterval(_gameLoopUpdate, 1000 / 60);
+    // requestAnimationFrame вместо setInterval: кадр синхронизирован с дисплеем
+    // (в OBS — с её рендер-пайплайном), на скрытой странице кадры не тратятся
+    function gameLoopFrame() {
+        if (!active) return;
+        gameLoopInterval = requestAnimationFrame(gameLoopFrame);
+        _gameLoopUpdate();
+    }
+    gameLoopInterval = requestAnimationFrame(gameLoopFrame);
 }
 
 // ==========================================

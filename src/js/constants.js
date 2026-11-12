@@ -312,8 +312,10 @@ const pedalHistory = {
     handbrake: Array(HISTORY_SIZE).fill(0), index: 0
 };
 
-// G-meter trail buffer (~3 sec at 60fps)
-const GMETER_TRAIL_SIZE = 180;
+// G-meter trail: 60 точек через каждые 30 мс ≈ 1.8 с шлейфа (как было при 180×10 мс)
+const GMETER_TRAIL_SIZE = 60;
+const GMETER_TRAIL_INTERVAL_MS = 30;
+const GMETER_TRAIL_DRAW_MS = 33;
 const gmeterTrail = {
     lat: new Float64Array(GMETER_TRAIL_SIZE),
     lon: new Float64Array(GMETER_TRAIL_SIZE),
@@ -324,6 +326,8 @@ const gmeterSmooth = { lat: 0, lon: 0, factor: 0.3 };
 const udpSmooth = { steering: 0, throttle: 0, brake: 0, clutch: 0, factor: 0.3 };
 const gmeterCache = { width: 100, ballSize: 0.2 };
 let _trailDirty = false;
+let _trailLastAppendMs = 0;
+let _trailLastDrawMs = 0;
 // Флаг: девайс уже возвращал ненулевое значение хотя бы по одной оси
 // Пока false — все оси геймпада считаем спящими (возвращаем null → 0% на индикаторах)
 let _deviceAwake = false;

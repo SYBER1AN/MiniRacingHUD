@@ -14,6 +14,9 @@ public abstract class UdpTelemetryProviderBase : ITelemetryProvider
 
     public bool IsConnected { get; protected set; }
 
+    private int _packetSeq;
+    public int PacketSeq => Volatile.Read(ref _packetSeq);
+
     protected abstract int Port { get; }
 
     protected readonly object _bufferLock = new();
@@ -91,6 +94,7 @@ public abstract class UdpTelemetryProviderBase : ITelemetryProvider
             _lastBuffer = buffer;
             _lastPacketTime = DateTime.UtcNow;
         }
+        Interlocked.Increment(ref _packetSeq);
     }
 
     protected abstract bool FilterPacket(byte[] buffer);

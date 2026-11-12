@@ -11,6 +11,9 @@ public interface ITelemetryProvider : System.IDisposable
     void Disconnect();
     bool IsConnected { get; }
 
+    /// <summary>Счётчик принятых пакетов; 0 — провайдер не сообщает о новых данных.</summary>
+    int PacketSeq => 0;
+
     Dictionary<string, object>? ReadTelemetry();
     Dictionary<string, object>? ReadReduced();
 }

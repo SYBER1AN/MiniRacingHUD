@@ -59,6 +59,8 @@ public partial class MainWindow : Window
     private bool _isAutoDetecting;
     private int _autoDetectBusy;
     private int _broadcastTickBusy;
+    private int _lastBroadcastSeq;
+    private static readonly System.Text.Json.JsonSerializerOptions _telemetryJsonOptions = new();
     private static readonly HttpClient _tvdHttp = new() { Timeout = TimeSpan.FromMilliseconds(800) };
     private System.Threading.Timer? _tvdTimer;
     private int _tvdTickBusy;
@@ -1254,6 +1256,7 @@ public partial class MainWindow : Window
 
                     _isRunning = connected;
                     _dataReceived = false;
+                    _lastBroadcastSeq = 0;
 
                     Dispatcher.Invoke(() =>
                     {
@@ -1368,7 +1371,7 @@ public partial class MainWindow : Window
             _ => UdpBroadcastTick(),
             null,
             TimeSpan.Zero,
-            TimeSpan.FromMilliseconds(16));
+            TimeSpan.FromMilliseconds(10));
     }
 
     private void StopBroadcastTimerLocked()
@@ -1438,6 +1441,15 @@ public partial class MainWindow : Window
         }
 
         if (!_dataReceived) OnFirstData();
+
+        // Шлём только когда пришёл новый пакет: тик 10 мс просто снимает свежие данные
+        var seq = provider.PacketSeq;
+        if (seq != 0)
+        {
+            if (seq == _lastBroadcastSeq) return;
+            _lastBroadcastSeq = seq;
+        }
+
         SendToClients(data);
     }
 
@@ -1454,7 +1466,8 @@ public partial class MainWindow : Window
 
     private void SendToClients(Dictionary<string, object> data)
     {
-        var json = JsonSerializer.Serialize(data);
+        if (_wsClients.IsEmpty) return;
+        var json = JsonSerializer.Serialize(data, _telemetryJsonOptions);
         foreach (var (id, client) in _wsClients)
         {
             _ = client.Send(json).ContinueWith(t =>
