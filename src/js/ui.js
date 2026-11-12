@@ -329,12 +329,27 @@ function updateWidgetDimensions() {
     DOM.hudContainer.style.height = `${sizes.widgetHeight}px`;
     DOM.hudContainer.style.width = `${sizes.widgetWidth}px`;
 
-    // Высота main-wrapper под максимальный масштаб (только когда панель настроек видна)
+    // Высота main-wrapper под максимальный масштаб (только когда панель настроек видна).
+    // Нижний отступ держит виджет там же, где он стоял по центру, а растёт он вверх
+    const mw = document.querySelector('.main-wrapper');
     if (window.innerHeight > 770) {
         const maxScale = parseFloat(document.getElementById('scaleSlider')?.max) || 3.0;
         const maxWidgetHeight = DOM.cssBaseValues.widgetHeight * maxScale / window.devicePixelRatio + 20;
-        const mw = document.querySelector('.main-wrapper');
-        if (mw) mw.style.height = `${maxWidgetHeight}px`;
+        if (mw) {
+            mw.style.height = `${maxWidgetHeight}px`;
+            // Отступ считаем только в покое: при открытой таблице высота обёртки
+            // другая из-за флекс-сжатия, и пересчёт сдвигал бы виджет
+            if (!isTvdActive() || !mw.style.paddingBottom) {
+                mw.style.paddingBottom = '0px';
+                const mwHeight = mw.getBoundingClientRect().height;
+                // Целые пиксели: иначе после анимации таблицы браузер «защёлкивает»
+                // дробную кромку виджета и он дёргается на пиксель
+                mw.style.paddingBottom = `${Math.max(0, Math.round((mwHeight - sizes.widgetHeight) / 2))}px`;
+            }
+        }
+    } else if (mw) {
+        mw.style.height = '';
+        mw.style.paddingBottom = '';
     }
 
     const basePadding = getCssBaseValue('widget-padding');
@@ -1968,17 +1983,7 @@ function applyTvdOffset() {
     var offset = isTvdActive() ? Math.ceil(el.getBoundingClientRect().height) : 0;
     container.style.height = Math.round(baseHeight + offset) + 'px';
     container.style.paddingTop = Math.round(basePadTop + offset) + 'px';
-    // Отдельный график центрируется флексом: сдвиг на весь offset опускает его
-    // на половину высоты таблицы и оставляет вровень с нижней полосой виджета
-    if (DOM.graphContainer) {
-        DOM.graphContainer.style.transform = offset ? `translateY(${Math.round(offset / 2)}px)` : '';
-    }
     invalidateGraphLayout();
-}
-
-function updateTvdShift() {
-    var shift = Math.round((window.innerHeight || 0) * 0.25);
-    document.documentElement.style.setProperty('--tvd-shift', shift + 'px');
 }
 
 function setTvdPreview(on) {
@@ -2001,15 +2006,6 @@ function updateTvdResults() {
 
     var active = isTvdActive();
     el.classList.toggle('on', active);
-    if (document.body) {
-        var wasOpen = document.body.classList.contains('tvd-open');
-        document.body.classList.toggle('tvd-open', active);
-        // Зафиксировать стартовое положение, чтобы сдвиг и рост шли одной анимацией
-        if (wasOpen !== active) {
-            var mw = document.querySelector('.main-wrapper');
-            if (mw) void mw.offsetHeight;
-        }
-    }
     if (active) {
         el.classList.toggle('compact', tvdWidgetWidth() < 205);
         renderTvdResult(currentTvdResult());
@@ -2111,9 +2107,5 @@ function renderTvdResult(r) {
 }
 
 setInterval(updateTvdResults, 1000);
-window.addEventListener('resize', function() {
-    updateTvdShift();
-    updateTvdResults();
-});
-updateTvdShift();
+window.addEventListener('resize', updateTvdResults);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(updateTvdResults);

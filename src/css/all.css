@@ -594,15 +594,7 @@
             }
             body {
                 padding: 0 !important;
-                justify-content: center;
-            }
-
-            .main-wrapper {
-                transform: translateY(var(--tvd-shift, 25vh));
-            }
-
-            body.tvd-open .main-wrapper {
-                transform: translateY(0);
+                justify-content: flex-end;
             }
 
             .settings-container {
@@ -938,6 +930,16 @@
             margin-bottom: var(--gap-sm);
             font-size: 14px;
             color: var(--panel-cont);
+        }
+
+        .setting-title-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .setting-title-link:hover {
+            color: color-mix(in oklab, var(--panel-cont), white 10%);
+            text-decoration: underline;
         }
 
         .other-settings {
@@ -1467,13 +1469,14 @@
         /* Главный обёрточный контейнер */
         .main-wrapper {
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
             gap: 0;
             position: relative;
             z-index: 6;
-            transition: transform var(--anim);
-            will-change: transform;
+            /* Высота не должна зависеть от содержимого: таблица выезжает поверх,
+               иначе флекс-сжатие при её открытии меняет высоту обёртки */
+            min-height: 0;
         }
 
         .main-wrapper.graph-independent {
@@ -1499,7 +1502,7 @@
             width: 0;
             height: 0;
             pointer-events: none;
-            transition: opacity var(--anim), width var(--anim), height var(--anim), border-radius var(--anim), transform var(--anim);
+            transition: opacity var(--anim), width var(--anim), height var(--anim), border-radius var(--anim);
             flex-shrink: 0;
         }
 
