@@ -1824,7 +1824,9 @@ var _tvdDemoResult = null;
 
 function tvdDemoResult() {
     if (_tvdDemoResult) return _tvdDemoResult;
-    var names = ['Gosha382', 'Ural_74', 'seWenöff', 'Sergey_R', 'Kolya', 'RioSsa93', 'Vitaliy', 'MaxDrift', 'Andrey'];
+    var names = ['Gosha382', 'Ural_74', 'seWenöff', 'Sergey_R', 'Kolya', 'RioSsa93', 'Vitaliy', 'MaxDrift', 'Andrey',
+        'Kostya_86', 'NikitaR', 'Denis_A', 'SashaPro', 'Ivan_G', 'Oleg_T', 'Pavel_K', 'Ruslan77', 'Misha_S',
+        'Anton_04', 'Vadim_N', 'Dima_B', 'Yura_M', 'Artem_Z', 'Kirill_V'];
     var meMs = 150000 + Math.floor(Math.random() * 25000);
     var rows = names.map(function(name) {
         return { driver: name, ms: 148000 + Math.floor(Math.random() * 30000), me: false };
@@ -1983,6 +1985,54 @@ function updateTvdResults() {
     updateTvdToggleAvailability();
 }
 
+// Максимум 12 строк в таблице; свой результат подсвечивает окно вокруг него
+var TVD_MAX_ROWS = 12;
+var TVD_TOP_ROWS = 10;
+var TVD_AROUND_ROWS = 3;
+
+function tvdPickPositions(of, myPos) {
+    var picks = [];
+    var i;
+    if (myPos && myPos <= TVD_TOP_ROWS) {
+        // Свой в топ-10: топ-10 + последняя позиция
+        for (i = 1; i <= TVD_TOP_ROWS && i <= of; i++) picks.push(i);
+        picks.push(of);
+    } else if (myPos && myPos >= of - TVD_TOP_ROWS + 1) {
+        // Свой в конце: первая позиция + топ-10 с конца
+        picks.push(1);
+        for (i = Math.max(1, of - TVD_TOP_ROWS + 1); i <= of; i++) picks.push(i);
+    } else if (myPos) {
+        // Свой в середине: первая + 3 сверху, свой, 3 снизу + последняя
+        picks.push(1);
+        for (i = myPos - TVD_AROUND_ROWS; i <= myPos + TVD_AROUND_ROWS; i++) picks.push(i);
+        picks.push(of);
+    } else {
+        // Позиция неизвестна: топ-10 + последняя
+        for (i = 1; i <= TVD_TOP_ROWS && i <= of; i++) picks.push(i);
+        picks.push(of);
+    }
+    return picks;
+}
+
+function tvdSelectRows(rows, of, myPos) {
+    var list = rows.slice().sort(function(a, b) { return (a.p || 0) - (b.p || 0); });
+    if (of <= TVD_MAX_ROWS) return list;
+
+    var byPos = {};
+    list.forEach(function(x) { if (x.p) byPos[x.p] = x; });
+
+    var picks = tvdPickPositions(of, myPos).filter(function(p, i, arr) {
+        return p >= 1 && p <= of && arr.indexOf(p) === i && byPos[p];
+    }).sort(function(a, b) { return a - b; });
+
+    var out = [];
+    picks.forEach(function(p, i) {
+        if (i > 0 && p - picks[i - 1] > 1) out.push({ sep: true });
+        out.push(byPos[p]);
+    });
+    return out;
+}
+
 function renderTvdResult(r) {
     DOM.tvdResultsTitle.textContent = r.n ? t('tvd.stage') + r.n : '';
     DOM.tvdResultsTrack.textContent = r.track || '';
@@ -2008,8 +2058,11 @@ function renderTvdResult(r) {
     }
 
     var html = '';
-    rows.forEach(function(x) {
-        if (x.skip && x.p > 1) html += '<div class="tvd-skip">···</div>';
+    tvdSelectRows(rows, of, r.pos).forEach(function(x) {
+        if (x.sep) {
+            html += '<div class="tvd-skip">···</div>';
+            return;
+        }
         var diff = x.diff_ms == null ? '' : tvdFormatDiff(x.diff_ms);
         var dcls = x.diff_ms == null ? '' : (x.diff_ms <= 0 ? ' fast' : ' slow');
         html += '<div class="tvd-row' + (x.me ? ' me' : '') + '">'
