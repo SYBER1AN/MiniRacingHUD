@@ -129,29 +129,35 @@ public static class UpdateService
         IProgress<(long received, long total)> progress,
         CancellationToken ct)
     {
-        var workDir = Path.Combine(Path.GetTempPath(), TempFolderName, info.Version);
-        if (Directory.Exists(workDir)) Directory.Delete(workDir, true);
+        var rootDir = Path.Combine(Path.GetTempPath(), TempFolderName);
+        if (Directory.Exists(rootDir)) Directory.Delete(rootDir, true);
+        var workDir = Path.Combine(rootDir, info.Version);
         Directory.CreateDirectory(workDir);
 
         var zipPath = Path.Combine(workDir, AssetName);
 
         try
         {
-            using var response = await Http.GetAsync(info.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct);
-            response.EnsureSuccessStatusCode();
-
-            var total = response.Content.Headers.ContentLength ?? info.Size;
-            await using var source = await response.Content.ReadAsStreamAsync(ct);
-            await using var target = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true);
-
-            var buffer = new byte[81920];
-            long received = 0;
-            int read;
-            while ((read = await source.ReadAsync(buffer, ct)) > 0)
+            long total;
+            using (var response = await Http.GetAsync(info.DownloadUrl, HttpCompletionOption.ResponseHeadersRead, ct))
             {
-                await target.WriteAsync(buffer.AsMemory(0, read), ct);
-                received += read;
-                progress.Report((received, total));
+                response.EnsureSuccessStatusCode();
+                total = response.Content.Headers.ContentLength ?? info.Size;
+
+                await using var source = await response.Content.ReadAsStreamAsync(ct);
+                // Поток записи закрываем до распаковки, иначе архив остаётся занятым
+                await using (var target = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
+                {
+                    var buffer = new byte[81920];
+                    long received = 0;
+                    int read;
+                    while ((read = await source.ReadAsync(buffer, ct)) > 0)
+                    {
+                        await target.WriteAsync(buffer.AsMemory(0, read), ct);
+                        received += read;
+                        progress.Report((received, total));
+                    }
+                }
             }
 
             var unpackDir = Path.Combine(workDir, "unpacked");

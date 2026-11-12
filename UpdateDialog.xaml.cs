@@ -14,7 +14,7 @@ public partial class UpdateDialog : Window
     private readonly UpdateInfo _info;
     private readonly TextBlock _header;
     private readonly TextBlock _versions;
-    private readonly TextBox _notes;
+    private readonly Border _notes;
     private readonly TextBlock _status;
     private readonly ProgressBar _progress;
     private readonly Button _primaryBtn;
@@ -33,11 +33,17 @@ public partial class UpdateDialog : Window
 
         InitializeComponent();
         BaseDialogWindow.SetupWindow(this);
+        // SetupWindow в конце фиксирует высоту; здесь возвращаем авто-высоту, чтобы
+        // полоса загрузки и статус не выталкивали кнопки за нижний край
+        SourceInitialized += (_, _) => SizeToContent = SizeToContent.Height;
         MinWidth = 520;
 
         shell.closeBtn.Click += (_, _) => CloseDialog();
 
         var textPrimary = TryFindResource("TextPrimaryBrush") as Brush ?? Brushes.Gainsboro;
+        var inputBg = TryFindResource("InputBgBrush") as Brush ?? Brushes.Black;
+        var accentBrush = TryFindResource("AccentBrush") as Brush ?? Brushes.LimeGreen;
+        var borderBrush = TryFindResource("BorderBrush") as Brush ?? Brushes.DimGray;
         _secondaryBrush = TryFindResource("TextSecondaryBrush") as Brush ?? Brushes.Gray;
         _redBrush = TryFindResource("RedBrush") as Brush ?? Brushes.IndianRed;
 
@@ -58,23 +64,41 @@ public partial class UpdateDialog : Window
             Margin = new Thickness(18, 4, 18, 0),
         };
 
-        _notes = new TextBox
+        var notesText = new TextBlock
         {
             Text = info.Notes,
-            IsReadOnly = true,
             TextWrapping = TextWrapping.Wrap,
-            VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            MaxHeight = 200,
+            FontSize = 12,
+            Foreground = textPrimary,
+            Margin = new Thickness(10, 7, 10, 7),
+        };
+
+        _notes = new Border
+        {
+            Background = inputBg,
+            BorderBrush = borderBrush,
+            BorderThickness = new Thickness(1),
+            CornerRadius = new CornerRadius(4),
             Margin = new Thickness(18, 12, 18, 0),
-            Padding = new Thickness(6),
+            Child = new ScrollViewer
+            {
+                Content = notesText,
+                MaxHeight = 200,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+            },
             Visibility = string.IsNullOrWhiteSpace(info.Notes) ? Visibility.Collapsed : Visibility.Visible,
         };
 
         _progress = new ProgressBar
         {
-            Height = 6,
+            Height = 8,
             Minimum = 0,
             Maximum = 100,
+            Foreground = accentBrush,
+            Background = inputBg,
+            BorderBrush = borderBrush,
+            BorderThickness = new Thickness(1),
             Margin = new Thickness(18, 12, 18, 0),
             Visibility = Visibility.Collapsed,
         };
