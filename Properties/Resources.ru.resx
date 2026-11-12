@@ -247,6 +247,23 @@
   <!-- App.xaml.cs -->
   <data name="Dialog_AppTitle" xml:space="preserve"><value>Mini Racing HUD</value></data>
   <data name="Dialog_AlreadyRunning" xml:space="preserve"><value>Mini Racing HUD уже запущен.</value></data>
+  <!-- UpdateDialog -->
+  <data name="Update_Title" xml:space="preserve"><value>Обновление</value></data>
+  <data name="Update_AvailableTitle" xml:space="preserve"><value>Доступна новая версия!</value></data>
+  <data name="Update_ButtonGo" xml:space="preserve"><value>Давай!</value></data>
+  <data name="Update_ButtonLater" xml:space="preserve"><value>Позже</value></data>
+  <data name="Update_ButtonCancel" xml:space="preserve"><value>Отмена</value></data>
+  <data name="Update_ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
+  <data name="Update_ButtonRestart" xml:space="preserve"><value>Перезапуск</value></data>
+  <data name="Update_ButtonRetry" xml:space="preserve"><value>Повторить</value></data>
+  <data name="Update_DownloadedFormat" xml:space="preserve"><value>Скачано {0:0.0} из {1:0.0} МБ</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>Скачано. Приложение перезапустится.</value></data>
+  <data name="Update_Applying" xml:space="preserve"><value>Обновление…</value></data>
+  <data name="Update_ErrorDownload" xml:space="preserve"><value>Не удалось скачать обновление: {0}</value></data>
+  <data name="Update_ErrorApply" xml:space="preserve"><value>Не удалось установить обновление: {0}</value></data>
+  <data name="Update_ErrorBadPackage" xml:space="preserve"><value>В архиве нет программы MiniRacingHUD.exe</value></data>
+  <data name="Update_ErrorNoWriteAccess" xml:space="preserve"><value>Нет прав на запись в папку программы</value></data>
+  <data name="Update_ErrorNoExePath" xml:space="preserve"><value>Не удалось определить путь к программе</value></data>
   <!-- Models.cs -->
   <data name="Constants_NoTelemetry" xml:space="preserve"><value>Игра без телеметрии</value></data>
   <data name="Constants_AddGame" xml:space="preserve"><value>Добавить игру...</value></data>

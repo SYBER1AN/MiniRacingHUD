@@ -49,3 +49,6 @@ migrate_presets.ps1
 *.backup
 *.log
 *.tmp
+
+# Готовые архивы релизов
+release/

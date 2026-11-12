@@ -206,5 +206,21 @@ namespace MiniRacingHUD.Properties {
         internal static string Label_Language => ResourceManager.GetString("Label_Language", Culture) ?? "!Label_Language!";
         internal static string Label_Game => ResourceManager.GetString("Label_Game", Culture) ?? "!Label_Game!";
         internal static string Label_Html => ResourceManager.GetString("Label_Html", Culture) ?? "!Label_Html!";
+        internal static string Update_Title => ResourceManager.GetString("Update_Title", Culture) ?? "!Update_Title!";
+        internal static string Update_AvailableTitle => ResourceManager.GetString("Update_AvailableTitle", Culture) ?? "!Update_AvailableTitle!";
+        internal static string Update_ButtonGo => ResourceManager.GetString("Update_ButtonGo", Culture) ?? "!Update_ButtonGo!";
+        internal static string Update_ButtonLater => ResourceManager.GetString("Update_ButtonLater", Culture) ?? "!Update_ButtonLater!";
+        internal static string Update_ButtonCancel => ResourceManager.GetString("Update_ButtonCancel", Culture) ?? "!Update_ButtonCancel!";
+        internal static string Update_ButtonClose => ResourceManager.GetString("Update_ButtonClose", Culture) ?? "!Update_ButtonClose!";
+        internal static string Update_ButtonRestart => ResourceManager.GetString("Update_ButtonRestart", Culture) ?? "!Update_ButtonRestart!";
+        internal static string Update_ButtonRetry => ResourceManager.GetString("Update_ButtonRetry", Culture) ?? "!Update_ButtonRetry!";
+        internal static string Update_DownloadedFormat => ResourceManager.GetString("Update_DownloadedFormat", Culture) ?? "!Update_DownloadedFormat!";
+        internal static string Update_Ready => ResourceManager.GetString("Update_Ready", Culture) ?? "!Update_Ready!";
+        internal static string Update_Applying => ResourceManager.GetString("Update_Applying", Culture) ?? "!Update_Applying!";
+        internal static string Update_ErrorDownload => ResourceManager.GetString("Update_ErrorDownload", Culture) ?? "!Update_ErrorDownload!";
+        internal static string Update_ErrorApply => ResourceManager.GetString("Update_ErrorApply", Culture) ?? "!Update_ErrorApply!";
+        internal static string Update_ErrorBadPackage => ResourceManager.GetString("Update_ErrorBadPackage", Culture) ?? "!Update_ErrorBadPackage!";
+        internal static string Update_ErrorNoWriteAccess => ResourceManager.GetString("Update_ErrorNoWriteAccess", Culture) ?? "!Update_ErrorNoWriteAccess!";
+        internal static string Update_ErrorNoExePath => ResourceManager.GetString("Update_ErrorNoExePath", Culture) ?? "!Update_ErrorNoExePath!";
     }
 }

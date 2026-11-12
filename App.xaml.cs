@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text.Json;
@@ -14,6 +15,8 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        HandleRestartAfterUpdate(e.Args);
+
         _mutex = new Mutex(true, "MiniRacingHUD", out bool createdNew);
 
         if (!createdNew)
@@ -71,6 +74,26 @@ public partial class App : Application
         _mutex?.ReleaseMutex();
         _mutex?.Close();
         base.OnExit(e);
+    }
+
+    // Новый экземпляр после обновления ждёт выхода старого, затем убирает его файлы
+    private static void HandleRestartAfterUpdate(string[] args)
+    {
+        for (var i = 0; i + 1 < args.Length; i++)
+        {
+            if (!string.Equals(args[i], "--wait-pid", StringComparison.OrdinalIgnoreCase)) continue;
+            if (!int.TryParse(args[i + 1], out var pid) || pid <= 0) break;
+
+            try
+            {
+                using var process = Process.GetProcessById(pid);
+                process.WaitForExit(10000);
+            }
+            catch { }
+
+            UpdateService.CleanupAfterRestart();
+            break;
+        }
     }
 }
 

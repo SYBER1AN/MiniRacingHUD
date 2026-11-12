@@ -184,6 +184,23 @@
   <data name="Validation_ThemeNameTaken" xml:space="preserve"><value>Choose a different name, this is a built-in theme</value></data>
   <data name="Dialog_AppTitle" xml:space="preserve"><value>Mini Racing HUD</value></data>
   <data name="Dialog_AlreadyRunning" xml:space="preserve"><value>Mini Racing HUD is already running.</value></data>
+  <!-- UpdateDialog -->
+  <data name="Update_Title" xml:space="preserve"><value>Update</value></data>
+  <data name="Update_AvailableTitle" xml:space="preserve"><value>A new version is available!</value></data>
+  <data name="Update_ButtonGo" xml:space="preserve"><value>Let's go!</value></data>
+  <data name="Update_ButtonLater" xml:space="preserve"><value>Later</value></data>
+  <data name="Update_ButtonCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="Update_ButtonClose" xml:space="preserve"><value>Close</value></data>
+  <data name="Update_ButtonRestart" xml:space="preserve"><value>Restart</value></data>
+  <data name="Update_ButtonRetry" xml:space="preserve"><value>Retry</value></data>
+  <data name="Update_DownloadedFormat" xml:space="preserve"><value>Downloaded {0:0.0} of {1:0.0} MB</value></data>
+  <data name="Update_Ready" xml:space="preserve"><value>Downloaded. The application will restart.</value></data>
+  <data name="Update_Applying" xml:space="preserve"><value>Updating…</value></data>
+  <data name="Update_ErrorDownload" xml:space="preserve"><value>Failed to download the update: {0}</value></data>
+  <data name="Update_ErrorApply" xml:space="preserve"><value>Failed to install the update: {0}</value></data>
+  <data name="Update_ErrorBadPackage" xml:space="preserve"><value>The archive does not contain MiniRacingHUD.exe</value></data>
+  <data name="Update_ErrorNoWriteAccess" xml:space="preserve"><value>No write access to the application folder</value></data>
+  <data name="Update_ErrorNoExePath" xml:space="preserve"><value>Could not determine the application path</value></data>
   <data name="Constants_NoTelemetry" xml:space="preserve"><value>No telemetry game</value></data>
   <data name="Constants_AddGame" xml:space="preserve"><value>Add game...</value></data>
   <data name="Tooltip_Eyedropper" xml:space="preserve"><value>Eyedropper</value></data>

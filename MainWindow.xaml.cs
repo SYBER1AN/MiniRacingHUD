@@ -1014,10 +1014,27 @@ public partial class MainWindow : Window
                 SaveConfig();
                 ShowDonationDialog();
             }
+
+            _ = CheckUpdatesAsync();
         }
         catch (Exception ex)
         {
             Log($"[Window_Loaded] Post-init error: {ex.Message}");
+        }
+    }
+
+    private async Task CheckUpdatesAsync()
+    {
+        try
+        {
+            await Task.Delay(5000);
+            var info = await UpdateService.CheckAsync();
+            if (info == null) return;
+            new UpdateDialog(info, this).ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            Log($"[Update] {ex.Message}");
         }
     }
 
