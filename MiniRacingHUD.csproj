@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MiniRacingHUD</AssemblyName>
     <!-- Versioning -->
-    <Version>1.0.1.246</Version>
+    <Version>1.0.1.254</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <ApplicationIcon>MiniRacingHUD.ico</ApplicationIcon>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
@@ -71,18 +71,12 @@
   <Target Name="CopyWidgetFiles" AfterTargets="Build">
     <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(OutDir)Widget" />
     <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(OutDir)Widget" />
-    <Copy SourceFiles="@(PresetFile)" DestinationFolder="$(OutDir)Widget\presets" />
   </Target>
-
-  <ItemGroup>
-    <PresetFile Include="$(ProjectDir)presets\*.js" />
-  </ItemGroup>
 
   <!-- ����������� Widget/ � ����� publish -->
   <Target Name="CopyWidgetToPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
     <Copy SourceFiles="$(ProjectDir)build\MiniRacingHUD.html" DestinationFolder="$(PublishDir)Widget" />
     <Copy SourceFiles="$(ProjectDir)build\bg.png" DestinationFolder="$(PublishDir)Widget" />
-    <Copy SourceFiles="@(PresetFile)" DestinationFolder="$(PublishDir)Widget\presets" />
   </Target>
 
   <Target Name="CopyReadme" AfterTargets="Build">
