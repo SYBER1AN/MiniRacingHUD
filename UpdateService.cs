@@ -18,6 +18,13 @@ public sealed class UpdateInfo
     public long Size { get; init; }
 }
 
+public enum UpdateStage
+{
+    Unpacking,
+    Installing,
+    Starting
+}
+
 public static class UpdateService
 {
     private const string RepoOwner = "SYBER1AN";
@@ -123,7 +130,7 @@ public static class UpdateService
 
     private static Version Normalize(Version v) => new(v.Major, v.Minor, Math.Max(v.Build, 0), Math.Max(v.Revision, 0));
 
-    // Возвращает папку с архивом и распакованными файлами
+    // Возвращает папку с архивом; распаковка и подмена файлов — в ApplyAndRestart
     public static async Task<string> DownloadAsync(
         UpdateInfo info,
         IProgress<(long received, long total)> progress,
@@ -145,7 +152,7 @@ public static class UpdateService
                 total = response.Content.Headers.ContentLength ?? info.Size;
 
                 await using var source = await response.Content.ReadAsStreamAsync(ct);
-                // Поток записи закрываем до распаковки, иначе архив остаётся занятым
+                // Поток записи закрываем до выхода из метода, иначе архив останется занятым
                 await using (var target = new FileStream(zipPath, FileMode.Create, FileAccess.Write, FileShare.None, 81920, true))
                 {
                     var buffer = new byte[81920];
@@ -160,11 +167,6 @@ public static class UpdateService
                 }
             }
 
-            var unpackDir = Path.Combine(workDir, "unpacked");
-            ZipFile.ExtractToDirectory(zipPath, unpackDir);
-            if (!File.Exists(Path.Combine(unpackDir, ExeName)))
-                throw new InvalidDataException(Res.Update_ErrorBadPackage);
-
             return workDir;
         }
         catch
@@ -174,8 +176,8 @@ public static class UpdateService
         }
     }
 
-    // Подменяет файлы и запускает новую копию, которая ждёт выхода текущего процесса
-    public static bool ApplyAndRestart(string workDir, out string error)
+    // Распаковывает архив, подменяет файлы и запускает новую копию, которая ждёт выхода текущего процесса
+    public static bool ApplyAndRestart(string workDir, IProgress<(UpdateStage stage, double percent)>? progress, out string error)
     {
         error = "";
         try
@@ -188,13 +190,6 @@ public static class UpdateService
             }
 
             var appDir = AppDir;
-            var unpackDir = Path.Combine(workDir, "unpacked");
-            var newExe = Path.Combine(unpackDir, ExeName);
-            if (!File.Exists(newExe))
-            {
-                error = Res.Update_ErrorBadPackage;
-                return false;
-            }
 
             var probePath = Path.Combine(appDir, ".update_probe");
             try
@@ -208,6 +203,18 @@ public static class UpdateService
                 return false;
             }
 
+            progress?.Report((UpdateStage.Unpacking, 0));
+            var unpackDir = Path.Combine(workDir, "unpacked");
+            if (Directory.Exists(unpackDir)) Directory.Delete(unpackDir, true);
+            ExtractWithProgress(Path.Combine(workDir, AssetName), unpackDir, progress);
+
+            var newExe = Path.Combine(unpackDir, ExeName);
+            if (!File.Exists(newExe))
+            {
+                error = Res.Update_ErrorBadPackage;
+                return false;
+            }
+
             var oldExe = Path.Combine(appDir, OldExeName);
             if (File.Exists(oldExe))
             {
@@ -217,12 +224,30 @@ public static class UpdateService
 
             File.Move(exePath, oldExe);
 
+            var copies = new (string source, string destination)[]
+            {
+                (newExe, exePath),
+                (Path.Combine(unpackDir, "Widget", "MiniRacingHUD.html"), Path.Combine(appDir, "Widget", "MiniRacingHUD.html")),
+                (Path.Combine(unpackDir, "Widget", "bg.png"), Path.Combine(appDir, "Widget", "bg.png")),
+                (Path.Combine(unpackDir, "README.md"), Path.Combine(appDir, "README.md")),
+            };
+
+            long totalBytes = 0;
+            foreach (var (source, _) in copies)
+                if (File.Exists(source)) totalBytes += new FileInfo(source).Length;
+
+            progress?.Report((UpdateStage.Installing, 0));
             try
             {
-                File.Copy(newExe, exePath, true);
-                CopyIfExists(Path.Combine(unpackDir, "Widget", "MiniRacingHUD.html"), Path.Combine(appDir, "Widget", "MiniRacingHUD.html"));
-                CopyIfExists(Path.Combine(unpackDir, "Widget", "bg.png"), Path.Combine(appDir, "Widget", "bg.png"));
-                CopyIfExists(Path.Combine(unpackDir, "README.md"), Path.Combine(appDir, "README.md"));
+                long copied = 0;
+                foreach (var (source, destination) in copies)
+                {
+                    if (!File.Exists(source)) continue;
+                    Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                    var size = new FileInfo(source).Length;
+                    CopyWithProgress(source, destination, copied, totalBytes, progress);
+                    copied += size;
+                }
             }
             catch
             {
@@ -230,6 +255,7 @@ public static class UpdateService
                 throw;
             }
 
+            progress?.Report((UpdateStage.Starting, 100));
             Process.Start(new ProcessStartInfo(exePath, $"--wait-pid {Environment.ProcessId}")
             {
                 UseShellExecute = false,
@@ -243,6 +269,60 @@ public static class UpdateService
         {
             error = ex.Message;
             return false;
+        }
+    }
+
+    private static void ExtractWithProgress(
+        string zipPath,
+        string destination,
+        IProgress<(UpdateStage stage, double percent)>? progress)
+    {
+        using var archive = ZipFile.OpenRead(zipPath);
+        var root = Path.GetFullPath(destination);
+        var rootWithSep = root.TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+        Directory.CreateDirectory(root);
+
+        var entries = archive.Entries;
+        for (var i = 0; i < entries.Count; i++)
+        {
+            var entry = entries[i];
+            var target = Path.GetFullPath(Path.Combine(root, entry.FullName));
+            if (!target.Equals(root, StringComparison.OrdinalIgnoreCase) &&
+                !target.StartsWith(rootWithSep, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException(Res.Update_ErrorBadPackage);
+
+            if (entry.FullName.EndsWith('/') || entry.FullName.EndsWith('\\'))
+            {
+                Directory.CreateDirectory(target);
+            }
+            else
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+                entry.ExtractToFile(target, true);
+            }
+
+            progress?.Report((UpdateStage.Unpacking, (i + 1) * 100.0 / entries.Count));
+        }
+    }
+
+    private static void CopyWithProgress(
+        string source,
+        string destination,
+        long alreadyCopied,
+        long totalBytes,
+        IProgress<(UpdateStage stage, double percent)>? progress)
+    {
+        using var input = new FileStream(source, FileMode.Open, FileAccess.Read, FileShare.Read, 81920);
+        using var output = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None, 81920);
+        var buffer = new byte[81920];
+        long done = 0;
+        int read;
+        while ((read = input.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            output.Write(buffer, 0, read);
+            done += read;
+            if (totalBytes > 0)
+                progress?.Report((UpdateStage.Installing, (alreadyCopied + done) * 100.0 / totalBytes));
         }
     }
 
@@ -263,11 +343,6 @@ public static class UpdateService
             TryDeleteDir(Path.Combine(Path.GetTempPath(), TempFolderName));
         }
         catch { }
-    }
-
-    private static void CopyIfExists(string source, string destination)
-    {
-        if (File.Exists(source)) File.Copy(source, destination, true);
     }
 
     private static void TryDeleteDir(string path)

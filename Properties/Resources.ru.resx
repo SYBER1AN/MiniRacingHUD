@@ -254,11 +254,11 @@
   <data name="Update_ButtonLater" xml:space="preserve"><value>Позже</value></data>
   <data name="Update_ButtonCancel" xml:space="preserve"><value>Отмена</value></data>
   <data name="Update_ButtonClose" xml:space="preserve"><value>Закрыть</value></data>
-  <data name="Update_ButtonRestart" xml:space="preserve"><value>Перезапуск</value></data>
   <data name="Update_ButtonRetry" xml:space="preserve"><value>Повторить</value></data>
   <data name="Update_DownloadedFormat" xml:space="preserve"><value>Скачано {0:0.0} из {1:0.0} МБ</value></data>
-  <data name="Update_Ready" xml:space="preserve"><value>Скачано. Приложение перезапустится.</value></data>
-  <data name="Update_Applying" xml:space="preserve"><value>Обновление…</value></data>
+  <data name="Update_Unpacking" xml:space="preserve"><value>Распаковка…</value></data>
+  <data name="Update_Installing" xml:space="preserve"><value>Установка…</value></data>
+  <data name="Update_Starting" xml:space="preserve"><value>Запуск…</value></data>
   <data name="Update_ErrorDownload" xml:space="preserve"><value>Не удалось скачать обновление: {0}</value></data>
   <data name="Update_ErrorApply" xml:space="preserve"><value>Не удалось установить обновление: {0}</value></data>
   <data name="Update_ErrorBadPackage" xml:space="preserve"><value>В архиве нет программы MiniRacingHUD.exe</value></data>

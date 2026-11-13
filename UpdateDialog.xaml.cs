@@ -154,12 +154,6 @@ public partial class UpdateDialog : Window
 
     private async Task PrimaryClickAsync()
     {
-        if (_workDir != null)
-        {
-            await ApplyAsync();
-            return;
-        }
-
         await DownloadAsync();
     }
 
@@ -169,8 +163,11 @@ public partial class UpdateDialog : Window
         _cts = new CancellationTokenSource();
         var ct = _cts.Token;
 
-        _primaryBtn.IsEnabled = false;
+        _workDir = null;
+        _primaryBtn.Visibility = Visibility.Collapsed;
         _secondaryBtn.Content = Res.Update_ButtonCancel;
+        _secondaryBtn.Visibility = Visibility.Visible;
+        _progress.IsIndeterminate = false;
         _progress.Value = 0;
         _progress.Visibility = Visibility.Visible;
         _status.Foreground = _secondaryBrush;
@@ -187,76 +184,104 @@ public partial class UpdateDialog : Window
         try
         {
             _workDir = await UpdateService.DownloadAsync(_info, progress, ct);
-            _progress.Value = 100;
-            _status.Foreground = _secondaryBrush;
-            _status.Text = Res.Update_Ready;
-            _primaryBtn.Content = Res.Update_ButtonRestart;
-            _primaryBtn.IsEnabled = true;
-            _secondaryBtn.Visibility = Visibility.Collapsed;
         }
         catch (OperationCanceledException)
         {
             _workDir = null;
             ResetToIdle();
+            return;
         }
         catch (Exception ex)
         {
             _workDir = null;
-            _progress.Visibility = Visibility.Collapsed;
-            _status.Foreground = _redBrush;
-            _status.Text = string.Format(Res.Update_ErrorDownload, ex.Message);
-            _primaryBtn.Content = Res.Update_ButtonRetry;
-            _primaryBtn.IsEnabled = true;
-            _secondaryBtn.Content = Res.Update_ButtonClose;
-            _secondaryBtn.Visibility = Visibility.Visible;
+            ShowError(string.Format(Res.Update_ErrorDownload, ex.Message));
+            return;
         }
+
+        await InstallAsync();
     }
 
-    private void ResetToIdle()
-    {
-        _progress.Value = 0;
-        _progress.Visibility = Visibility.Collapsed;
-        _status.Visibility = Visibility.Collapsed;
-        _primaryBtn.Content = Res.Update_ButtonGo;
-        _primaryBtn.IsEnabled = true;
-        _secondaryBtn.Content = Res.Update_ButtonLater;
-        _secondaryBtn.Visibility = Visibility.Visible;
-    }
-
-    private async Task ApplyAsync()
+    private async Task InstallAsync()
     {
         if (_workDir == null) return;
 
         _applying = true;
-        _primaryBtn.IsEnabled = false;
+        _primaryBtn.Visibility = Visibility.Collapsed;
         _secondaryBtn.Visibility = Visibility.Collapsed;
-        _progress.Visibility = Visibility.Collapsed;
+        _progress.IsIndeterminate = true;
+        _progress.Value = 0;
         _status.Foreground = _secondaryBrush;
+        _status.Text = Res.Update_Unpacking;
         _status.Visibility = Visibility.Visible;
-        _status.Text = Res.Update_Applying;
+
+        var progress = new Progress<(UpdateStage stage, double percent)>(p =>
+        {
+            switch (p.stage)
+            {
+                case UpdateStage.Unpacking:
+                    if (!_progress.IsIndeterminate) _progress.IsIndeterminate = true;
+                    _status.Text = Res.Update_Unpacking;
+                    break;
+                case UpdateStage.Installing:
+                    if (_progress.IsIndeterminate)
+                    {
+                        _progress.IsIndeterminate = false;
+                        _progress.Value = 0;
+                    }
+                    _progress.Value = p.percent;
+                    _status.Text = Res.Update_Installing;
+                    break;
+                case UpdateStage.Starting:
+                    _progress.IsIndeterminate = false;
+                    _progress.Value = 100;
+                    _status.Text = Res.Update_Starting;
+                    break;
+            }
+        });
 
         var workDir = _workDir;
         var (ok, error) = await Task.Run(() =>
         {
-            var result = UpdateService.ApplyAndRestart(workDir, out var err);
+            var result = UpdateService.ApplyAndRestart(workDir, progress, out var err);
             return (result, err);
         });
 
+        _applying = false;
         if (ok)
         {
-            _applying = false;
             Close();
             if (Owner is Window owner) owner.Close();
             else Application.Current.Shutdown();
             return;
         }
 
-        _applying = false;
+        _workDir = null;
+        ShowError(string.Format(Res.Update_ErrorApply, error));
+    }
+
+    private void ShowError(string message)
+    {
+        _progress.Visibility = Visibility.Collapsed;
         _status.Foreground = _redBrush;
-        _status.Text = string.Format(Res.Update_ErrorApply, error);
+        _status.Text = message;
+        _status.Visibility = Visibility.Visible;
         _primaryBtn.Content = Res.Update_ButtonRetry;
+        _primaryBtn.Visibility = Visibility.Visible;
         _primaryBtn.IsEnabled = true;
         _secondaryBtn.Content = Res.Update_ButtonClose;
+        _secondaryBtn.Visibility = Visibility.Visible;
+    }
+
+    private void ResetToIdle()
+    {
+        _progress.Value = 0;
+        _progress.IsIndeterminate = false;
+        _progress.Visibility = Visibility.Collapsed;
+        _status.Visibility = Visibility.Collapsed;
+        _primaryBtn.Content = Res.Update_ButtonGo;
+        _primaryBtn.Visibility = Visibility.Visible;
+        _primaryBtn.IsEnabled = true;
+        _secondaryBtn.Content = Res.Update_ButtonLater;
         _secondaryBtn.Visibility = Visibility.Visible;
     }
 

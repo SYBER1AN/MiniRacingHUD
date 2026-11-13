@@ -212,11 +212,11 @@ namespace MiniRacingHUD.Properties {
         internal static string Update_ButtonLater => ResourceManager.GetString("Update_ButtonLater", Culture) ?? "!Update_ButtonLater!";
         internal static string Update_ButtonCancel => ResourceManager.GetString("Update_ButtonCancel", Culture) ?? "!Update_ButtonCancel!";
         internal static string Update_ButtonClose => ResourceManager.GetString("Update_ButtonClose", Culture) ?? "!Update_ButtonClose!";
-        internal static string Update_ButtonRestart => ResourceManager.GetString("Update_ButtonRestart", Culture) ?? "!Update_ButtonRestart!";
         internal static string Update_ButtonRetry => ResourceManager.GetString("Update_ButtonRetry", Culture) ?? "!Update_ButtonRetry!";
         internal static string Update_DownloadedFormat => ResourceManager.GetString("Update_DownloadedFormat", Culture) ?? "!Update_DownloadedFormat!";
-        internal static string Update_Ready => ResourceManager.GetString("Update_Ready", Culture) ?? "!Update_Ready!";
-        internal static string Update_Applying => ResourceManager.GetString("Update_Applying", Culture) ?? "!Update_Applying!";
+        internal static string Update_Unpacking => ResourceManager.GetString("Update_Unpacking", Culture) ?? "!Update_Unpacking!";
+        internal static string Update_Installing => ResourceManager.GetString("Update_Installing", Culture) ?? "!Update_Installing!";
+        internal static string Update_Starting => ResourceManager.GetString("Update_Starting", Culture) ?? "!Update_Starting!";
         internal static string Update_ErrorDownload => ResourceManager.GetString("Update_ErrorDownload", Culture) ?? "!Update_ErrorDownload!";
         internal static string Update_ErrorApply => ResourceManager.GetString("Update_ErrorApply", Culture) ?? "!Update_ErrorApply!";
         internal static string Update_ErrorBadPackage => ResourceManager.GetString("Update_ErrorBadPackage", Culture) ?? "!Update_ErrorBadPackage!";

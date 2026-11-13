@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>MiniRacingHUD</AssemblyName>
     <!-- Versioning -->
-    <Version>1.0.1.259</Version>
+    <Version>1.0.1.260</Version>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <ApplicationIcon>MiniRacingHUD.ico</ApplicationIcon>
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
