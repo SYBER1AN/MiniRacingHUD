@@ -73,13 +73,13 @@ public partial class ColorEditorWindow : Window
                 first.IsSelected = true;
             }
             _selectedKey = first.Key;
-            var hex = GetColorValue(_selectedKey);
+            var hex = GetEffectiveHex(_selectedKey);
             if (!string.IsNullOrEmpty(hex))
                 try { _colorPicker.SetColor((Color)ColorConverter.ConvertFromString("#" + hex.TrimStart('#'))); }
                 catch { }
             else
                 _colorPicker.SetColor(Color.FromRgb(0x55, 0x55, 0x55));
-            _colorPicker.SetOldPreview(GetColorFromKey(_originalColors, _selectedKey));
+            _colorPicker.SetOldPreview(GetOriginalColor(_selectedKey));
         }
     }
 
@@ -131,13 +131,13 @@ public partial class ColorEditorWindow : Window
         item.IsSelected = true;
         _selectedKey = item.Key;
 
-        var hex = GetColorValue(_selectedKey);
+        var hex = GetEffectiveHex(_selectedKey);
         if (!string.IsNullOrEmpty(hex))
             try { _colorPicker.SetColor((Color)ColorConverter.ConvertFromString("#" + hex.TrimStart('#'))); }
             catch { }
         else
             _colorPicker.SetColor(Color.FromRgb(0x55, 0x55, 0x55));
-        _colorPicker.SetOldPreview(GetColorFromKey(_originalColors, _selectedKey));
+        _colorPicker.SetOldPreview(GetOriginalColor(_selectedKey));
     }
 
     private static ColorItemViewModel? FindColorItemFromEvent(MouseButtonEventArgs e)
@@ -202,11 +202,11 @@ public partial class ColorEditorWindow : Window
 
     private void InitPicker()
     {
-        var initHex = GetColorValue(_selectedKey);
+        var initHex = GetEffectiveHex(_selectedKey);
         if (!string.IsNullOrEmpty(initHex))
             try { _colorPicker.SetColor((Color)ColorConverter.ConvertFromString("#" + initHex.TrimStart('#'))); }
             catch { }
-        _colorPicker.SetOldPreview(GetColorFromKey(_originalColors, _selectedKey));
+        _colorPicker.SetOldPreview(GetOriginalColor(_selectedKey));
     }
 
     private static readonly Dictionary<string, Func<UIColors, string?>> ColorGetters = new()
@@ -264,6 +264,8 @@ public partial class ColorEditorWindow : Window
     private string? GetColorValue(string key) =>
         ColorGetters.TryGetValue(key, out var getter) ? getter(_colors) : null;
 
+    private string? GetEffectiveHex(string key) => GetColorValue(key) ?? GetDefaultHex(key);
+
     private void SetColorValue(string key, string? value)
     {
         if (!ColorSetters.TryGetValue(key, out var setter)) return;
@@ -276,15 +278,13 @@ public partial class ColorEditorWindow : Window
     private string? GetDefaultHex(string key) =>
         ColorGetters.TryGetValue(key, out var getter) ? getter(_defaultColors)?.TrimStart('#') : null;
 
-    private static Color GetColorFromKey(UIColors colors, string key)
+    private Color GetOriginalColor(string key)
     {
-        if (ColorGetters.TryGetValue(key, out var getter))
-        {
-            var val = getter(colors);
-            if (!string.IsNullOrEmpty(val))
-                try { return (Color)ColorConverter.ConvertFromString("#" + val.TrimStart('#')); }
-                catch { }
-        }
+        var hex = ColorGetters.TryGetValue(key, out var getter) ? getter(_originalColors) : null;
+        hex ??= GetDefaultHex(key);
+        if (!string.IsNullOrEmpty(hex))
+            try { return (Color)ColorConverter.ConvertFromString("#" + hex.TrimStart('#')); }
+            catch { }
         return Color.FromRgb(0x55, 0x55, 0x55);
     }
 
@@ -359,7 +359,8 @@ public partial class ColorEditorWindow : Window
                 {
                     Key = item.Key,
                     Label = item.Label,
-                    Hex = hex ?? ""
+                    Hex = hex ?? "",
+                    DefaultHex = GetDefaultHex(item.Key) ?? ""
                 });
             }
             if (i < 2) LeftGroups.Add(vm); else RightGroups.Add(vm);
@@ -385,6 +386,7 @@ public class ColorItemViewModel : INotifyPropertyChanged
     private string _key = "";
     private string _label = "";
     private string _hex = "";
+    private string _defaultHex = "";
     private bool _isSelected;
 
     public string Key { get => _key; set { _key = value; OnPropertyChanged(); } }
@@ -393,10 +395,30 @@ public class ColorItemViewModel : INotifyPropertyChanged
     public string Hex
     {
         get => _hex;
-        set { _hex = value; OnPropertyChanged(); OnPropertyChanged(nameof(HexDisplay)); }
+        set
+        {
+            _hex = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(EffectiveHex));
+            OnPropertyChanged(nameof(HexDisplay));
+        }
     }
 
-    public string HexDisplay => !string.IsNullOrEmpty(Hex) ? "#" + Hex.TrimStart('#') : "\u2014";
+    public string DefaultHex
+    {
+        get => _defaultHex;
+        set
+        {
+            _defaultHex = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(EffectiveHex));
+            OnPropertyChanged(nameof(HexDisplay));
+        }
+    }
+
+    public string EffectiveHex => !string.IsNullOrEmpty(Hex) ? Hex : DefaultHex;
+
+    public string HexDisplay => !string.IsNullOrEmpty(EffectiveHex) ? "#" + EffectiveHex.TrimStart('#') : "\u2014";
 
     public bool IsSelected
     {

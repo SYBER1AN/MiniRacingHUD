@@ -18,7 +18,7 @@
                 </Grid.ColumnDefinitions>
                 <Rectangle Width="18" Height="18" RadiusX="3" RadiusY="3"
                            Stroke="{StaticResource BorderBrush}" StrokeThickness="1"
-                           Fill="{Binding Hex, Converter={StaticResource HexToBrush}}"
+                           Fill="{Binding EffectiveHex, Converter={StaticResource HexToBrush}}"
                            Margin="0,0,6,0"/>
                  <TextBlock Grid.Column="1" Text="{Binding HexDisplay}"
                             FontSize="11" FontFamily="Consolas"
