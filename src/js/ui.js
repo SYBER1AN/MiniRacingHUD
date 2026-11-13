@@ -1681,7 +1681,7 @@ function updateUIFromConfig() {
     }
 
     if (DOM.tvdResultsSlider && DOM.tvdResultsValue) {
-        var tvdSec = currentConfig.tvdResultsSeconds ?? 60;
+        var tvdSec = currentConfig.tvdResultsSeconds ?? 20;
         DOM.tvdResultsValue.value = String(tvdSec);
         DOM.tvdResultsSlider.value = tvdSec;
     }
@@ -1968,7 +1968,7 @@ function isTvdActive() {
     if (TVD_DEMO) return !!currentConfig.showTvdResults;
     if (!currentConfig.showTvdResults) return false;
     if (typeof isVisible === 'function' && !isVisible('tr')) return false;
-    var seconds = Number(currentConfig.tvdResultsSeconds) || 60;
+    var seconds = Number(currentConfig.tvdResultsSeconds) || 20;
     return (performance.now() - _tvdReceivedAt) < seconds * 1000;
 }
 

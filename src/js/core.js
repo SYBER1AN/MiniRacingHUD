@@ -565,7 +565,7 @@ DOM.toggleTvdResults?.addEventListener('click', () => {
 });
 
 DOM.tvdResultsSlider?.addEventListener('input', () => {
-    var sec = parseInt(DOM.tvdResultsSlider.value, 10) || 60;
+    var sec = parseInt(DOM.tvdResultsSlider.value, 10) || 20;
     sec = Math.max(10, Math.min(300, sec));
     DOM.tvdResultsValue.value = String(sec);
     currentConfig.tvdResultsSeconds = sec;
@@ -574,7 +574,7 @@ DOM.tvdResultsSlider?.addEventListener('input', () => {
 });
 
 DOM.tvdResultsValue?.addEventListener('change', () => {
-    var sec = parseInt(DOM.tvdResultsValue.value, 10) || 60;
+    var sec = parseInt(DOM.tvdResultsValue.value, 10) || 20;
     sec = Math.max(10, Math.min(300, sec));
     DOM.tvdResultsValue.value = String(sec);
     DOM.tvdResultsSlider.value = sec;
@@ -930,6 +930,7 @@ function initUdpWebSocket() {
                 if (currentConfig.showGmeter && window.MultiWidget.isVisible('gm')) {
                     let lat = data.gForceLateral || 0;
                     let lon = data.gForceLongitudinal || 0;
+                    _gmeterLastDataMs = performance.now();
                     if (data.gameId === 1) lon = -lon;
                     gmeterSmooth.lat += (lat - gmeterSmooth.lat) * gmeterSmooth.factor;
                     gmeterSmooth.lon += (lon - gmeterSmooth.lon) * gmeterSmooth.factor;
@@ -1951,7 +1952,7 @@ function parseExternalConfig(config) {
     if (config.showTvdResults !== undefined) currentConfig.showTvdResults = config.showTvdResults === true;
     if (config.tvdResultsSeconds !== undefined) {
         var tvdSec = parseInt(config.tvdResultsSeconds, 10);
-        currentConfig.tvdResultsSeconds = isNaN(tvdSec) ? 60 : Math.max(10, Math.min(300, tvdSec));
+        currentConfig.tvdResultsSeconds = isNaN(tvdSec) ? 20 : Math.max(10, Math.min(300, tvdSec));
     }
 
     // hideXxx — глобальное скрытие элементов (OFF-режим мультивиджета)
@@ -2413,6 +2414,36 @@ if (DOM.gearDisplayIndependent) {
         if (showBrake) renderPedals('brake', brakePct);
         if (showClutch) renderPedals('clutch', clutchPct);
         if (showHandbrake) renderPedals('handbrake', handbrakePct);
+
+        // G-meter: пакеты перестали приходить — плавно возвращаем шарик в центр
+        // и дописываем шлейф, пока он не сойдётся в точку
+        if (currentConfig.showGmeter && udpState.connected && window.MultiWidget.isVisible('gm')) {
+            const gmeterNow = performance.now();
+            const gmeterIdle = _gmeterLastDataMs > 0 && gmeterNow - _gmeterLastDataMs > GMETER_IDLE_MS;
+            if (gmeterIdle) {
+                const hadOffset = gmeterSmooth.lat !== 0 || gmeterSmooth.lon !== 0;
+                const dt = _gmeterIdleLastMs > 0 ? Math.min(gmeterNow - _gmeterIdleLastMs, 100) : 16;
+                _gmeterIdleLastMs = gmeterNow;
+                const decay = Math.exp(-dt / GMETER_RETURN_MS);
+                gmeterSmooth.lat *= decay;
+                gmeterSmooth.lon *= decay;
+                if (Math.abs(gmeterSmooth.lat) < 0.01) gmeterSmooth.lat = 0;
+                if (Math.abs(gmeterSmooth.lon) < 0.01) gmeterSmooth.lon = 0;
+                if (hadOffset) renderGmeter(gmeterSmooth.lat, gmeterSmooth.lon);
+                // Шлейф пишем постоянно, пока G-meter активен: старые точки плавно
+                // вытесняются нулевыми и след сам сходится в центр
+                if (gmeterNow - _trailLastAppendMs >= GMETER_TRAIL_INTERVAL_MS) {
+                    _trailLastAppendMs = gmeterNow;
+                    gmeterTrail.lat[gmeterTrail.idx] = gmeterSmooth.lat;
+                    gmeterTrail.lon[gmeterTrail.idx] = gmeterSmooth.lon;
+                    gmeterTrail.idx = (gmeterTrail.idx + 1) % GMETER_TRAIL_SIZE;
+                    if (gmeterTrail.count < GMETER_TRAIL_SIZE) gmeterTrail.count++;
+                    _trailDirty = true;
+                }
+            } else {
+                _gmeterIdleLastMs = 0;
+            }
+        }
 
         // G-meter trail render — только по флагу новых данных, не чаще ~30 Гц
         if (currentConfig.showGmeter && udpState.connected && window.MultiWidget.isVisible('gm') && _trailDirty) {

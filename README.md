@@ -1,6 +1,6 @@
 <img width="785" height="279" alt="MiniRacingHUD-scr" src="https://github.com/user-attachments/assets/a82351b0-6997-440f-a345-828680681da8" />
 
-# Mini Racing HUD v1.0.1.262
+# Mini Racing HUD v1.0.1.264
 
 ## RU
 

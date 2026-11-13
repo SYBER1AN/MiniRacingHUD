@@ -316,6 +316,10 @@ const pedalHistory = {
 const GMETER_TRAIL_SIZE = 60;
 const GMETER_TRAIL_INTERVAL_MS = 30;
 const GMETER_TRAIL_DRAW_MS = 33;
+// Нет новых пакетов дольше — плавно возвращаем шарик в центр
+const GMETER_IDLE_MS = 250;
+// Постоянная времени возврата (не зависит от частоты кадров)
+const GMETER_RETURN_MS = 200;
 const gmeterTrail = {
     lat: new Float64Array(GMETER_TRAIL_SIZE),
     lon: new Float64Array(GMETER_TRAIL_SIZE),
@@ -328,6 +332,8 @@ const gmeterCache = { width: 100, ballSize: 0.2 };
 let _trailDirty = false;
 let _trailLastAppendMs = 0;
 let _trailLastDrawMs = 0;
+let _gmeterLastDataMs = 0;
+let _gmeterIdleLastMs = 0;
 // Флаг: девайс уже возвращал ненулевое значение хотя бы по одной оси
 // Пока false — все оси геймпада считаем спящими (возвращаем null → 0% на индикаторах)
 let _deviceAwake = false;
@@ -362,7 +368,7 @@ const DEFAULT_CONFIG = {
     hideWheel: false, hideThrottle: false, hideBrake: false,
     hideClutch: false, hideHandbrake: false, hideGear: false,
     hideGmeter: false, hideGraphs: false, hideBg: false, hideTvdResults: false,
-    showTvdResults: false, tvdResultsSeconds: 60,
+    showTvdResults: false, tvdResultsSeconds: 20,
     multiWidgetMode: false,
     multiWidgetSlots: [],
     multiWidgetActiveSlot: 0
