@@ -1027,7 +1027,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            await Task.Delay(5000);
+            await Task.Delay(3000);
             var info = await UpdateService.CheckAsync();
             if (info == null) return;
             new UpdateDialog(info, this).ShowDialog();
