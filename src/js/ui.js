@@ -1682,7 +1682,7 @@ function updateUIFromConfig() {
 
     if (DOM.tvdResultsSlider && DOM.tvdResultsValue) {
         var tvdSec = currentConfig.tvdResultsSeconds ?? 20;
-        DOM.tvdResultsValue.value = String(tvdSec);
+        DOM.tvdResultsValue.value = tvdSecondsText(tvdSec);
         DOM.tvdResultsSlider.value = tvdSec;
     }
 
@@ -1943,6 +1943,10 @@ function tvdWidgetWidth() {
     return el ? el.getBoundingClientRect().width / scale : 0;
 }
 
+function tvdSecondsText(sec) {
+    return sec + (t('tvd.secondsUnit') || ' с');
+}
+
 function updateTvdToggleAvailability() {
     var btn = DOM.toggleTvdResults;
     if (!btn) return;
@@ -1968,7 +1972,7 @@ function isTvdActive() {
     if (TVD_DEMO) return !!currentConfig.showTvdResults;
     if (!currentConfig.showTvdResults) return false;
     if (typeof isVisible === 'function' && !isVisible('tr')) return false;
-    var seconds = Number(currentConfig.tvdResultsSeconds) || 20;
+    var seconds = Math.max(10, Math.min(120, Number(currentConfig.tvdResultsSeconds) || 20));
     return (performance.now() - _tvdReceivedAt) < seconds * 1000;
 }
 

@@ -1,8 +1,11 @@
 using System;
+using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Res = MiniRacingHUD.Properties.Resources;
@@ -21,6 +24,7 @@ public partial class UpdateDialog : Window
     private readonly Button _secondaryBtn;
     private readonly Brush _secondaryBrush;
     private readonly Brush _redBrush;
+    private readonly Brush _accentBrush;
 
     private CancellationTokenSource? _cts;
     private string? _workDir;
@@ -43,6 +47,7 @@ public partial class UpdateDialog : Window
         var textPrimary = TryFindResource("TextPrimaryBrush") as Brush ?? Brushes.Gainsboro;
         var inputBg = TryFindResource("InputBgBrush") as Brush ?? Brushes.Black;
         var accentBrush = TryFindResource("AccentBrush") as Brush ?? Brushes.LimeGreen;
+        _accentBrush = accentBrush;
         var borderBrush = TryFindResource("BorderBrush") as Brush ?? Brushes.DimGray;
         _secondaryBrush = TryFindResource("TextSecondaryBrush") as Brush ?? Brushes.Gray;
         _redBrush = TryFindResource("RedBrush") as Brush ?? Brushes.IndianRed;
@@ -64,14 +69,7 @@ public partial class UpdateDialog : Window
             Margin = new Thickness(18, 4, 18, 0),
         };
 
-        var notesText = new TextBlock
-        {
-            Text = info.Notes,
-            TextWrapping = TextWrapping.Wrap,
-            FontSize = 12,
-            Foreground = textPrimary,
-            Margin = new Thickness(10, 7, 10, 7),
-        };
+        var notesText = BuildNotesContent(info.Notes, textPrimary);
 
         _notes = new Border
         {
@@ -150,6 +148,147 @@ public partial class UpdateDialog : Window
         shell.contentArea.Content = content;
 
         Closed += (_, _) => _cts?.Cancel();
+    }
+
+    // Подмножество Markdown из описаний релизов: заголовки, списки, **жирный**,
+    // *курсив*, `код`, ссылки и разделители. Таблицы и картинки не поддерживаются.
+    private FrameworkElement BuildNotesContent(string notes, Brush foreground)
+    {
+        var panel = new StackPanel { Margin = new Thickness(10, 7, 10, 7) };
+
+        foreach (var rawLine in notes.Replace("\r\n", "\n").Split('\n'))
+        {
+            var line = rawLine.TrimEnd();
+            if (line.Length == 0)
+            {
+                panel.Children.Add(new Border { Height = 6 });
+                continue;
+            }
+            if (line.Trim() == "---")
+            {
+                panel.Children.Add(new Border
+                {
+                    Height = 1,
+                    Background = _secondaryBrush,
+                    Margin = new Thickness(0, 6, 0, 6),
+                });
+                continue;
+            }
+
+            var headingLevel = 0;
+            while (headingLevel < line.Length && line[headingLevel] == '#') headingLevel++;
+            if (headingLevel is > 0 and <= 6 && headingLevel < line.Length && line[headingLevel] == ' ')
+            {
+                panel.Children.Add(CreateNotesLine(line[(headingLevel + 1)..].Trim(), foreground, heading: true));
+                continue;
+            }
+
+            var isBullet = line.StartsWith("- ") || line.StartsWith("* ") || line.StartsWith("+ ");
+            panel.Children.Add(CreateNotesLine(isBullet ? line[2..] : line, foreground, bullet: isBullet));
+        }
+
+        return panel;
+    }
+
+    private TextBlock CreateNotesLine(string text, Brush foreground, bool heading = false, bool bullet = false)
+    {
+        var block = new TextBlock
+        {
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = heading ? 13 : 12,
+            FontWeight = heading ? FontWeights.Bold : FontWeights.Normal,
+            Foreground = foreground,
+            Margin = new Thickness(bullet ? 12 : 0, heading ? 6 : 0, 0, heading ? 2 : 1),
+        };
+        if (bullet) block.Inlines.Add(new Run("•  "));
+        AddInlineMarkup(block, text);
+        return block;
+    }
+
+    private void AddInlineMarkup(TextBlock block, string text)
+    {
+        var plain = new StringBuilder();
+        void Flush()
+        {
+            if (plain.Length == 0) return;
+            block.Inlines.Add(new Run(plain.ToString()));
+            plain.Clear();
+        }
+
+        var i = 0;
+        while (i < text.Length)
+        {
+            var c = text[i];
+
+            if (c == '`')
+            {
+                var end = text.IndexOf('`', i + 1);
+                if (end > i + 1)
+                {
+                    Flush();
+                    block.Inlines.Add(new Run(text[(i + 1)..end]) { FontFamily = new FontFamily("Consolas") });
+                    i = end + 1;
+                    continue;
+                }
+            }
+            else if (c == '[')
+            {
+                var close = text.IndexOf(']', i + 1);
+                if (close > i + 1 && close + 1 < text.Length && text[close + 1] == '(')
+                {
+                    var paren = text.IndexOf(')', close + 2);
+                    if (paren > close + 2)
+                    {
+                        var url = text[(close + 2)..paren];
+                        if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
+                            (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
+                        {
+                            Flush();
+                            var link = new Hyperlink(new Run(text[(i + 1)..close]))
+                            {
+                                Foreground = _accentBrush,
+                                Cursor = Cursors.Hand,
+                            };
+                            link.RequestNavigate += (_, e) =>
+                            {
+                                try { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); }
+                                catch { }
+                            };
+                            block.Inlines.Add(link);
+                            i = paren + 1;
+                            continue;
+                        }
+                    }
+                }
+            }
+            else if (c == '*' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                var end = text.IndexOf("**", i + 2, StringComparison.Ordinal);
+                if (end > i + 2)
+                {
+                    Flush();
+                    block.Inlines.Add(new Run(text[(i + 2)..end]) { FontWeight = FontWeights.Bold });
+                    i = end + 2;
+                    continue;
+                }
+            }
+            else if (c == '*')
+            {
+                var end = text.IndexOf('*', i + 1);
+                if (end > i + 1)
+                {
+                    Flush();
+                    block.Inlines.Add(new Run(text[(i + 1)..end]) { FontStyle = FontStyles.Italic });
+                    i = end + 1;
+                    continue;
+                }
+            }
+
+            plain.Append(c);
+            i++;
+        }
+
+        Flush();
     }
 
     private async Task PrimaryClickAsync()

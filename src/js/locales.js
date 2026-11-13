@@ -55,12 +55,13 @@ const LOCALES = {
         'toggle.graphsOnly': 'Только графики',
         'tooltip.noRounding': 'Отключить динамическое скругление по форме элементов',
         'toggle.noRounding': 'Не скруглять',
-        'tvd.section': 'Результаты TVD',
-        'toggle.tvdResults': 'Итог СУ',
-        'tooltip.tvdResults': 'Показывать итог СУ из лаунчера TVD Rally',
-        'toggle.tvdPreview': 'Превью',
+        'tvd.sectionHtml': 'Чемпионаты <a href="https://tvdrally.online/" class="setting-title-link" target="_blank" title="https://tvdrally.online/">TVD</a>',
+        'toggle.tvdResults': 'Результаты СУ',
+        'tooltip.tvdResults': 'Показывать результаты СУ из лаунчера TVD Rally',
+        'toggle.tvdPreview': 'Предпросмотр',
         'tooltip.tvdPreview': 'Показать таблицу с тестовыми данными',
-        'tooltip.tvdDuration': 'Сколько секунд держать результат на экране',
+        'tooltip.tvdDuration': 'Время показа таблицы',
+        'tvd.secondsUnit': ' с',
         'mw.tvdResults': 'Итог СУ',
         'tvd.finish': 'ФИНИШ',
         'tvd.stage': 'СУ',
@@ -279,12 +280,13 @@ const LOCALES = {
         'toggle.graphsOnly': 'Graphs only',
         'tooltip.noRounding': 'Disable dynamic rounding based on element shape',
         'toggle.noRounding': 'No rounding',
-        'tvd.section': 'TVD results',
-        'toggle.tvdResults': 'Stage result',
+        'tvd.sectionHtml': '<a href="https://tvdrally.online/" class="setting-title-link" target="_blank" title="https://tvdrally.online/">TVD</a> championships',
+        'toggle.tvdResults': 'Stage results',
         'tooltip.tvdResults': 'Show stage results from the TVD Rally launcher',
         'toggle.tvdPreview': 'Preview',
         'tooltip.tvdPreview': 'Show the table with sample data',
-        'tooltip.tvdDuration': 'How many seconds to keep the result on screen',
+        'tooltip.tvdDuration': 'Table display time',
+        'tvd.secondsUnit': ' s',
         'mw.tvdResults': 'Stage result',
         'tvd.finish': 'FINISH',
         'tvd.stage': 'SS',
@@ -495,6 +497,11 @@ function applyLocale() {
         const key = el.getAttribute('data-i18n-placeholder');
         el.setAttribute('placeholder', t(key));
     });
+    // Единица измерения в поле длительности TVD зависит от языка
+    const tvdValue = document.getElementById('tvdResultsValue');
+    if (tvdValue && typeof currentConfig !== 'undefined' && typeof tvdSecondsText === 'function') {
+        tvdValue.value = tvdSecondsText(Number(currentConfig.tvdResultsSeconds) || 20);
+    }
     // Re-initialize dynamic help elements after innerHTML replacement
     if (typeof enableCopyOnCodes === 'function') {
         enableCopyOnCodes('.hud-info');

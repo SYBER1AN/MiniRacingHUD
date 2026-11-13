@@ -566,8 +566,8 @@ DOM.toggleTvdResults?.addEventListener('click', () => {
 
 DOM.tvdResultsSlider?.addEventListener('input', () => {
     var sec = parseInt(DOM.tvdResultsSlider.value, 10) || 20;
-    sec = Math.max(10, Math.min(300, sec));
-    DOM.tvdResultsValue.value = String(sec);
+    sec = Math.max(10, Math.min(120, sec));
+    DOM.tvdResultsValue.value = tvdSecondsText(sec);
     currentConfig.tvdResultsSeconds = sec;
     updateTvdResults();
     sendConfigUpdateDebounced();
@@ -575,8 +575,8 @@ DOM.tvdResultsSlider?.addEventListener('input', () => {
 
 DOM.tvdResultsValue?.addEventListener('change', () => {
     var sec = parseInt(DOM.tvdResultsValue.value, 10) || 20;
-    sec = Math.max(10, Math.min(300, sec));
-    DOM.tvdResultsValue.value = String(sec);
+    sec = Math.max(10, Math.min(120, sec));
+    DOM.tvdResultsValue.value = tvdSecondsText(sec);
     DOM.tvdResultsSlider.value = sec;
     currentConfig.tvdResultsSeconds = sec;
     updateTvdResults();
@@ -1952,7 +1952,7 @@ function parseExternalConfig(config) {
     if (config.showTvdResults !== undefined) currentConfig.showTvdResults = config.showTvdResults === true;
     if (config.tvdResultsSeconds !== undefined) {
         var tvdSec = parseInt(config.tvdResultsSeconds, 10);
-        currentConfig.tvdResultsSeconds = isNaN(tvdSec) ? 20 : Math.max(10, Math.min(300, tvdSec));
+        currentConfig.tvdResultsSeconds = isNaN(tvdSec) ? 20 : Math.max(10, Math.min(120, tvdSec));
     }
 
     // hideXxx — глобальное скрытие элементов (OFF-режим мультивиджета)

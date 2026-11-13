@@ -316,29 +316,30 @@
                             </div>
                             <!-- РЕЗУЛЬТАТЫ TVD -->
                             <div class="tvd-settings-block">
-                                <div class="setting-title"><a href="https://tvdrally.online/" class="setting-title-link"
-                                        target="_blank" title="https://tvdrally.online/" data-i18n="tvd.section">Результаты TVD</a></div>
+                                <div class="setting-title" data-i18n-html="tvd.sectionHtml">Чемпионаты <a
+                                        href="https://tvdrally.online/" class="setting-title-link" target="_blank"
+                                        title="https://tvdrally.online/">TVD</a></div>
                                 <div class="other-settings">
                                     <div class="other-settings-col">
                                         <div class="widget-toggle-row">
                                             <button class="widget-toggle" id="toggleTvdResults"
-                                                title="Показывать итог СУ из лаунчера TVD Rally" data-i18n-attr="title" data-i18n-title="tooltip.tvdResults"></button>
-                                            <span class="widget-toggle-label" data-i18n="toggle.tvdResults">Итог СУ</span>
+                                                title="Показывать результаты СУ из лаунчера TVD Rally" data-i18n-attr="title" data-i18n-title="tooltip.tvdResults"></button>
+                                            <span class="widget-toggle-label" data-i18n="toggle.tvdResults">Результаты СУ</span>
                                         </div>
                                     </div>
                                     <div class="other-settings-col">
                                         <div class="widget-toggle-row">
                                             <button class="widget-toggle" id="toggleTvdPreview"
                                                 title="Показать таблицу с тестовыми данными" data-i18n-attr="title" data-i18n-title="tooltip.tvdPreview"></button>
-                                            <span class="widget-toggle-label" data-i18n="toggle.tvdPreview">Превью</span>
+                                            <span class="widget-toggle-label" data-i18n="toggle.tvdPreview">Предпросмотр</span>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="steering-angle-row" title="Сколько секунд держать результат на экране" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
-                                    <input type="range" class="steering-slider" id="tvdResultsSlider" min="10" max="300" value="20" step="5"
-                                        title="Сколько секунд держать результат" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
-                                    <input type="text" class="steering-input" id="tvdResultsValue" value="20"
-                                        title="Сколько секунд держать результат" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                <div class="steering-angle-row" title="Время показа таблицы" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                    <input type="range" class="steering-slider" id="tvdResultsSlider" min="10" max="120" value="20" step="10"
+                                        title="Время показа таблицы" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
+                                    <input type="text" class="steering-input" id="tvdResultsValue" value="20 с"
+                                        title="Время показа таблицы" data-i18n-attr="title" data-i18n-title="tooltip.tvdDuration">
                                 </div>
                             </div>
                             <!-- UDP-телеметрия -->

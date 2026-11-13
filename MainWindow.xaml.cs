@@ -117,6 +117,7 @@ public partial class MainWindow : Window
 
 #if DEBUG
         colorEditorBtn.Visibility = Visibility.Visible;
+        updatePreviewBtn.Visibility = Visibility.Visible;
 #endif
 
         trayToggle.IsChecked = _appConfig.MinimizeToTray;
@@ -326,6 +327,28 @@ public partial class MainWindow : Window
                 _colorEditorWindow?.Refresh(_colorOverrides, parsed);
         }
         catch { }
+    }
+
+    // Только для отладки: окно обновления с демо-описанием, без реальной загрузки
+    private void OpenUpdatePreview_Click(object sender, RoutedEventArgs e)
+    {
+        var sample = new UpdateInfo
+        {
+            Version = "1.0.1.999",
+            Notes =
+                "v1.0.1.999\n" +
+                "**Результаты TVD**\n" +
+                "- Время показа таблицы по умолчанию 20 секунд, диапазон настройки 10–120 с.\n" +
+                "- В поле длительности отображается единица измерения — секунды\n" +
+                "- Изменён раздел «Чемпионаты TVD» и ссылка «TVD» выделена акцентным цветом\n\n" +
+                "v1.0.1.998\n" +
+                "**Окно обновления**\n" +
+                "- Разметка: **жирный**, *курсив*, `код`, [ссылка](https://tvdrally.online/)\n" +
+                "- Списки и заголовки\n\n" +
+                "v1.0.1.997\n" +
+                "- Обычный текст без разметки\n",
+        };
+        new UpdateDialog(sample, this).ShowDialog();
     }
 
     private async void OpenColorEditor_Click(object sender, RoutedEventArgs e)

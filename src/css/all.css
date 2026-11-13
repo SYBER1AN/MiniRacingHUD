@@ -933,12 +933,12 @@
         }
 
         .setting-title-link {
-            color: inherit;
+            color: var(--accent);
             text-decoration: none;
         }
 
         .setting-title-link:hover {
-            color: color-mix(in oklab, var(--panel-cont), white 10%);
+            color: color-mix(in oklab, var(--accent), white 10%);
             text-decoration: underline;
         }
 
