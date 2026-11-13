@@ -22,6 +22,8 @@
 - Для ручника добавлена поддержка клавиатуры (глобальный хук в app-режиме)
 - Индикаторы передач с режимами H/L (ETS2/ATS) и автоподстройкой под КПП
 - Система пресетов и мультипресетов (несколько отдельных виджетов в одном пресете)
+- Таблица итога СУ из лаунчера TVD Rally (https://tvdrally.online/): результаты этапа, своя позиция и отставание
+- Автообновление: проверка новой версии при запуске, показ изменений и установка с перезапуском
 - Поддержка тем, в том числе кастомных + встроенный редактор тем
 - Русский и английский язык интерфейса
 - Русский, английский и китайский язык виджета
@@ -53,6 +55,8 @@ p.s.: Если вы не видите панель настройки, увел�
 <udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
 ```
 - Изменить порт в приложении на 20778
+
+**TVD Rally** — если запущен лаунчер TVD Rally, поддерживается своя кастомная таблица результатов.
 
 **BeamNG.drive** — базовая телеметрия (педали, руль, КПП, ручник) доступна без мода.
 Для правильной работы индикатора передач (P, R, N, D, S1, M1...) и G-meter:
@@ -96,6 +100,8 @@ Minimalistic fully customizable HUD for simracing streams.
 - Assignable keyboard keys for handbrake (global hook in app mode)
 - Gear indicator with H/L modes (ETS2/ATS) and auto layouts
 - Presets and multi-presets (multiple widget layouts in one preset)
+- Stage-results table from the TVD Rally launcher (https://tvdrally.online/): stage results, your position and gap
+- Auto-update: checks for a new version at startup, shows the changes and installs with a restart
 - Theme system with custom themes + built-in theme editor
 - Interface language: Russian, English
 - Widget language: Russian, English, Chinese
@@ -125,6 +131,8 @@ and add this line inside the `motion_platform` block:
 ```
 <udp extradata="3" ip="127.0.0.1" delay="1" port="20778" enabled="true" />
 ```
+
+**TVD Rally** — if the TVD Rally launcher is running, its own custom results table is supported.
 
 **BeamNG.drive** — basic telemetry (pedals, steering, gear, handbrake) works without a mod.
 For gear indicator (P, R, N, D, S1, M1...) and G-meter:

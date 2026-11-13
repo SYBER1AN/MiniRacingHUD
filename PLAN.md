@@ -1,6 +1,8 @@
 # План оптимизации производительности телеметрии
 
-## Текущая ситуация
+> **Статус: выполнен** (коммит `e50b533` «Плавность телеметрии: рассылка по пакетам и rAF-цикл»). Все пять пунктов реализованы в `Telemetry/Providers/`; файл оставлен как запись о причине изменений.
+
+## Исходная ситуация
 
 `ReadReduced()` вызывается каждые 16 мс (~62.5 FPS) из `UdpBroadcastTickCore`.
 
@@ -14,7 +16,7 @@
 
 ## План работ
 
-### 1. SCS — кэш словаря в reduced-пути
+### 1. ✅ SCS — кэш словаря в reduced-пути
 
 Файл: `Telemetry/Providers/ScsTelemetryProvider.cs`
 
@@ -22,21 +24,21 @@
 - В `DoRead(bool reduced)`: при `reduced == true` не создавать `new Dictionary(11)`, а `_reducedCache.Clear()` и перезаполнить
 - При `reduced == false` — `new Dictionary(50)` (full-путь, вызывается раз в 33 мс)
 
-### 2. SCS — переиспользовать byte[64] в ReadString
+### 2. ✅ SCS — переиспользовать byte[64] в ReadString
 
 Файл: `Telemetry/Providers/ScsTelemetryProvider.cs`
 
 - Вынести `byte[64]` в `private readonly byte[] _stringBuf = new byte[64];`
 - `ReadString(long offset)` — читать в `_stringBuf` вместо `new byte[64]`
 
-### 3. SCS — кэш ComputeGearName
+### 3. ✅ SCS — кэш ComputeGearName
 
 Файл: `Telemetry/Providers/ScsTelemetryProvider.cs`
 
 - Добавить поля `_lastGearInput` и `_lastGearName` (int, int, bool, bool, int, int, string → можно tuple или просто сравнение)
 - Если все входные параметры совпадают — вернуть `_lastGearName` без вызова `DetectAll()`
 
-### 4. AC Rally — разделить DoRead на reduced/full
+### 4. ✅ AC Rally — разделить DoRead на reduced/full
 
 Файл: `Telemetry/Providers/AcRallyTelemetryProvider.cs`
 
@@ -45,7 +47,7 @@
 - При `reduced == true` — только 11 полей (как у SCS), + `_reducedCache`
 - Reducer можно составить из полей: gameId, gear, speed, engineRate, steeringInput, throttleInput, brakeInput, clutchInput, handbrake, gearName
 
-### 5. AC Rally — кэш словаря reduced-пути
+### 5. ✅ AC Rally — кэш словаря reduced-пути
 
 Файл: `Telemetry/Providers/AcRallyTelemetryProvider.cs`
 
