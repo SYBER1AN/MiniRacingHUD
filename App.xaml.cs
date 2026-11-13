@@ -15,7 +15,7 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        HandleRestartAfterUpdate(e.Args);
+        var afterUpdate = HandleRestartAfterUpdate(e.Args);
 
         _mutex = new Mutex(true, "MiniRacingHUD", out bool createdNew);
 
@@ -33,6 +33,9 @@ public partial class App : Application
         }
 
         base.OnStartup(e);
+
+        // Уборка ~230 МБ временных файлов не должна задерживать показ окна
+        if (afterUpdate) _ = Task.Run(UpdateService.CleanupAfterRestart);
 
         // Устанавливаем язык ДО создания MainWindow, чтобы LocExtension получил правильную культуру
         try
@@ -76,8 +79,8 @@ public partial class App : Application
         base.OnExit(e);
     }
 
-    // Новый экземпляр после обновления ждёт выхода старого, затем убирает его файлы
-    private static void HandleRestartAfterUpdate(string[] args)
+    // Новый экземпляр после обновления ждёт выхода старого, чтобы забрать мьютекс
+    private static bool HandleRestartAfterUpdate(string[] args)
     {
         for (var i = 0; i + 1 < args.Length; i++)
         {
@@ -90,10 +93,9 @@ public partial class App : Application
                 process.WaitForExit(10000);
             }
             catch { }
-
-            UpdateService.CleanupAfterRestart();
-            break;
+            return true;
         }
+        return false;
     }
 }
 

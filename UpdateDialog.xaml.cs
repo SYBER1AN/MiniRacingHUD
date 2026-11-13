@@ -249,9 +249,19 @@ public partial class UpdateDialog : Window
         _applying = false;
         if (ok)
         {
-            Close();
-            if (Owner is Window owner) owner.Close();
-            else Application.Current.Shutdown();
+            // Файлы заменены и новая копия запущена: окна убираем сразу,
+            // штатное завершение (сохранение настроек, WebView2) идёт уже скрыто
+            if (Owner is Window owner)
+            {
+                owner.Hide();
+                Close();
+                owner.Close();
+            }
+            else
+            {
+                Close();
+                Application.Current.Shutdown();
+            }
             return;
         }
 

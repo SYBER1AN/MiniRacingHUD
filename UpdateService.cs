@@ -293,7 +293,8 @@ public static class UpdateService
                 WorkingDirectory = appDir
             });
 
-            TryDeleteDir(workDir);
+            // Временную папку убирает уже новая копия при старте — здесь удаление
+            // ~230 МБ задерживает закрытие окон на несколько секунд
             return true;
         }
         catch (Exception ex)
