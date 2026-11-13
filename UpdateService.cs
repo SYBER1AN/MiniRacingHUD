@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -76,43 +77,68 @@ public static class UpdateService
 
         try
         {
-            var url = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases/latest";
+            if (!Version.TryParse(CurrentVersion, out var current)) return null;
+
+            var url = $"https://api.github.com/repos/{RepoOwner}/{RepoName}/releases?per_page=30";
             using var response = await Http.GetAsync(url, ct);
             if (!response.IsSuccessStatusCode) return null;
 
             var json = await response.Content.ReadAsStringAsync(ct);
             using var doc = JsonDocument.Parse(json);
-            var root = doc.RootElement;
+            if (doc.RootElement.ValueKind != JsonValueKind.Array) return null;
 
-            if (!root.TryGetProperty("tag_name", out var tagEl)) return null;
-            var tag = tagEl.GetString() ?? "";
-            var remoteText = tag.TrimStart('v', 'V');
-            if (!Version.TryParse(remoteText, out var remote)) return null;
-            if (!Version.TryParse(CurrentVersion, out var current)) return null;
-            if (!IsNewer(remote, current)) return null;
-
-            if (!root.TryGetProperty("assets", out var assets)) return null;
-
-            string? downloadUrl = null;
-            long size = 0;
-            foreach (var asset in assets.EnumerateArray())
+            var releases = new List<ReleaseEntry>();
+            foreach (var release in doc.RootElement.EnumerateArray())
             {
-                var name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
-                if (!string.Equals(name, AssetName, StringComparison.OrdinalIgnoreCase)) continue;
-                downloadUrl = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
-                if (asset.TryGetProperty("size", out var s) && s.TryGetInt64(out var parsed)) size = parsed;
-                break;
+                if (IsTrue(release, "draft") || IsTrue(release, "prerelease")) continue;
+
+                var tag = release.TryGetProperty("tag_name", out var tagEl) ? tagEl.GetString() ?? "" : "";
+                var versionText = tag.TrimStart('v', 'V');
+                if (!Version.TryParse(versionText, out var version)) continue;
+                if (!IsNewer(version, current)) continue;
+
+                string? downloadUrl = null;
+                long size = 0;
+                if (release.TryGetProperty("assets", out var assets))
+                {
+                    foreach (var asset in assets.EnumerateArray())
+                    {
+                        var name = asset.TryGetProperty("name", out var n) ? n.GetString() : null;
+                        if (!string.Equals(name, AssetName, StringComparison.OrdinalIgnoreCase)) continue;
+                        downloadUrl = asset.TryGetProperty("browser_download_url", out var u) ? u.GetString() : null;
+                        if (asset.TryGetProperty("size", out var s) && s.TryGetInt64(out var parsed)) size = parsed;
+                        break;
+                    }
+                }
+
+                var body = release.TryGetProperty("body", out var bodyEl) ? bodyEl.GetString() ?? "" : "";
+                releases.Add(new ReleaseEntry(versionText, Normalize(version), body.Trim(), downloadUrl, size));
             }
 
-            if (string.IsNullOrEmpty(downloadUrl)) return null;
+            // Устанавливаемся на самый новый релиз, у которого есть архив
+            var target = releases
+                .Where(r => !string.IsNullOrEmpty(r.DownloadUrl))
+                .OrderByDescending(r => r.Version)
+                .FirstOrDefault();
+            if (target == null) return null;
 
-            var notes = root.TryGetProperty("body", out var bodyEl) ? bodyEl.GetString() ?? "" : "";
+            // Заметки — по всем версиям между текущей и целевой, от новой к старой
+            var notes = new StringBuilder();
+            foreach (var release in releases
+                         .Where(r => r.Version <= target.Version)
+                         .OrderByDescending(r => r.Version))
+            {
+                if (notes.Length > 0) notes.Append("\n\n");
+                notes.Append('v').Append(release.VersionText);
+                if (release.Body.Length > 0) notes.Append('\n').Append(release.Body);
+            }
+
             return new UpdateInfo
             {
-                Version = remoteText,
-                Notes = notes.Trim(),
-                DownloadUrl = downloadUrl,
-                Size = size
+                Version = target.VersionText,
+                Notes = notes.ToString().Trim(),
+                DownloadUrl = target.DownloadUrl!,
+                Size = target.Size
             };
         }
         catch
@@ -120,6 +146,11 @@ public static class UpdateService
             return null;
         }
     }
+
+    private sealed record ReleaseEntry(string VersionText, Version Version, string Body, string? DownloadUrl, long Size);
+
+    private static bool IsTrue(JsonElement element, string property) =>
+        element.TryGetProperty(property, out var value) && value.ValueKind == JsonValueKind.True;
 
     private static bool IsNewer(Version remote, Version current)
     {
